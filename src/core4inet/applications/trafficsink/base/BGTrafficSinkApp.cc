@@ -18,6 +18,9 @@
 //CoRE4INET
 #include "core4inet/buffer/base/BGBuffer.h"
 
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/packet/Packet.h"
+
 namespace CoRE4INET {
 
 Define_Module(BGTrafficSinkApp);
@@ -40,27 +43,29 @@ void BGTrafficSinkApp::initialize()
 
 void BGTrafficSinkApp::handleMessage(cMessage *msg)
 {
-    if (inet::EtherFrame *frame = dynamic_cast<inet::EtherFrame*>(msg))
+    auto packet = check_and_cast<inet::Packet*>(msg);
+    auto protocol = packet->getTag<inet::PacketProtocolTag>()->getProtocol();
+    if (protocol == &inet::Protocol::ethernetMac)
     {
+        auto frame = packet->popAtFront<inet::EthernetMacHeader>();
         if (address.isUnspecified() || frame->getSrc() == address)
         {
             if((!received && par("replyFirst").boolValue()) || par("reply").boolValue()){
-                inet::EtherFrame *reply = new inet::EthernetIIFrame("Reply",7);
-                reply->setDest(frame->getSrc());
-                cPacket* payload = new cPacket("Reply");
+                auto replyPacket = new inet::Packet("Reply");
+                auto replyHdr = inet::makeShared<inet::EthernetMacHeader>();
+                replyHdr->setDest(frame->getSrc());
+
                 //Payloadsize:
-                if(frame->hasEncapsulatedPacket()){
-                    payload->setByteLength(frame->getEncapsulatedPacket()->getByteLength());
-                }
-                else{
-                    payload->setByteLength(frame->getByteLength()-ETHER_MAC_FRAME_BYTES);
-                }
-                reply->encapsulate(payload);
+                int payloadSize = frame->getTypeOrLength();
+                if (!inet::isIeee8023Length(payloadSize))
+                    payloadSize = packet->getByteLength();
+                replyPacket->insertAtFront(packet->peekDataAt(inet::b(0), inet::B(payloadSize)));
+                replyPacket->insertAtFront(replyHdr);
                 for (std::list<BGBuffer*>::const_iterator buf = bgbuffers.begin();
                             buf != bgbuffers.end(); ++buf) {
-                    sendDirect(reply->dup(), (*buf)->gate("in"));
+                    sendDirect(replyPacket->dup(), (*buf)->gate("in"));
                 }
-                delete reply;
+                delete replyPacket;
             }
             received++;
             TrafficSinkApp::handleMessage(msg);
