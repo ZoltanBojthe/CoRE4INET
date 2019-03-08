@@ -21,6 +21,10 @@
 
 #include "core4inet/base/Dependencies.h"
 
+namespace CoRE4INET {
+using namespace omnetpp;
+}
+
 /**
  * Definition of CORE4INET version
  */
