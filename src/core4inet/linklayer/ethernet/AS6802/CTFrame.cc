@@ -21,7 +21,7 @@ Register_Class(CTFrame);
 
 unsigned short CTFrame::getCtID() const
 {
-    inet::MACAddress mac = getDest();
+    inet::MacAddress mac = getDest();
     uint16_t CtID = 0;
     CtID = static_cast<uint16_t>(mac.getAddressByte(4) << 8);
     CtID = static_cast<uint16_t>(CtID | static_cast<uint16_t>(mac.getAddressByte(5)));
@@ -30,7 +30,7 @@ unsigned short CTFrame::getCtID() const
 
 void CTFrame::setCtID(uint16_t ctID)
 {
-    inet::MACAddress mac = getDest();
+    inet::MacAddress mac = getDest();
     mac.setAddressByte(4, static_cast<unsigned char>(ctID >> 8));
     mac.setAddressByte(5, static_cast<unsigned char>(ctID));
     setDest(mac);
@@ -38,7 +38,7 @@ void CTFrame::setCtID(uint16_t ctID)
 
 unsigned int CTFrame::getCtMarker() const
 {
-    inet::MACAddress mac = getDest();
+    inet::MacAddress mac = getDest();
     uint32_t CtMarker = 0;
     CtMarker = static_cast<uint32_t>(mac.getAddressByte(0) << 24);
     CtMarker = CtMarker | static_cast<uint32_t>(mac.getAddressByte(1) << 16);
@@ -49,7 +49,7 @@ unsigned int CTFrame::getCtMarker() const
 
 void CTFrame::setCtMarker(uint32_t ctMarker)
 {
-    inet::MACAddress mac = getDest();
+    inet::MacAddress mac = getDest();
     mac.setAddressByte(0, static_cast<unsigned char>(ctMarker >> 24));
     mac.setAddressByte(1, static_cast<unsigned char>(ctMarker >> 16));
     mac.setAddressByte(2, static_cast<unsigned char>(ctMarker >> 8));

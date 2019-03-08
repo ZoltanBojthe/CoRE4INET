@@ -16,7 +16,7 @@
 #ifndef CORE4INET_AVBDEFS_H_
 #define CORE4INET_AVBDEFS_H_
 
-#include "inet/linklayer/ethernet/EtherMAC.h"
+#include "inet/linklayer/ethernet/EtherMac.h"
 
 namespace CoRE4INET {
 
@@ -32,7 +32,7 @@ static std::map<SR_CLASS, const char*> SR_CLASStoString = {{SR_CLASS::A,"A"},{SR
 #define MSRP_ETHERTYPE 0x22EA
 
 //Destination Multicast MAC for SRP Protocol (01:80:C2:00:00:0E)
-const inet::MACAddress SRP_ADDRESS = inet::MACAddress("01:80:C2:00:00:0E");
+const inet::MacAddress SRP_ADDRESS = inet::MacAddress("01:80:C2:00:00:0E");
 
 //Service class A interval is 125us
 #define SR_CLASS_A_INTERVAL "0.000125s"

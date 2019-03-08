@@ -220,8 +220,8 @@ void AVBShaper<SRCLASS, TC>::initialize(int stage)
         int portIndex = cModule::getParentModule()->getIndex();
         avbBuffer = dynamic_cast<AVBBuffer*>(cModule::getParentModule()->getParentModule()->getSubmodule(
                 avbBufferName.c_str(), portIndex));
-        if (inet::EtherMACFullDuplex* mac =
-                dynamic_cast<inet::EtherMACFullDuplex*>(TC::gate("out")->getPathEndGate()->getOwner()))
+        if (inet::EtherMacFullDuplex* mac =
+                dynamic_cast<inet::EtherMacFullDuplex*>(TC::gate("out")->getPathEndGate()->getOwner()))
         {
             if (!mac->isSubscribed("transmitState", this))
             {
@@ -358,14 +358,14 @@ void AVBShaper<SRCLASS, TC>::receiveSignal(cComponent *source, simsignal_t signa
 {
     if (strncmp(TC::getSignalName(signalID), "transmitState", 14) == 0)
     {
-        inet::EtherMACBase::MACTransmitState macTransmitState = static_cast<inet::EtherMACBase::MACTransmitState>(l);
-        if (state == BLOCKED_STATE && macTransmitState == inet::EtherMACBase::MACTransmitState::TRANSMITTING_STATE)
+        inet::EtherMacBase::MacTransmitState macTransmitState = static_cast<inet::EtherMacBase::MacTransmitState>(l);
+        if (state == BLOCKED_STATE && macTransmitState == inet::EtherMacBase::MacTransmitState::TRANSMITTING_STATE)
         {
             state = TRANSMITTING_STATE;
         }
         else if (state == TRANSMITTING_STATE
-                && (macTransmitState == inet::EtherMACBase::MACTransmitState::TX_IDLE_STATE
-                        || macTransmitState == inet::EtherMACBase::MACTransmitState::WAIT_IFG_STATE))
+                && (macTransmitState == inet::EtherMacBase::MacTransmitState::TX_IDLE_STATE
+                        || macTransmitState == inet::EtherMacBase::MacTransmitState::WAIT_IFG_STATE))
         {
             state = IDLE_STATE;
         }

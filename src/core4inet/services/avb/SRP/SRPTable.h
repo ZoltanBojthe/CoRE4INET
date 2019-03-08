@@ -24,7 +24,7 @@
 #include "core4inet/base/avb/AVBDefs.h"
 
 //INET
-#include "inet/linklayer/common/MACAddress.h"
+#include "inet/linklayer/common/MacAddress.h"
 
 //Auto-generated Messages
 #include "core4inet/base/avb/AVBDefs_m.h"
@@ -49,7 +49,7 @@ class SRPTable : public virtual cSimpleModule
             public:
                 uint64_t streamId;          // Stream ID
                 SR_CLASS srClass;           // Stream Reservation Class
-                inet::MACAddress address;   // The talkers address
+                inet::MacAddress address;   // The talkers address
                 cModule *module;            // Input port or module
                 size_t framesize;           // Frame size in byte
                 uint16_t intervalFrames;    // interval frames
@@ -57,7 +57,7 @@ class SRPTable : public virtual cSimpleModule
                 simtime_t insertionTime;    // Arrival time of SRP entry
 
                 TalkerEntry();
-                TalkerEntry(uint64_t new_streamId, SR_CLASS new_srClass, inet::MACAddress new_address,
+                TalkerEntry(uint64_t new_streamId, SR_CLASS new_srClass, inet::MacAddress new_address,
                         cModule *new_module, size_t new_framesize, unsigned short new_intervalFrames,
                         unsigned short new_vlan_id, simtime_t new_insertionTime);
                 virtual ~TalkerEntry();
@@ -135,7 +135,7 @@ class SRPTable : public virtual cSimpleModule
          * @param vid VLAN ID
          * @return streamId related to talkerAddress
          */
-        virtual uint64_t getStreamIdForTalkerAddress(const inet::MACAddress &talkerAddress, uint16_t vid =
+        virtual uint64_t getStreamIdForTalkerAddress(const inet::MacAddress &talkerAddress, uint16_t vid =
                 VLAN_ID_DEFAULT);
 
         /**
@@ -145,7 +145,7 @@ class SRPTable : public virtual cSimpleModule
          * @param vid VLAN ID
          * @return SR-Class related to the Stream of the talkerAddress
          */
-        virtual SR_CLASS getSrClassForTalkerAddress(const inet::MACAddress &talkerAddress, uint16_t vid =
+        virtual SR_CLASS getSrClassForTalkerAddress(const inet::MacAddress &talkerAddress, uint16_t vid =
                 VLAN_ID_DEFAULT);
 
         /**
@@ -164,7 +164,7 @@ class SRPTable : public virtual cSimpleModule
          * @param vid VLAN ID
          * @return listeners for the stream
          */
-        virtual std::list<cModule*> getListenersForTalkerAddress(const inet::MACAddress &talkerAddress, uint16_t vid =
+        virtual std::list<cModule*> getListenersForTalkerAddress(const inet::MacAddress &talkerAddress, uint16_t vid =
                 VLAN_ID_DEFAULT);
 
         /**
@@ -206,7 +206,7 @@ class SRPTable : public virtual cSimpleModule
          * @brief Register a new streamId at talkerTable.
          * @return True if refreshed. False if it is new.
          */
-        virtual bool updateTalkerWithStreamId(uint64_t streamId, cModule *module, const inet::MACAddress address,
+        virtual bool updateTalkerWithStreamId(uint64_t streamId, cModule *module, const inet::MacAddress address,
                 SR_CLASS srClass = SR_CLASS::A, size_t framesize = 0, uint16_t intervalFrames = 0, uint16_t vid =
                         VLAN_ID_DEFAULT);
 
@@ -214,7 +214,7 @@ class SRPTable : public virtual cSimpleModule
          * @brief Unregister a streamId at talkerTable.
          * @return True if removed. False if not registered.
          */
-        virtual bool removeTalkerWithStreamId(uint64_t streamId, cModule *module, const inet::MACAddress address,
+        virtual bool removeTalkerWithStreamId(uint64_t streamId, cModule *module, const inet::MacAddress address,
                 uint16_t vid = VLAN_ID_DEFAULT);
 
         /**

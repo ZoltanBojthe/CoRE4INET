@@ -22,7 +22,7 @@
 #include "core4inet/utilities/classes/Timed.h"
 #include "core4inet/base/avb/AVBDefs.h"
 //INET
-#include "inet/linklayer/common/MACAddress.h"
+#include "inet/linklayer/common/MacAddress.h"
 
 namespace CoRE4INET {
 
@@ -47,7 +47,7 @@ class AVBTrafficSourceApp : public virtual TrafficSourceAppBase, public virtual 
         uint16_t intervalFrames;
         uint16_t vlan_id;
         cModule *avbOutCTC;
-        inet::MACAddress multicastMAC;
+        inet::MacAddress multicastMAC;
     public:
         AVBTrafficSourceApp();
 

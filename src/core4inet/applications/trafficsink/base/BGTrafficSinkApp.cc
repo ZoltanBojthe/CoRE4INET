@@ -33,9 +33,9 @@ void BGTrafficSinkApp::initialize()
     if (par("srcAddress").stdstringValue() == "auto")
     {
         // change module parameter from "auto" to concrete address
-        par("srcAddress").setStringValue(inet::MACAddress::UNSPECIFIED_ADDRESS.str());
+        par("srcAddress").setStringValue(inet::MacAddress::UNSPECIFIED_ADDRESS.str());
     }
-    address = inet::MACAddress(par("srcAddress").stringValue());
+    address = inet::MacAddress(par("srcAddress").stringValue());
 }
 
 void BGTrafficSinkApp::handleMessage(cMessage *msg)

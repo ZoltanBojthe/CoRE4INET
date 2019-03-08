@@ -17,7 +17,7 @@
 #include "inet/common/ModuleAccess.h"
 
 //INET
-#include "inet/linklayer/ethernet/EtherMACFullDuplex.h"
+#include "inet/linklayer/ethernet/EtherMacFullDuplex.h"
 
 //Std
 #include <algorithm>
@@ -28,8 +28,8 @@ void BaseShaper::initialize(int stage)
 {
     if (stage == 0)
     {
-        inet::EtherMACFullDuplex* mac =
-                dynamic_cast<inet::EtherMACFullDuplex*>(gate("out")->getPathEndGate()->getOwner());
+        inet::EtherMacFullDuplex* mac =
+                dynamic_cast<inet::EtherMacFullDuplex*>(gate("out")->getPathEndGate()->getOwner());
         if (mac->gate("phys$o"))
         {
             cGate *physOutGate = mac->gate("phys$o");
@@ -37,7 +37,7 @@ void BaseShaper::initialize(int stage)
         }
         else
         {
-            throw cRuntimeError("A shaper can only be used attached to an EtherMACFullDuplex");
+            throw cRuntimeError("A shaper can only be used attached to an EtherMacFullDuplex");
         }
         WATCH(framesRequested);
     }

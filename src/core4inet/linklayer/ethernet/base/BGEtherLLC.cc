@@ -28,11 +28,11 @@ void BGEtherLLC::handleMessage(cMessage *msg)
     else if (msg->arrivedOn("lowerLayerIn"))
     {
         send(msg->dup(), gate("bgOut"));
-        EtherLLC::handleMessage(msg);
+        EtherLlc::handleMessage(msg);
     }
     else
     {
-        EtherLLC::handleMessage(msg);
+        EtherLlc::handleMessage(msg);
     }
 }
 

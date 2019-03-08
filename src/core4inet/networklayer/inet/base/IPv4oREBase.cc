@@ -40,7 +40,7 @@ namespace CoRE4INET {
 
 IPv4oREBase::IPv4oREBase()
 {
-    this->m_protocolEnum = cEnum::get("inet::IPProtocolId");
+    this->m_protocolEnum = cEnum::get("inet::IpProtocolId");
 }
 
 //==============================================================================
@@ -59,11 +59,11 @@ IPv4oREBase::~IPv4oREBase()
 void IPv4oREBase::addFilter(IPoREFilter *filter)
 {
     TrafficPattern *tp = filter->getTrafficPattern();
-    if (!tp->getSrcAddr().isUnspecified() && (((tp->getSrcAddr().getType()==inet::L3Address::IPv6) && tp->getSrcPrefixLength() > 128) ||
-                                            ((tp->getSrcAddr().getType()!=inet::L3Address::IPv6) && tp->getSrcPrefixLength() > 32)))
+    if (!tp->getSrcAddr().isUnspecified() && (((tp->getSrcAddr().getType()==inet::L3Address::Ipv6) && tp->getSrcPrefixLength() > 128) ||
+                                            ((tp->getSrcAddr().getType()!=inet::L3Address::Ipv6) && tp->getSrcPrefixLength() > 32)))
         throw cRuntimeError("srcPrefixLength is invalid");
-    if (!tp->getDestAddr().isUnspecified() && (((tp->getDestAddr().getType()==inet::L3Address::IPv6) && tp->getDestPrefixLength() > 128) ||
-                                             ((tp->getDestAddr().getType()!=inet::L3Address::IPv6) && tp->getDestPrefixLength() > 32)))
+    if (!tp->getDestAddr().isUnspecified() && (((tp->getDestAddr().getType()==inet::L3Address::Ipv6) && tp->getDestPrefixLength() > 128) ||
+                                             ((tp->getDestAddr().getType()!=inet::L3Address::Ipv6) && tp->getDestPrefixLength() > 32)))
         throw cRuntimeError("srcPrefixLength is invalid");
     if (tp->getProtocol() != -1 && (tp->getProtocol() < 0 || tp->getProtocol() > 0xff))
         throw cRuntimeError("protocol is not a valid protocol number");
@@ -133,7 +133,7 @@ int IPv4oREBase::parseProtocol(const char *attrValue, const char *attrName)
         return -1;
     if (isdigit(*attrValue))
         return parseIntAttribute(attrValue, attrName);
-    m_protocolEnum = cEnum::get("inet::IPProtocolId");
+    m_protocolEnum = cEnum::get("inet::IpProtocolId");
     char protoName[20];
     strcpy(protoName, "IP_PROT_");
     char *dest;

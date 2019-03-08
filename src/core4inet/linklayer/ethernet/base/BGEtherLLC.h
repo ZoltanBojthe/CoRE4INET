@@ -17,18 +17,18 @@
 #define CORE4INET_BGETHERLLC_H
 
 //INET
-#include "inet/linklayer/ethernet/EtherLLC.h"
+#include "inet/linklayer/ethernet/EtherLlc.h"
 
 namespace CoRE4INET {
 
 /**
  * @brief This module forwards frames to the bg buffers
  *
- * @sa EtherLLC
+ * @sa EtherLlc
  *
  * @author Till Steinbach
  */
-class BGEtherLLC : public virtual inet::EtherLLC
+class BGEtherLLC : public virtual inet::EtherLlc
 {
   protected:
     /**

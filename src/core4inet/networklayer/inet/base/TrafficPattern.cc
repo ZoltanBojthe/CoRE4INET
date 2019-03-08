@@ -14,8 +14,8 @@
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/ipv4/IPv4Datagram.h"
 #include "inet/transportlayer/udp/UDPPacket.h"
-#include "inet/transportlayer/tcp_common/TCPSegment.h"
-#include "inet/transportlayer/sctp/SCTPMessage.h"
+#include "inet/transportlayer/tcp_common/TcpHeader.h"
+#include "inet/transportlayer/sctp/SctpMessage.h"
 
 //==============================================================================
 
@@ -44,11 +44,11 @@ bool TrafficPattern::matches(const cPacket *packet)
         return false;
 
     if (srcPrefixLength > 0
-            && ((srcAddr.getType() == inet::L3Address::IPv6)
+            && ((srcAddr.getType() == inet::L3Address::Ipv6)
                     || !datagram->getSrcAddress().prefixMatches(srcAddr.toIPv4(), srcPrefixLength)))
         return false;
     if (destPrefixLength > 0
-            && ((destAddr.getType() == inet::L3Address::IPv6)
+            && ((destAddr.getType() == inet::L3Address::Ipv6)
                     || !datagram->getDestAddress().prefixMatches(destAddr.toIPv4(), destPrefixLength)))
         return false;
     if (protocol >= 0 && datagram->getTransportProtocol() != protocol)
@@ -65,13 +65,13 @@ bool TrafficPattern::matches(const cPacket *packet)
             srcPort = static_cast<int>(udpPacket->getSourcePort());
             destPort = static_cast<int>(udpPacket->getDestinationPort());
         }
-        const inet::tcp::TCPSegment *tcpSegment = dynamic_cast<const inet::tcp::TCPSegment*>(encPacket);
+        const inet::tcp::TcpHeader *tcpSegment = dynamic_cast<const inet::tcp::TcpHeader*>(encPacket);
         if (tcpSegment)
         {
             srcPort = tcpSegment->getSrcPort();
             destPort = tcpSegment->getDestPort();
         }
-        const inet::sctp::SCTPMessage *sctpPacket = dynamic_cast<const inet::sctp::SCTPMessage*>(encPacket);
+        const inet::sctp::SctpMessage *sctpPacket = dynamic_cast<const inet::sctp::SctpMessage*>(encPacket);
         if (sctpPacket)
         {
             srcPort = static_cast<int>(sctpPacket->getSrcPort());

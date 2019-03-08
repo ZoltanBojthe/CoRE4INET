@@ -25,7 +25,7 @@
 #include "core4inet/base/IPoRE/IPoREDefs_m.h"
 
 #include "inet/common/ModuleAccess.h"
-#include "inet/networklayer/ipv4/IPv4.h"
+#include "inet/networklayer/ipv4/Ipv4.h"
 
 namespace CoRE4INET {
 

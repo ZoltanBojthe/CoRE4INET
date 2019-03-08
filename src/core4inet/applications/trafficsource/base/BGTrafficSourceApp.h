@@ -20,7 +20,7 @@
 #include "core4inet/applications/trafficsource/base/TrafficSourceAppBase.h"
 
 //INET
-#include "inet/linklayer/common/MACAddress.h"
+#include "inet/linklayer/common/MacAddress.h"
 
 namespace CoRE4INET {
 
@@ -48,7 +48,7 @@ class BGTrafficSourceApp : public virtual TrafficSourceAppBase
         /**
          * @brief caches destAddress parameter
          */
-        inet::MACAddress destAddress;
+        inet::MacAddress destAddress;
 
     public:
         /**
@@ -91,7 +91,7 @@ class BGTrafficSourceApp : public virtual TrafficSourceAppBase
          *         */
         virtual void handleParameterChange(const char* parname) override;
 
-        inet::MACAddress getDestAddress();
+        inet::MacAddress getDestAddress();
 };
 
 } //namespace

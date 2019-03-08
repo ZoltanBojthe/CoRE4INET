@@ -22,7 +22,7 @@
 #include "core4inet/base/avb/AVBDefs_m.h"
 
 //INET
-#include "inet/linklayer/common/MACAddress.h"
+#include "inet/linklayer/common/MacAddress.h"
 
 
 namespace CoRE4INET {
@@ -36,9 +36,9 @@ public:
 
 
 public:
-    inet::MACAddress* getDestMac() const { return destMAC; }
+    inet::MacAddress* getDestMac() const { return destMAC; }
 
-    void setDestMac(inet::MACAddress* destMac) { destMAC = destMac; }
+    void setDestMac(inet::MacAddress* destMac) { destMAC = destMac; }
 
     AVBIncoming* getDestModule() const { return destModule; }
 
@@ -66,7 +66,7 @@ public:
 
 private:
     AVBIncoming *destModule;
-    inet::MACAddress  *destMAC;
+    inet::MacAddress  *destMAC;
     uint64_t    streamId;
     SR_CLASS    srClass;
     uint32_t    frameSize;

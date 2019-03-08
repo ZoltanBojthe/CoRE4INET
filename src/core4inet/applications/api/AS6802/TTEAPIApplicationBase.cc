@@ -23,7 +23,7 @@
 
 //INET
 #include "inet/common/ModuleAccess.h"
-#include "inet/linklayer/ethernet/EtherMACFullDuplex.h"
+#include "inet/linklayer/ethernet/EtherMacFullDuplex.h"
 
 //Auto-generated
 #include "core4inet/api/AS6802/APIPayload_m.h"
@@ -253,8 +253,8 @@ int32_t TTEAPIApplicationBase::tte_get_var(__attribute__((unused))          cons
             {
                 for (int i = 0; i < phy->getVectorSize(); i++)
                 {
-                    inet::EtherMACFullDuplex* mac =
-                            dynamic_cast<inet::EtherMACFullDuplex*>(getParentModule()->getSubmodule("phy", i)->getSubmodule(
+                    inet::EtherMacFullDuplex* mac =
+                            dynamic_cast<inet::EtherMacFullDuplex*>(getParentModule()->getSubmodule("phy", i)->getSubmodule(
                                     "mac"));
                     if (mac->gate("phys")->isConnected())
                         *static_cast<uint8_t*>(value) = static_cast<uint8_t>(*static_cast<uint8_t*>(value)
@@ -322,8 +322,8 @@ int32_t TTEAPIApplicationBase::tte_get_var(__attribute__((unused))          cons
             cModule *phy = getParentModule()->getSubmodule("phy", 0);
             if (phy)
             {
-                inet::EtherMACFullDuplex *mac = dynamic_cast<inet::EtherMACFullDuplex*>(phy->getSubmodule("mac"));
-                inet::MACAddress macAddress = mac->getMACAddress();
+                inet::EtherMacFullDuplex *mac = dynamic_cast<inet::EtherMacFullDuplex*>(phy->getSubmodule("mac"));
+                inet::MacAddress macAddress = mac->getMACAddress();
                 //Change order
                 valueArr[5] = macAddress.getAddressByte(0);
                 valueArr[4] = macAddress.getAddressByte(1);
@@ -366,7 +366,7 @@ int32_t TTEAPIApplicationBase::tte_open_output_buf(tte_buffer_t * const buf, tte
     }
     priv->frame->setByteLength(ETHER_MAC_FRAME_BYTES);
 
-    inet::MACAddress dest;
+    inet::MacAddress dest;
     dest.setAddressByte(5, frame->eth_hdr.dst_mac[0]);
     dest.setAddressByte(4, frame->eth_hdr.dst_mac[1]);
     dest.setAddressByte(3, frame->eth_hdr.dst_mac[2]);
@@ -374,7 +374,7 @@ int32_t TTEAPIApplicationBase::tte_open_output_buf(tte_buffer_t * const buf, tte
     dest.setAddressByte(1, frame->eth_hdr.dst_mac[4]);
     dest.setAddressByte(0, frame->eth_hdr.dst_mac[5]);
     priv->frame->setDest(dest);
-    inet::MACAddress src;
+    inet::MacAddress src;
     src.setAddressByte(5, frame->eth_hdr.src_mac[0]);
     src.setAddressByte(4, frame->eth_hdr.src_mac[1]);
     src.setAddressByte(3, frame->eth_hdr.src_mac[2]);
@@ -411,14 +411,14 @@ int32_t TTEAPIApplicationBase::tte_open_input_buf(tte_buffer_t * const buf, tte_
     frame->length = static_cast<uint16_t>(payload->getByteLength());
     frame->data = static_cast<uint8_t*>(malloc(static_cast<size_t>(payload->getByteLength())));
     priv->data = frame->data;
-    inet::MACAddress dest = msg->getDest();
+    inet::MacAddress dest = msg->getDest();
     frame->eth_hdr.dst_mac[0] = dest.getAddressByte(5);
     frame->eth_hdr.dst_mac[1] = dest.getAddressByte(4);
     frame->eth_hdr.dst_mac[2] = dest.getAddressByte(3);
     frame->eth_hdr.dst_mac[3] = dest.getAddressByte(2);
     frame->eth_hdr.dst_mac[4] = dest.getAddressByte(1);
     frame->eth_hdr.dst_mac[5] = dest.getAddressByte(0);
-    inet::MACAddress src = msg->getSrc();
+    inet::MacAddress src = msg->getSrc();
     frame->eth_hdr.src_mac[0] = src.getAddressByte(5);
     frame->eth_hdr.src_mac[1] = src.getAddressByte(4);
     frame->eth_hdr.src_mac[2] = src.getAddressByte(3);

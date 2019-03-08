@@ -24,7 +24,7 @@
 //INET
 #include "inet/linklayer/ethernet/Ethernet.h"
 #include "inet/common/ModuleAccess.h"
-#include "inet/linklayer/ethernet/EtherMACFullDuplex.h"
+#include "inet/linklayer/ethernet/EtherMacFullDuplex.h"
 //Auto-generated Messages
 #include "core4inet/linklayer/ethernet/avb/AVBFrame_m.h"
 

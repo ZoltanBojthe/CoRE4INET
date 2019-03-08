@@ -56,7 +56,7 @@ void SRPEtherLLC::dispatchSRP(SRPFrame * srp)
     ExtendedIeee802Ctrl * controlInfo = dynamic_cast<ExtendedIeee802Ctrl *>(srp->removeControlInfo());
     int portNum = controlInfo->getSwitchPort();
     int notPortNum = controlInfo->getNotSwitchPort();
-    inet::MACAddress address = controlInfo->getDest();
+    inet::MacAddress address = controlInfo->getDest();
 
     if (portNum >= 1)
         throw cRuntimeError("Output port %d doesn't exist!", portNum);

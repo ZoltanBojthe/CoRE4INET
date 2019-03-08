@@ -285,7 +285,7 @@ void IPv4oAVB<base>::configureFilters(cXMLElement *config)
                     throw cRuntimeError("destModule: %s is not a AVBIncoming!", destModule);
                 }
                 if (destMAC)
-                    avbDestInfo->setDestMac(new inet::MACAddress(destMAC));
+                    avbDestInfo->setDestMac(new inet::MacAddress(destMAC));
                 else
                     throw cRuntimeError("destMAC not specified!");
                 avbDestInfo->setStreamId(static_cast<uint64_t>(base::parseIntAttribute(streamId, "streamId", false)));
@@ -310,13 +310,13 @@ void IPv4oAVB<base>::configureFilters(cXMLElement *config)
                 if (srcPrefixLengthAttr)
                     tp->setSrcPrefixLength(base::parseIntAttribute(srcPrefixLengthAttr, "srcPrefixLength"));
                 else if (srcAddrAttr)
-                    tp->setSrcPrefixLength(tp->getSrcAddr().getType()==inet::L3Address::IPv6 ? 128 : 32);
+                    tp->setSrcPrefixLength(tp->getSrcAddr().getType()==inet::L3Address::Ipv6 ? 128 : 32);
                 if (destAddrAttr)
                     tp->setDestAddr(addressResolver.resolve(destAddrAttr));
                 if (destPrefixLengthAttr)
                     tp->setDestPrefixLength(base::parseIntAttribute(destPrefixLengthAttr, "destPrefixLength"));
                 else if (destAddrAttr)
-                    tp->setDestPrefixLength(tp->getDestAddr().getType()==inet::L3Address::IPv6 ? 128 : 32);
+                    tp->setDestPrefixLength(tp->getDestAddr().getType()==inet::L3Address::Ipv6 ? 128 : 32);
                 if (protocolAttr)
                     tp->setProtocol(base::parseProtocol(protocolAttr, "protocol"));
                 if (tosAttr)

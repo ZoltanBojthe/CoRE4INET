@@ -22,11 +22,11 @@
 #include "core4inet/base/IPoRE/IPoREDefs_m.h"
 
 #include "inet/common/ModuleAccess.h"
-#include "inet/networklayer/ipv4/IPv4.h"
+#include "inet/networklayer/ipv4/Ipv4.h"
 
 namespace CoRE4INET {
 
-class IPv4oREBase : public inet::IPv4 {
+class IPv4oREBase : public inet::Ipv4 {
 
     public:
         IPv4oREBase();
@@ -58,7 +58,7 @@ class IPv4oREBase : public inet::IPv4 {
 
         /**
         * Parses an IP protocol number.
-        * Recognizes the names defined in IPProtocolId.msg (e.g. "UDP", "udp", "Tcp"),
+        * Recognizes the names defined in IpProtocolId.msg (e.g. "Udp", "udp", "Tcp"),
         * and accepts decimal/octal/hex/binary numbers.
         */
         int parseProtocol(const char *attrValue, const char *attrName);

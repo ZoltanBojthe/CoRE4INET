@@ -16,7 +16,7 @@
 #include "core4inet/buffer/avb/AVBBuffer.h"
 
 //INET
-#include "inet/linklayer/ethernet/EtherMACBase.h"
+#include "inet/linklayer/ethernet/EtherMacBase.h"
 //CoRE4INET
 #include "core4inet/utilities/ModuleAccess.h"
 
@@ -50,8 +50,8 @@ void AVBBuffer::receiveSignal(cComponent *source, simsignal_t signalID, long l, 
 {
     (void) source;
     (void) signalID;
-    inet::EtherMACBase::MACTransmitState macTransmitState = static_cast<inet::EtherMACBase::MACTransmitState>(l);
-    if (macTransmitState == inet::EtherMACBase::MACTransmitState::TX_IDLE_STATE)
+    inet::EtherMacBase::MacTransmitState macTransmitState = static_cast<inet::EtherMacBase::MacTransmitState>(l);
+    if (macTransmitState == inet::EtherMacBase::MacTransmitState::TX_IDLE_STATE)
     {
         refresh();
         if (credit < 0)

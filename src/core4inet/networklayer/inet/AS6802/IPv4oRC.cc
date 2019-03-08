@@ -154,13 +154,13 @@ void IPv4oRC<Base>::configureFilters(cXMLElement *config)
                 if (srcPrefixLengthAttr)
                     tp->setSrcPrefixLength(Base::parseIntAttribute(srcPrefixLengthAttr, "srcPrefixLength"));
                 else if (srcAddrAttr)
-                    tp->setSrcPrefixLength(tp->getSrcAddr().getType()==inet::L3Address::IPv6 ? 128 : 32);
+                    tp->setSrcPrefixLength(tp->getSrcAddr().getType()==inet::L3Address::Ipv6 ? 128 : 32);
                 if (destAddrAttr)
                     tp->setDestAddr(addressResolver.resolve(destAddrAttr));
                 if (destPrefixLengthAttr)
                     tp->setDestPrefixLength(Base::parseIntAttribute(destPrefixLengthAttr, "destPrefixLength"));
                 else if (destAddrAttr)
-                    tp->setDestPrefixLength(tp->getDestAddr().getType()==inet::L3Address::IPv6 ? 128 : 32);
+                    tp->setDestPrefixLength(tp->getDestAddr().getType()==inet::L3Address::Ipv6 ? 128 : 32);
                 if (protocolAttr)
                     tp->setProtocol(Base::parseProtocol(protocolAttr, "protocol"));
                 if (tosAttr)

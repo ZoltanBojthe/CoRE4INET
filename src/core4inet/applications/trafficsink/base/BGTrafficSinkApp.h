@@ -19,7 +19,7 @@
 //CoRE4INET
 #include "core4inet/applications/trafficsink/base/TrafficSinkApp.h"
 //INET
-#include "inet/linklayer/common/MACAddress.h"
+#include "inet/linklayer/common/MacAddress.h"
 
 namespace CoRE4INET {
 
@@ -35,7 +35,7 @@ namespace CoRE4INET {
 class BGTrafficSinkApp : public virtual TrafficSinkApp
 {
     private:
-        inet::MACAddress address;
+        inet::MacAddress address;
         unsigned int received;
     public:
         BGTrafficSinkApp();

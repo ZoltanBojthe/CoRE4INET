@@ -35,10 +35,10 @@
 
 #ifdef WITH_IPORE
 #ifndef WITH_IPv4
-#  error You must enable the IPv4 feature in INET framework
+#  error You must enable the Ipv4 feature in INET framework
 #endif
 #ifndef WITH_IPv6
-#  error You must enable the IPv6 feature in INET framework
+#  error You must enable the Ipv6 feature in INET framework
 #endif
 #ifndef WITH_TCP_COMMON
 #  error You must enable the TCP_COMMON feature in INET framework
@@ -47,10 +47,10 @@
 #  error You must enable the TCP_INET feature in INET framework
 #endif
 #ifndef WITH_UDP
-#  error You must enable the UDP feature in INET framework
+#  error You must enable the Udp feature in INET framework
 #endif
 #ifndef WITH_SCTP
-#  error You must enable the SCTP feature in INET framework
+#  error You must enable the Sctp feature in INET framework
 #endif
 #endif
 

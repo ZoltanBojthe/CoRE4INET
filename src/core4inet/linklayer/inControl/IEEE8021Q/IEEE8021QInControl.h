@@ -122,7 +122,7 @@ void IEEE8021QInControl<IC>::handleMessage(cMessage *msg)
             }
             else
             {
-                inet::MACAddress address;
+                inet::MacAddress address;
                 address.setAddress(frame->getArrivalGate()->getPathStartGate()->getOwnerModule()->par("address"));
                 if (frame->getDest().equals(address))
                 {

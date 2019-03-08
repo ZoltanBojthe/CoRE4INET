@@ -24,7 +24,7 @@
 #include "core4inet/linklayer/ethernet/AS6802/PCFrame_m.h"
 
 //INET
-#include "inet/linklayer/ethernet/EtherMACFullDuplex.h"
+#include "inet/linklayer/ethernet/EtherMacFullDuplex.h"
 
 //Std
 #include <unordered_map>
@@ -199,8 +199,8 @@ void RCShaper<TC>::initialize(int stage)
     {
         Timed::initialize();
 
-        /*inet::EtherMACFullDuplex* mac =
-         dynamic_cast<inet::EtherMACFullDuplex*>(gate("out")->getPathEndGate()->getOwner());
+        /*inet::EtherMacFullDuplex* mac =
+         dynamic_cast<inet::EtherMacFullDuplex*>(gate("out")->getPathEndGate()->getOwner());
          mac->subscribe("txPk", this);*/
 
         numRcPriority = static_cast<size_t>(par("numRCpriority"));

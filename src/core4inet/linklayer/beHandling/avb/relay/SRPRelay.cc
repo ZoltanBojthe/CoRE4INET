@@ -40,7 +40,7 @@ void SRPRelay::handleMessage(cMessage * msg)
 
     if (msg && !msg->isSelfMessage())
     {
-        // messages from STP process
+        // messages from Stp process
         if (msg->arrivedOn("srpIn"))
         {
             SRPFrame * srpFrame = check_and_cast<SRPFrame*>(msg);
@@ -74,7 +74,7 @@ void SRPRelay::dispatchSRP(SRPFrame * srp)
     }
     int portNum = controlInfo->getSwitchPort();
     int notPortNum = controlInfo->getNotSwitchPort();
-    inet::MACAddress address = controlInfo->getDest();
+    inet::MacAddress address = controlInfo->getDest();
 
     if (portNum >= static_cast<int>(portCount))
         throw cRuntimeError("Output port %d doesn't exist!", portNum);

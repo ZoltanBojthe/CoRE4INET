@@ -20,7 +20,7 @@
 #include "core4inet/applications/trafficsource/base/TrafficSourceAppBase.h"
 
 //INET
-#include "inet/linklayer/common/MACAddress.h"
+#include "inet/linklayer/common/MacAddress.h"
 
 namespace CoRE4INET {
 
@@ -43,7 +43,7 @@ class IEEE8021QTrafficSourceApp : public virtual TrafficSourceAppBase
         /**
          * @brief caches destAddress parameter
          */
-        inet::MACAddress destAddress;
+        inet::MacAddress destAddress;
 
         /**
          * @brief caches priority parameter

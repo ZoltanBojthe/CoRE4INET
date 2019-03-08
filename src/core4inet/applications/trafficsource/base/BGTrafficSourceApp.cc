@@ -97,7 +97,7 @@ void BGTrafficSourceApp::handleParameterChange(const char* parname)
         if (par("destAddress").stdstringValue() == "auto")
         {
             // assign automatic address
-            this->destAddress = inet::MACAddress::generateAutoAddress();
+            this->destAddress = inet::MacAddress::generateAutoAddress();
 
             // change module parameter from "auto" to concrete address
             par("destAddress").setStringValue(this->destAddress.str());
@@ -109,7 +109,7 @@ void BGTrafficSourceApp::handleParameterChange(const char* parname)
     }
 }
 
-inet::MACAddress BGTrafficSourceApp::getDestAddress()
+inet::MacAddress BGTrafficSourceApp::getDestAddress()
 {
     if (!parametersInitialized)
     {

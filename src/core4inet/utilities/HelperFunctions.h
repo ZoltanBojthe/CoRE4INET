@@ -115,7 +115,7 @@ uint64_t transparentClockToTicks(uint64_t transparentClock, simtime_t tick);
  *
  * @return unique multicast address
  */
-inet::MACAddress generateAutoMulticastAddress();
+inet::MacAddress generateAutoMulticastAddress();
 
 #ifdef WITH_AS6802_COMMON
 /**
