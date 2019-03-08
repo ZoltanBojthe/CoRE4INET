@@ -16,6 +16,8 @@
 #include "core4inet/applications/trafficsink/base/TrafficSinkApp.h"
 
 //INET Auto-Generated Messages
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/packet/Packet.h"
 #include "inet/linklayer/ethernet/EtherFrame_m.h"
 
 namespace CoRE4INET {
@@ -28,9 +30,12 @@ void TrafficSinkApp::handleMessage(cMessage *msg)
 {
     ApplicationBase::handleMessage(msg);
 
-    if (inet::EtherFrame *frame = dynamic_cast<inet::EtherFrame*>(msg))
+    if (auto *frame = dynamic_cast<inet::Packet*>(msg))
     {
-        emit(rxPkSignal, frame);
+        auto protocol = frame->getTag<inet::PacketProtocolTag>()->getProtocol();
+        if (protocol == &inet::Protocol::ethernetMac) {
+            emit(rxPkSignal, frame);
+        }
     }
     delete msg;
 }
