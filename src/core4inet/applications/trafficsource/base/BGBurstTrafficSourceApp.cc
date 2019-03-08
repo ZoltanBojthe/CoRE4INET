@@ -19,6 +19,11 @@
 #include "core4inet/buffer/base/BGBuffer.h"
 #include "core4inet/utilities/ConfigFunctions.h"
 
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/packet/Packet.h"
+#include "inet/common/packet/chunk/ByteCountChunk.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
+
 namespace CoRE4INET {
 
 Define_Module(BGBurstTrafficSourceApp);
@@ -38,30 +43,30 @@ void BGBurstTrafficSourceApp::sendMessage()
         unsigned long size_left = getBurstSize();
         while (size_left > 0)
         {
-            inet::EthernetIIFrame *frame = new inet::EthernetIIFrame("Best-Effort Traffic", 7); //kind 7 = black
+            auto *packet = new inet::Packet("Best-Effort Traffic", 7); //kind 7 = black
+            auto frame = inet::makeShared<inet::EthernetMacHeader>();
             size_t payloadBytes = getPayloadBytes();
 
             frame->setDest(this->getDestAddress());
 
-            cPacket *payload_packet = new cPacket();
+            inet::B curPayload;
             if (size_left >= payloadBytes)
             {
-                payload_packet->setByteLength(static_cast<int64_t>(payloadBytes));
+                curPayload = inet::B(payloadBytes);
                 size_left -= payloadBytes;
             }
             else
             {
-                payload_packet->setByteLength(static_cast<int64_t>(size_left));
+                curPayload = inet::B(size_left);
                 size_left = 0;
             }
-            frame->setByteLength(ETHER_MAC_FRAME_BYTES);
-            frame->encapsulate(payload_packet);
+            auto payload = inet::makeShared<inet::ByteCountChunk>(curPayload);
+            packet->insertAtFront(payload);
+            packet->insertAtFront(frame);
+
             //Padding
-            if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-            {
-                frame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
-            }
-            sendDirect(frame, (*buf)->gate("in"));
+            inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);
+            sendDirect(packet, (*buf)->gate("in"));
         }
     }
 
