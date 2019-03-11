@@ -17,7 +17,7 @@
 #define CORE4INET_BESHAPER_H
 
 //INET
-#include "inet/linklayer/ethernet/EtherFrame.h"
+#include "inet/common/packet/Packet.h"
 
 namespace CoRE4INET {
 
@@ -86,7 +86,8 @@ class BEShaper : public TC
          * @brief Forwards the messages from the different buffers and LLC
          * according to the specification for BEMessages.
          *
-         * Best-effort messages are send immediately, lower priority frames are queued
+         * Best-effort messages are send immediately, lower priority fra#include "inet/linklayer/ethernet/EtherFrame.h"
+         * mes are queued
          * as long as there are best-effort messages waiting.
          * If the mac layer is idle, messages are picked from the queues according
          * to the priorities, using the template class.
@@ -218,7 +219,7 @@ void BEShaper<TC>::enqueueMessage(cMessage *msg)
     {
         beQueue.insert(msg);
         cComponent::emit(beQueueLengthSignal, static_cast<unsigned long>(beQueue.getLength()));
-        beQueueSize+=static_cast<size_t>(check_and_cast<inet::EtherFrame*>(msg)->getByteLength());
+        beQueueSize+=static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
         cComponent::emit(beQueueSizeSignal, static_cast<unsigned long>(beQueueSize));
         TC::notifyListeners();
         EV_TRACE << "Interface not idle queuing BE frame" << endl;
@@ -253,7 +254,7 @@ cMessage* BEShaper<TC>::pop()
         cMessage* message = static_cast<cMessage*>(beQueue.pop());
         cComponent::emit(beQueueLengthSignal, static_cast<unsigned long>(beQueue.getLength()));
 
-        beQueueSize-=static_cast<size_t>(check_and_cast<inet::EtherFrame*>(message)->getByteLength());
+        beQueueSize-=static_cast<size_t>(check_and_cast<inet::Packet*>(message)->getByteLength());
         cComponent::emit(beQueueSizeSignal, static_cast<unsigned long>(beQueueSize));
         return message;
     }
