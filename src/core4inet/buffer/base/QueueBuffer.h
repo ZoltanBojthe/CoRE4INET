@@ -80,18 +80,18 @@ class QueueBuffer : public virtual Buffer
         void setFilled(size_t fillLevel);
     protected:
         /**
-         * @brief Inserts inet::EtherFrame in the Queue and emits the queue length.
+         * @brief Inserts inet::Packet in the Queue and emits the queue length.
          *
-         * @param newFrame a pointer to the inet::EtherFrame to insert in the queue.
+         * @param newFrame a pointer to the inet::Packet to insert in the queue.
          */
-        virtual void enqueue(inet::EtherFrame *newFrame) override;
+        virtual void enqueue(inet::Packet *newFrame) override;
 
         /**
-         * @brief Removes and returns an inet::EtherFrame from the Queue and emits the queue length.
+         * @brief Removes and returns an inet::Packet from the Queue and emits the queue length.
          *
-         * @return Aa pointer to the inet::EtherFrame removed from the queue.
+         * @return Aa pointer to the inet::Packet removed from the queue.
          */
-        virtual inet::EtherFrame* dequeue() override;
+        virtual inet::Packet* dequeue() override;
 
         /**
          * @brief Returns the used size of the buffer

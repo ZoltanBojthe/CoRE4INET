@@ -21,7 +21,7 @@
 //CoRE4INET
 #include "core4inet/base/CoRE4INET_Defs.h"
 //INET Auto-generated Messages
-#include "inet/linklayer/ethernet/EtherFrame_m.h"
+#include "inet/common/packet/Packet.h"
 
 namespace CoRE4INET {
 
@@ -37,10 +37,10 @@ class Callback;
  * or more virtual member functions to make it do useful work. These
  * functions are:
  *
- *    - void enqueue(inet::EtherFrame *newFrame)
- *    - inet::EtherFrame* dequeue()
+ *    - void enqueue(inet::Packet *newFrame)
+ *    - inet::Packet* dequeue()
  *
- * enqueue(inet::EtherFrame *newFrame) is called to queue a message in the buffer.
+ * enqueue(inet::Packet *newFrame) is called to queue a message in the buffer.
  * It must be implemented according to the correct buffer behaviour.
  *
  * dequeue() is called to get a frame from the buffer.
@@ -107,7 +107,7 @@ class Buffer : public virtual cSimpleModule
          *
          * When a frame is received on the in-Gate it is processed. If the destination
          * address is unspecified it is set according to the ct marker of the buffer.
-         * Afterwards it is enqueued using the buffer specific enqueue(inet::EtherFrame *newFrame)
+         * Afterwards it is enqueued using the buffer specific enqueue(inet::Packet *newFrame)
          * method. In the end all registered receive callbacks are executed.
          *
          * @param msg The incoming message
@@ -122,57 +122,57 @@ class Buffer : public virtual cSimpleModule
         virtual void handleParameterChange(const char* parname) override;
 
         /**
-         * @brief Is called to store an inet::EtherFrame in the buffer.
+         * @brief Is called to store an inet::Packet in the buffer.
          *
          * This method must be implemented according to the buffer strategy.
          *
-         * @param newFrame A pointer to the new inet::EtherFrame to be saved in the buffer
+         * @param newFrame A pointer to the new inet::Packet to be saved in the buffer
          */
-        virtual void enqueue(inet::EtherFrame *newFrame);
+        virtual void enqueue(inet::Packet *newFrame);
 
         /**
-         * @brief Is called to get an inet::EtherFrame from the buffer.
+         * @brief Is called to get an inet::Packet from the buffer.
          *
          * This method must be implemented according to the buffer strategy.
          *
-         * @return A pointer to the next EtherFrame from the buffer. Returns
-         * nullptr if there is no EtherFrame in the buffer
+         * @return A pointer to the next Packet from the buffer. Returns
+         * nullptr if there is no Packet in the buffer
          */
-        virtual inet::EtherFrame* dequeue();
+        virtual inet::Packet* dequeue();
 
         /**
          * @brief Emits a statistics signal that a frame was sent from the buffer
          *
          * @param frame the frame that was sent
          */
-        void recordPacketSent(inet::EtherFrame *frame);
+        void recordPacketSent(inet::Packet *frame);
 
         /**
          * @brief Emits a statistics signal that a frame was received in the buffer
          *
          * @param frame the frame that was received
          */
-        void recordPacketReceived(inet::EtherFrame *frame);
+        void recordPacketReceived(inet::Packet *frame);
 
     public:
         /**
          * @brief Wrapper function arround dequeue().
          *
-         * @return A pointer to the next EtherFrame from the buffer. Returns
-         * nullptr if there is no EtherFrame in the buffer
+         * @return A pointer to the next Packet from the buffer. Returns
+         * nullptr if there is no Packet in the buffer
          *
          * @sa dequeue();
          */
-        inet::EtherFrame* getFrame();
+        inet::Packet* getFrame();
 
         /**
          * @brief Wrapper function arround enqueue().
          *
-         * @param frame The inet::EtherFrame to put in the buffer.
+         * @param frame The inet::Packet to put in the buffer.
          *
          * @sa enqueue();
          */
-        void putFrame(inet::EtherFrame* frame);
+        void putFrame(inet::Packet* frame);
 
         /**
          * @brief Calculates the bandwidth this module requires for transmission.

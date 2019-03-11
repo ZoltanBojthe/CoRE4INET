@@ -38,7 +38,7 @@ void QueueBuffer::initializeStatistics()
     frames.setName("frames");
 }
 
-void QueueBuffer::enqueue(inet::EtherFrame *newFrame)
+void QueueBuffer::enqueue(inet::Packet *newFrame)
 {
     int max_size = par("size");
     if (max_size >= 0 && frames.getLength() >= max_size)
@@ -59,7 +59,7 @@ void QueueBuffer::enqueue(inet::EtherFrame *newFrame)
         }
         else
         {
-            inet::EtherFrame *popFrame = static_cast<inet::EtherFrame*>(frames.pop());
+            inet::Packet *popFrame = static_cast<inet::Packet*>(frames.pop());
             queueSize-=static_cast<size_t>(popFrame->getByteLength());
             delete popFrame;
         }
@@ -71,14 +71,14 @@ void QueueBuffer::enqueue(inet::EtherFrame *newFrame)
     emit(queueSizeSignal, static_cast<unsigned long>(queueSize));
 }
 
-inet::EtherFrame * QueueBuffer::dequeue()
+inet::Packet * QueueBuffer::dequeue()
 {
     if (frames.getLength() > 0)
     {
         setFilled(static_cast<size_t>(frames.getLength() - 1));
         emit(queueLengthSignal, static_cast<unsigned long>(frames.getLength() - 1));
 
-        inet::EtherFrame* dequeueFrame = static_cast<inet::EtherFrame*>(frames.pop());
+        inet::Packet* dequeueFrame = static_cast<inet::Packet*>(frames.pop());
 
         ASSERT2(queueSize>=static_cast<size_t>(dequeueFrame->getByteLength()),"queueSize would become negative");
         queueSize-=static_cast<size_t>(dequeueFrame->getByteLength());

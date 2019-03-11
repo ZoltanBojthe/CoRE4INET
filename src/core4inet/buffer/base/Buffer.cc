@@ -20,6 +20,8 @@
 #include "core4inet/utilities/ConfigFunctions.h"
 
 #include "inet/common/ModuleAccess.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
+#include "inet/linklayer/ethernet/Ethernet.h"
 
 //std
 #include <algorithm>
@@ -64,17 +66,17 @@ void Buffer::initialize(int stage)
     }
 }
 
-void Buffer::recordPacketSent(inet::EtherFrame *frame)
+void Buffer::recordPacketSent(inet::Packet *frame)
 {
     emit(txPkSignal, frame);
 }
 
-void Buffer::recordPacketReceived(inet::EtherFrame *frame)
+void Buffer::recordPacketReceived(inet::Packet *frame)
 {
     emit(rxPkSignal, frame);
 }
 
-inet::EtherFrame* Buffer::getFrame()
+inet::Packet* Buffer::getFrame()
 {
     if (par("enabled").boolValue())
     {
@@ -86,7 +88,7 @@ inet::EtherFrame* Buffer::getFrame()
     }
 }
 
-void Buffer::putFrame(inet::EtherFrame* frame)
+void Buffer::putFrame(inet::Packet* frame)
 {
     enqueue(frame);
 }
@@ -95,13 +97,14 @@ void Buffer::handleMessage(cMessage *msg)
 {
     if (msg && msg->arrivedOn("in"))
     {
-        if (inet::EtherFrame *frame = dynamic_cast<inet::EtherFrame *>(msg))
+        if (inet::Packet *frame = dynamic_cast<inet::Packet *>(msg))
         {
             recordPacketReceived(frame);
 
-            if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+            if (frame->getDataLength() < inet::MIN_ETHERNET_FRAME_BYTES)
             {
-                frame->setByteLength(MIN_ETHERNET_FRAME_BYTES);  // "padding"
+                auto oldFcs = frame->removeAtBack<inet::EthernetFcs>(inet::B(4));
+                inet::EtherEncap::addPaddingAndFcs(frame, oldFcs->getFcsMode(), inet::MIN_ETHERNET_FRAME_BYTES);
             }
             if (static_cast<size_t>(frame->getByteLength()) <= maxMessageSize)
             {
@@ -114,7 +117,7 @@ void Buffer::handleMessage(cMessage *msg)
         }
         else
         {
-            throw cRuntimeError("received Message on gate in that is no EtherFrame");
+            throw cRuntimeError("received Message on gate in that is no Packet");
         }
     }
 }
@@ -138,7 +141,7 @@ void Buffer::handleParameterChange(const char* parname)
     if (!parname || !strcmp(parname, "maxMessageSize"))
     {
         this->maxMessageSize = parameterULongCheckRange(par("maxMessageSize"),
-        MIN_ETHERNET_FRAME_BYTES, MAX_ETHER_8021Q_FRAME_BYTES);
+                inet::MIN_ETHERNET_FRAME_BYTES.get(), MAX_ETHER_8021Q_FRAME_BYTES.get());
     }
     if (!parname || !strcmp(parname, "destination_gates"))
     {
@@ -175,12 +178,12 @@ void Buffer::handleParameterChange(const char* parname)
 #  pragma GCC diagnostic ignored "-Wsuggest-attribute=noreturn"
 #endif
 
-void Buffer::enqueue(__attribute__((unused)) inet::EtherFrame *newFrame)
+void Buffer::enqueue(__attribute__((unused)) inet::Packet *newFrame)
 {
     throw cRuntimeError("Buffer::enqueue not implemented");
 }
 
-inet::EtherFrame * Buffer::dequeue()
+inet::Packet * Buffer::dequeue()
 {
     throw cRuntimeError("Buffer::dequeue not implemented");
 }

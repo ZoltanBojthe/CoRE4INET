@@ -27,7 +27,7 @@ DoubleBuffer::~DoubleBuffer()
     delete frame;
 }
 
-void DoubleBuffer::enqueue(inet::EtherFrame *newFrame)
+void DoubleBuffer::enqueue(inet::Packet *newFrame)
 {
     if (frame != nullptr)
         delete frame;
@@ -45,7 +45,7 @@ void DoubleBuffer::enqueue(inet::EtherFrame *newFrame)
     frame = newFrame;
 }
 
-inet::EtherFrame * DoubleBuffer::dequeue()
+inet::Packet * DoubleBuffer::dequeue()
 {
     if (frame)
         return frame->dup();
