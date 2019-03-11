@@ -22,7 +22,7 @@
 #include "core4inet/utilities/ConfigFunctions.h"
 
 //INET Auto-Generated Messages
-#include "inet/linklayer/ethernet/EtherFrame_m.h"
+#include "inet/common/packet/Packet.h"
 
 namespace CoRE4INET {
 
@@ -120,7 +120,7 @@ void AVBTrafficSinkApp::handleMessage(cMessage *msg)
     else
     {
         //Received an EtherFrame so the source seems to be active
-        if (getEnvir()->isGUI() && dynamic_cast<inet::EtherFrame*>(msg))
+        if (getEnvir()->isGUI() && dynamic_cast<inet::Packet*>(msg))
         {
             getDisplayString().setTagArg("i2", 0, "status/active");
         }
