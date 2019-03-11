@@ -23,9 +23,9 @@ static omnetpp::cNEDValue ned_sec_to_tick(omnetpp::cComponent *context, omnetpp:
     double seconds = argv[0].doubleValueInUnit("s");
     if (argc <= 1)
     {
-        cModule* module = CoRE4INET::findModuleWhereverInNode("scheduler", context->getParentModule());
+        omnetpp::cModule* module = CoRE4INET::findModuleWhereverInNode("scheduler", context->getParentModule());
         if (!module)
-            throw cRuntimeError("ned_sec_to_tick(): cannot determine tick length, you should specify it!");
+            throw omnetpp::cRuntimeError("ned_sec_to_tick(): cannot determine tick length, you should specify it!");
         ticklength = module->par("tick").doubleValue();
     }
     else
@@ -48,9 +48,9 @@ static omnetpp::cNEDValue ned_tick_to_sec(omnetpp::cComponent *context, omnetpp:
     long ticks = argv[0].intValue();
     if (argc <= 1)
     {
-        cModule* module = CoRE4INET::findModuleWhereverInNode("scheduler", context->getParentModule());
+        omnetpp::cModule* module = CoRE4INET::findModuleWhereverInNode("scheduler", context->getParentModule());
         if (!module)
-            throw cRuntimeError("ned_sec_to_tick(): cannot determine tick length, you should specify it!");
+            throw omnetpp::cRuntimeError("ned_sec_to_tick(): cannot determine tick length, you should specify it!");
         ticklength = module->par("tick").doubleValue();
     }
     else
@@ -71,15 +71,15 @@ static omnetpp::cNEDValue ned_find_module_wherever_in_node(omnetpp::cComponent *
         __attribute__((unused)) int argc)
 {
     const char* name = argv[0].stringValue();
-    cModule* contextModule = dynamic_cast<cModule*>(context);
+    omnetpp::cModule* contextModule = dynamic_cast<omnetpp::cModule*>(context);
     if(!contextModule)
     {
-        throw cRuntimeError("find_in_node(): can only be used for parameters inside a networkNode!");
+        throw omnetpp::cRuntimeError("find_in_node(): can only be used for parameters inside a networkNode!");
     }
-    cModule* module = CoRE4INET::findModuleWhereverInNode(name, contextModule);
+    omnetpp::cModule* module = CoRE4INET::findModuleWhereverInNode(name, contextModule);
     if (!module)
     {
-        throw cRuntimeError("find_in_node(): cannot find a module with this name!");
+        throw omnetpp::cRuntimeError("find_in_node(): cannot find a module with this name!");
     }
     return module->getFullPath();
 }

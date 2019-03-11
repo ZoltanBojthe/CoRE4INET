@@ -18,21 +18,23 @@
 
 //Std
 #include <vector>
+
 //CoRE4INET
+#include "core4inet/features.h"
 #include "core4inet/scheduler/timer/Timer.h"
 
-//TODO: Can be used when opp_makedep is able to use defines
-//#ifdef WITH_AS6802_COMMON
+#ifdef WITH_AS6802_COMMON
 //CoRE4INET
 #include "core4inet/linklayer/ethernet/AS6802/PCFrame_m.h"
-//#endif
+#endif
 
-//TODO: Can be used when opp_makedep is able to use defines
-//#ifdef WITH_AVB_COMMON
+#ifdef WITH_AVB_COMMON
 //CoRE4INET
 #include "core4inet/base/avb/AVBDefs.h"
 #include "core4inet/base/avb/AVBDefs_m.h"
-//#endif
+#endif
+
+#include "inet/linklayer/common/MacAddress.h"
 
 namespace CoRE4INET {
 

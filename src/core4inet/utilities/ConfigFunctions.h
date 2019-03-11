@@ -28,6 +28,8 @@
 
 namespace CoRE4INET {
 
+using namespace omnetpp;
+
 template<typename T>
 T recursiveFindByType(cModule *root);
 
