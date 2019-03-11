@@ -47,6 +47,8 @@ void BGBurstTrafficSourceApp::sendMessage()
             auto frame = inet::makeShared<inet::EthernetMacHeader>();
             size_t payloadBytes = getPayloadBytes();
 
+            //TODO set etherType
+            //TODO set sourceAddress
             frame->setDest(this->getDestAddress());
 
             inet::B curPayload;
@@ -65,7 +67,11 @@ void BGBurstTrafficSourceApp::sendMessage()
             packet->insertAtFront(frame);
 
             //Padding
-            inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);
+            inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);    //TODO get crcMode from parameter
+
+            //PacketProtocolTag
+            packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
+
             sendDirect(packet, (*buf)->gate("in"));
         }
     }
