@@ -84,7 +84,7 @@ void TrafficSourceAppBase::handleParameterChange(const char* parname)
     if (!parname || !strcmp(parname, "payload"))
     {
         this->payload = parameterULongCheckRange(par("payload"), 0,
-                MAX_ETHERNET_DATA_BYTES);
+                inet::MAX_ETHERNET_DATA_BYTES.get());
     }
 }
 
