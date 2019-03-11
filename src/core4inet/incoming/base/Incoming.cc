@@ -18,6 +18,8 @@
 //CoRE4INET
 #include "core4inet/utilities/ConfigFunctions.h"
 
+#include "inet/common/ProtocolTag_m.h"
+
 namespace CoRE4INET {
 
 simsignal_t Incoming::droppedSignal = registerSignal("droppedPk");
@@ -34,7 +36,7 @@ Incoming::~Incoming(){
 
 }
 
-void Incoming::recordPacketReceived(inet::EtherFrame *frame)
+void Incoming::recordPacketReceived(inet::Packet *frame)
 {
     emit(rxPkSignal, frame);
 }
@@ -43,9 +45,11 @@ void Incoming::handleMessage(cMessage *msg)
 {
     if (msg && msg->arrivedOn("in"))
     {
-        if(inet::EtherFrame* ef = dynamic_cast<inet::EtherFrame*>(msg))
+        auto packet = check_and_cast<inet::Packet*>(msg);
+        auto protocol = packet->getTag<inet::PacketProtocolTag>()->getProtocol();
+        if(protocol == &inet::Protocol::ethernetMac)
         {
-            recordPacketReceived(ef);
+            recordPacketReceived(packet);
             sendDelayed(msg, this->hardware_delay, "out");
         }
         else
@@ -74,7 +78,6 @@ void Incoming::handleParameterChange(const char* parname)
     {
         this->hardware_delay = SimTime(parameterDoubleCheckRange(par("hardware_delay"), 0, DBL_MAX));
     }
-
 }
 
 } //namespace

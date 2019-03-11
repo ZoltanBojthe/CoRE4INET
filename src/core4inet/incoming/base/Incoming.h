@@ -19,7 +19,7 @@
 //CoRE4INET
 #include "core4inet/base/CoRE4INET_Defs.h"
 //INET
-#include "inet/linklayer/ethernet/EtherFrame_m.h"
+#include "inet/common/packet/Packet.h"
 
 namespace CoRE4INET {
 
@@ -89,7 +89,7 @@ class Incoming : public virtual cSimpleModule
          *
          * @param frame the frame that was received
          */
-        void recordPacketReceived(inet::EtherFrame *frame);
+        void recordPacketReceived(inet::Packet *frame);
 
         /**
          * @brief Indicates a parameter has changed.
