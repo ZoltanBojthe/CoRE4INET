@@ -20,7 +20,7 @@
 #include "core4inet/base/CoRE4INET_Defs.h"
 #include "core4inet/utilities/classes/Timed.h"
 //INET Auto-generated Messages
-#include "inet/linklayer/ethernet/EtherFrame_m.h"
+#include "inet/common/packet/Packet.h"
 
 namespace CoRE4INET {
 
@@ -104,14 +104,14 @@ class BaseInControl : public virtual cSimpleModule, public Timed
          *
          * @param frame the frame that was received
          */
-        void setParameters(inet::EtherFrame *frame);
+        void setParameters(inet::Packet *frame);
 
         /**
          * @brief Emits a statistics signal that a frame was received in the buffer
          *
          * @param frame the frame that was received
          */
-        void recordPacketReceived(inet::EtherFrame *frame);
+        void recordPacketReceived(inet::Packet *frame);
 };
 }
 

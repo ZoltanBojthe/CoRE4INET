@@ -17,6 +17,8 @@
 #define CORE4INET_BEINCONTROL_H_
 
 //INET Auto-generated Messages
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/packet/Packet.h"
 #include "inet/linklayer/ethernet/EtherFrame_m.h"
 
 namespace CoRE4INET {
@@ -48,9 +50,12 @@ void BEInControl<IC>::handleMessage(cMessage *msg)
 {
     if (msg->arrivedOn("in"))
     {
-        if (inet::EtherFrame *frame = dynamic_cast<inet::EtherFrame*>(msg))
+        auto packet = check_and_cast<inet::Packet*>(msg);
+        auto protocol = packet->getTag<inet::PacketProtocolTag>()->getProtocol();
+        if (protocol == &inet::Protocol::ethernetMac)
         {
-            this->recordPacketReceived(frame);
+            const auto& frame = packet->peekAtFront<inet::EthernetMacHeader>();
+            this->recordPacketReceived(packet);
 
             if (IC::isPromiscuous() || frame->getDest().isMulticast())
             {
@@ -59,7 +64,7 @@ void BEInControl<IC>::handleMessage(cMessage *msg)
             else
             {
                 inet::MacAddress address;
-                address.setAddress(frame->getArrivalGate()->getPathStartGate()->getOwnerModule()->par("address"));
+                address.setAddress(msg->getArrivalGate()->getPathStartGate()->getOwnerModule()->par("address"));
                 if (frame->getDest().equals(address))
                 {
                     cSimpleModule::send(msg, "out");

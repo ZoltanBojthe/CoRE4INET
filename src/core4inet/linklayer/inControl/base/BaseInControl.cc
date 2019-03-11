@@ -24,7 +24,7 @@ void BaseInControl::initialize()
     Timed::initialize();
 }
 
-void BaseInControl::setParameters(inet::EtherFrame *frame)
+void BaseInControl::setParameters(inet::Packet *frame)
 {
     if (frame)
     {
@@ -45,7 +45,7 @@ void BaseInControl::setParameters(inet::EtherFrame *frame)
     }
 }
 
-void BaseInControl::recordPacketReceived(inet::EtherFrame *frame)
+void BaseInControl::recordPacketReceived(inet::Packet *frame)
 {
     emit(rxPkSignal, frame);
 }
