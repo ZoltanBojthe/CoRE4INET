@@ -66,8 +66,8 @@ void AVBTrafficSinkApp::receiveSignal(cComponent *src, simsignal_t id, cObject *
         SRPTable::TalkerEntry *tentry = check_and_cast<SRPTable::TalkerEntry*>(obj);
 
         //If talker for the desired stream, register Listener
-        if (tentry->streamId == static_cast<uint64_t>(par("streamID").longValue())
-                && tentry->vlan_id == static_cast<uint16_t>(par("vlan_id").longValue()))
+        if (tentry->streamId == static_cast<uint64_t>(par("streamID"))
+                && tentry->vlan_id == static_cast<uint16_t>(par("vlan_id")))
         {
             SRPTable *signal_srpTable = check_and_cast<SRPTable *>(src);
 
@@ -85,8 +85,8 @@ void AVBTrafficSinkApp::receiveSignal(cComponent *src, simsignal_t id, cObject *
     else if (id == NF_AVB_LISTENER_REGISTRATION_TIMEOUT)
     {
         SRPTable::ListenerEntry *lentry = check_and_cast<SRPTable::ListenerEntry*>(obj);
-        if (lentry->streamId == static_cast<uint64_t>(par("streamID").longValue())
-                && lentry->vlan_id == static_cast<uint16_t>(par("vlan_id").longValue()))
+        if (lentry->streamId == static_cast<uint64_t>(par("streamID"))
+                && lentry->vlan_id == static_cast<uint16_t>(par("vlan_id")))
         {
             if (lentry->module == this)
             {
@@ -107,8 +107,7 @@ void AVBTrafficSinkApp::handleMessage(cMessage *msg)
 {
     if (msg && msg->isSelfMessage())
     {
-        srpTable->updateListenerWithStreamId(static_cast<uint64_t>(par("streamID").longValue()), this,
-                static_cast<uint16_t>(par("vlan_id").longValue()));
+        srpTable->updateListenerWithStreamId(static_cast<uint64_t>(par("streamID")), this, par("vlan_id"));
         if (getEnvir()->isGUI())
         {
             getDisplayString().setTagArg("i2", 0, "status/active");
