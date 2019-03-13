@@ -107,7 +107,7 @@ class CTBuffer : public virtual Buffer
          *
          * @sa enqueue();
          */
-        void putFrame(inet::EtherFrame* frame);
+        void putFrame(inet::Packet* frame);
 
         /**
          * @brief get critical traffic id
