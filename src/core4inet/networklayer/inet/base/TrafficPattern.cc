@@ -12,10 +12,10 @@
 
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
-#include "inet/networklayer/ipv4/IPv4Datagram.h"
-#include "inet/transportlayer/udp/UDPPacket.h"
+#include "inet/networklayer/ipv4/Ipv4Header_m.h"
+#include "inet/transportlayer/udp/UdpHeader_m.h"
 #include "inet/transportlayer/tcp_common/TcpHeader.h"
-#include "inet/transportlayer/sctp/SctpMessage.h"
+#include "inet/transportlayer/sctp/SctpHeader.h"
 
 //==============================================================================
 

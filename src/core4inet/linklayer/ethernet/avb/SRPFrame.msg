@@ -15,7 +15,7 @@
 
 cplusplus {{
 //INET
-#include "inet/linklayer/common/MACAddress.h"
+#include "inet/linklayer/common/MacAddress.h"
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Winconsistent-missing-override"
@@ -24,7 +24,7 @@ cplusplus {{
 #endif
 }}
 
-class noncobject inet::MACAddress;
+class noncobject inet::MacAddress;
 
 namespace CoRE4INET;
 
@@ -49,7 +49,7 @@ packet TalkerAdvertise extends SRPFrame{
     
     // DataFrameParameters => destination adress and vlan identifier
 	// 64 Bit Field
-	inet::MACAddress destination_address; //only one Talker allowed per destination_address
+	inet::MacAddress destination_address; //only one Talker allowed per destination_address
 	uint16_t vlan_identifier;
 	// TSpec => Max frame size and sending interval of an AVB stream
 	// 32 Bit Field

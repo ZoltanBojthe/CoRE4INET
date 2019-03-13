@@ -589,7 +589,7 @@ bool TTShaper<TC>::isTransmissionAllowed(inet::EtherFrame *message)
     SimTime sendTime = TC::outChannel->calculateDuration(message);
 //Don't know if that is right, but it works!
     sendTime += SimTime(
-            (INTERFRAME_GAP_BITS + ((PREAMBLE_BYTES + SFD_BYTES) * 8)) / TC::outChannel->getNominalDatarate());
+            inet::b(inet::INTERFRAME_GAP_BITS + inet::PREAMBLE_BYTES + inet::SFD_BYTES).get() / TC::outChannel->getNominalDatarate());
     uint64_t sendTicks = static_cast<uint64_t>(ceil((sendTime.dbl() / getOscillator()->par("tick").doubleValue())));
     sendTicks += this->safetyMargin;
     uint64_t startTicks = ttBuffers.begin()->first;

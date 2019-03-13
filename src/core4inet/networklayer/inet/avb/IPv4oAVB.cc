@@ -309,13 +309,13 @@ void IPv4oAVB<base>::configureFilters(cXMLElement *config)
                 if (srcPrefixLengthAttr)
                     tp->setSrcPrefixLength(base::parseIntAttribute(srcPrefixLengthAttr, "srcPrefixLength"));
                 else if (srcAddrAttr)
-                    tp->setSrcPrefixLength(tp->getSrcAddr().getType()==inet::L3Address::Ipv6 ? 128 : 32);
+                    tp->setSrcPrefixLength(tp->getSrcAddr().getType()==inet::L3Address::IPv6 ? 128 : 32);
                 if (destAddrAttr)
                     tp->setDestAddr(addressResolver.resolve(destAddrAttr));
                 if (destPrefixLengthAttr)
                     tp->setDestPrefixLength(base::parseIntAttribute(destPrefixLengthAttr, "destPrefixLength"));
                 else if (destAddrAttr)
-                    tp->setDestPrefixLength(tp->getDestAddr().getType()==inet::L3Address::Ipv6 ? 128 : 32);
+                    tp->setDestPrefixLength(tp->getDestAddr().getType()==inet::L3Address::IPv6 ? 128 : 32);
                 if (protocolAttr)
                     tp->setProtocol(base::parseProtocol(protocolAttr, "protocol"));
                 if (tosAttr)
@@ -424,9 +424,9 @@ void IPv4oAVB<base>::registerTalker(const IPoREFilter* filter, SRPTable *srpTabl
 template<class base>
 void IPv4oAVB<base>::sendPacketToBuffers(cPacket *packet, const inet::InterfaceEntry *ie, std::list<IPoREFilter*> &filters)
 {
-    if (packet->getByteLength() > MAX_ETHERNET_DATA_BYTES)
+    if (packet->getByteLength() > inet::MAX_ETHERNET_DATA_BYTES.get())
         base::error("packet from higher layer (%d bytes) exceeds maximum Ethernet payload length (%d)",
-                packet->getByteLength(), MAX_ETHERNET_DATA_BYTES);
+                packet->getByteLength(), inet::MAX_ETHERNET_DATA_BYTES.get());
 
     typename std::list<IPoREFilter*>::iterator filter = filters.begin();
     for (; filter != filters.end(); ++filter)

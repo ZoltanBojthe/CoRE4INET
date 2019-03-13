@@ -8,6 +8,8 @@
 #ifndef CORE4INET_TRAFFICPATTERN_H_
 #define CORE4INET_TRAFFICPATTERN_H_
 
+#include "core4inet/base/CoRE4INET_Defs.h"
+
 #include "inet/networklayer/common/L3Address.h"
 
 namespace CoRE4INET {
