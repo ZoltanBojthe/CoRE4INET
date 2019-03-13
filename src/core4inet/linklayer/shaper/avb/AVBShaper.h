@@ -240,7 +240,7 @@ void AVBShaper<SRCLASS, TC>::handleMessage(cMessage *msg)
         {
             TC::framesRequested--;
             AVBFrame* sizeMsg = dynamic_cast<AVBFrame*>(msg->dup());
-            sizeMsg->setByteLength(sizeMsg->getByteLength() + PREAMBLE_BYTES + SFD_BYTES + (INTERFRAME_GAP_BITS / 8));
+            sizeMsg->setByteLength(sizeMsg->getByteLength() + inet::B(inet::PREAMBLE_BYTES + inet::SFD_BYTES + inet::INTERFRAME_GAP_BITS).get());
             cSimpleModule::send(msg, cModule::gateBaseId("out"));
             ASSERT(state == IDLE_STATE);
             state = BLOCKED_STATE;
@@ -273,7 +273,7 @@ void AVBShaper<SRCLASS, TC>::enqueueMessage(cMessage *msg)
     {
         avbQueue.insert(msg);
         cComponent::emit(avbQueueLengthSignal, static_cast<unsigned long>(avbQueue.getLength()));
-        avbQueueSize+=static_cast<size_t>(check_and_cast<inet::EtherFrame*>(msg)->getByteLength());
+        avbQueueSize+=static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
         cComponent::emit(avbQueueSizeSignal, static_cast<unsigned long>(avbQueueSize));
         TC::notifyListeners();
         EV_TRACE << "Interface not idle queuing AVB frame" << endl;

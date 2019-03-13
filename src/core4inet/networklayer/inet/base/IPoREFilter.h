@@ -16,6 +16,7 @@
 #ifndef CORE4INET_IPOREFILTER_H_
 #define CORE4INET_IPOREFILTER_H_
 
+#include "core4inet/base/CoRE4INET_Defs.h"
 #include "core4inet/networklayer/inet/base/TrafficPattern.h"
 #include "core4inet/networklayer/inet/base/DestinationInfo.h"
 

@@ -302,7 +302,7 @@ void RCShaper<TC>::enqueueMessage(cMessage *msg)
                         static_cast<unsigned long>(rcQueue[static_cast<size_t>(priority)].getLength()));
             }
             rcQueueSize[static_cast<size_t>(priority)] +=
-                    static_cast<size_t>(check_and_cast<inet::EtherFrame*>(msg)->getByteLength());
+                    static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
             if (simTime() > getSimulation()->getWarmupPeriod())
             {
                 cComponent::emit(rcQueueSizeSignals[static_cast<size_t>(priority)],
@@ -349,12 +349,12 @@ cMessage* RCShaper<TC>::pop()
     {
         if (!rcQueue[i].isEmpty())
         {
-            inet::EtherFrame *message = static_cast<inet::EtherFrame*>(rcQueue[i].pop());
+            inet::Packet *message = static_cast<inet::Packet*>(rcQueue[i].pop());
             if (simTime() > getSimulation()->getWarmupPeriod())
             {
                 cComponent::emit(rcQueueLengthSignals[i], static_cast<unsigned long>(rcQueue[i].getLength()));
             }
-            rcQueueSize[i]-=static_cast<size_t>(check_and_cast<inet::EtherFrame*>(message)->getByteLength());
+            rcQueueSize[i]-=static_cast<size_t>(check_and_cast<inet::Packet*>(message)->getByteLength());
             if (simTime() > getSimulation()->getWarmupPeriod())
             {
                 cComponent::emit(rcQueueSizeSignals[i], static_cast<unsigned long>(rcQueueSize[i]));
@@ -388,7 +388,7 @@ cMessage* RCShaper<TC>::front()
     {
         if (!rcQueue[i].isEmpty())
         {
-            inet::EtherFrame *message = static_cast<inet::EtherFrame*>(rcQueue[i].front());
+            inet::Packet *message = static_cast<inet::Packet*>(rcQueue[i].front());
             return message;
         }
     }

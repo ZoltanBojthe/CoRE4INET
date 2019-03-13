@@ -22,6 +22,8 @@
 //Auto-generated Messages
 #include "core4inet/linklayer/ethernet/AS6802/PCFrame_m.h"
 
+#include "inet/common/packet/Packet.h"
+
 namespace CoRE4INET {
 
 /**
@@ -234,7 +236,7 @@ void PCFShaper<TC>::enqueueMessage(cMessage *msg)
     {
         pcfQueue.insert(msg);
         cComponent::emit(pcfQueueLengthSignal, static_cast<unsigned long>(pcfQueue.getLength()));
-        pcfQueueSize+=static_cast<size_t>(check_and_cast<inet::EtherFrame*>(msg)->getByteLength());
+        pcfQueueSize+=static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
         cComponent::emit(pcfQueueSizeSignal, static_cast<unsigned long>(pcfQueueSize));
         TC::notifyListeners();
         EV_TRACE << "Interface not idle queuing PCF" << endl;
@@ -269,7 +271,7 @@ cMessage* PCFShaper<TC>::pop()
         cMessage *msg = static_cast<cMessage*>(pcfQueue.pop());
         cComponent::emit(pcfQueueLengthSignal, static_cast<unsigned long>(pcfQueue.getLength()));
 
-        pcfQueueSize-=static_cast<size_t>(check_and_cast<inet::EtherFrame*>(msg)->getByteLength());
+        pcfQueueSize-=static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
         cComponent::emit(pcfQueueSizeSignal, static_cast<unsigned long>(pcfQueueSize));
 
         PCFrame *pcf = dynamic_cast<PCFrame*>(msg);

@@ -26,6 +26,8 @@
 //Auto-generated Messages
 #include "core4inet/linklayer/ethernet/base/EtherFrameWithQTag_m.h"
 
+#include "inet/common/packet/Packet.h"
+
 namespace CoRE4INET {
 
 /**
@@ -336,7 +338,7 @@ void IEEE8021QShaper<TC>::enqueueMessage(cMessage *msg)
                         static_cast<unsigned long>(qQueue[static_cast<size_t>(priority)].getLength()));
             }
             qQueueSize[static_cast<size_t>(priority)] +=
-                    static_cast<size_t>(check_and_cast<inet::EtherFrame*>(msg)->getByteLength());
+                    static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
             if (simTime() > getSimulation()->getWarmupPeriod())
             {
                 cComponent::emit(qQueueSizeSignals[static_cast<size_t>(priority)],
@@ -353,7 +355,7 @@ void IEEE8021QShaper<TC>::enqueueMessage(cMessage *msg)
                         static_cast<unsigned long>(qQueue[this->defaultPriority].getLength()));
             }
             qQueueSize[this->defaultPriority] +=
-                    static_cast<size_t>(check_and_cast<inet::EtherFrame*>(msg)->getByteLength());
+                    static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
             if (simTime() > getSimulation()->getWarmupPeriod())
             {
                 cComponent::emit(qQueueSizeSignals[this->defaultPriority],
@@ -393,12 +395,12 @@ cMessage* IEEE8021QShaper<TC>::pop()
     {
         if (!qQueue[i - 1].isEmpty())
         {
-            inet::EtherFrame *message = static_cast<inet::EtherFrame*>(qQueue[i - 1].pop());
+            inet::Packet *message = static_cast<inet::Packet*>(qQueue[i - 1].pop());
             if (simTime() > getSimulation()->getWarmupPeriod())
             {
                 cComponent::emit(qQueueLengthSignals[i - 1], static_cast<unsigned long>(qQueue[i - 1].getLength()));
             }
-            qQueueSize[i - 1]-=static_cast<size_t>(check_and_cast<inet::EtherFrame*>(message)->getByteLength());
+            qQueueSize[i - 1]-=static_cast<size_t>(check_and_cast<inet::Packet*>(message)->getByteLength());
             if (simTime() > getSimulation()->getWarmupPeriod())
             {
                 cComponent::emit(qQueueSizeSignals[i - 1], static_cast<unsigned long>(qQueueSize[i - 1]));
@@ -418,7 +420,7 @@ cMessage* IEEE8021QShaper<TC>::front()
     {
         if (!qQueue[i - 1].isEmpty())
         {
-            inet::EtherFrame *message = static_cast<inet::EtherFrame*>(qQueue[i - 1].front());
+            inet::Packet *message = static_cast<inet::Packet*>(qQueue[i - 1].front());
             return message;
         }
     }

@@ -31,7 +31,7 @@
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
-#include "inet/transportlayer/udp/UDPPacket.h"
+#include "inet/transportlayer/udp/UdpHeader_m.h"
 
 //==============================================================================
 
@@ -154,13 +154,13 @@ void IPv4oRC<Base>::configureFilters(cXMLElement *config)
                 if (srcPrefixLengthAttr)
                     tp->setSrcPrefixLength(Base::parseIntAttribute(srcPrefixLengthAttr, "srcPrefixLength"));
                 else if (srcAddrAttr)
-                    tp->setSrcPrefixLength(tp->getSrcAddr().getType()==inet::L3Address::Ipv6 ? 128 : 32);
+                    tp->setSrcPrefixLength(tp->getSrcAddr().getType()==inet::L3Address::IPv6 ? 128 : 32);
                 if (destAddrAttr)
                     tp->setDestAddr(addressResolver.resolve(destAddrAttr));
                 if (destPrefixLengthAttr)
                     tp->setDestPrefixLength(Base::parseIntAttribute(destPrefixLengthAttr, "destPrefixLength"));
                 else if (destAddrAttr)
-                    tp->setDestPrefixLength(tp->getDestAddr().getType()==inet::L3Address::Ipv6 ? 128 : 32);
+                    tp->setDestPrefixLength(tp->getDestAddr().getType()==inet::L3Address::IPv6 ? 128 : 32);
                 if (protocolAttr)
                     tp->setProtocol(Base::parseProtocol(protocolAttr, "protocol"));
                 if (tosAttr)
@@ -236,8 +236,8 @@ void IPv4oRC<Base>::handleMessage(cMessage* msg)
 template<class Base>
 void IPv4oRC<Base>::sendPacketToBuffers(cPacket *packet, const inet::InterfaceEntry *ie, std::list<IPoREFilter*> &filters)
 {
-    if (packet->getByteLength() > MAX_ETHERNET_DATA_BYTES)
-        Base::error("packet from higher layer (%d bytes) exceeds maximum Ethernet payload length (%d)", packet->getByteLength(), MAX_ETHERNET_DATA_BYTES);
+    if (packet->getByteLength() > inet::MAX_ETHERNET_DATA_BYTES.get())
+        Base::error("packet from higher layer (%d bytes) exceeds maximum Ethernet payload length (%d)", packet->getByteLength(), inet::MAX_ETHERNET_DATA_BYTES.get());
 
     typename std::list<IPoREFilter*>::iterator filter = filters.begin();
     for ( ; filter != filters.end(); ++filter) {

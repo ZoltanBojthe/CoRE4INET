@@ -29,7 +29,6 @@
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
-#include "inet/transportlayer/udp/UDPPacket.h"
 
 //==============================================================================
 
