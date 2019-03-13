@@ -41,7 +41,7 @@ simple BE_Shaper like IShaper
         @statistic[beQueueSize](title="BE-Queue Size"; unit=B; record=vector,stats; interpolationmode=sample-hold);
         
     gates:
-        //Input for best-effort frames from the upper layer (EtherLLC or IMacRelayUnit)
+        //Input for best-effort frames from the upper layer (EtherLlc or IMacRelayUnit)
         input in @labels(EtherFrame);
         //Output to the lower layer (MAC layer)
         output out @labels(EtherFrame);

@@ -19,15 +19,15 @@ import core4inet.scheduler.ITTEScheduler;
 import core4inet.synchronisation.base.ISync;
 import core4inet.utilities.modules.CheckedBuffer;
 
-import inet.linklayer.contract.IMACAddressTable;
-import inet.linklayer.contract.IMACRelayUnit;
+import inet.linklayer.contract.IMacAddressTable;
+import inet.linklayer.contract.IMacRelayUnit;
 import inet.common.lifecycle.NodeStatus;
 import inet.networklayer.common.InterfaceTable;
 
 //
 // Module for a IEEE 802.1Q Ethernet Switch with variable number of ports.
 //
-// @see ~NodeStatus, ~IMACRelayUnit, ~IMACAddressTable, ~InterfaceTable, ~IEEE8021QPHYPort, ~ISync, ~ITTEScheduler, ~CheckedBuffer
+// @see ~NodeStatus, ~IMacRelayUnit, ~IMacAddressTable, ~InterfaceTable, ~IEEE8021QPHYPort, ~ISync, ~ITTEScheduler, ~CheckedBuffer
 //
 // @author Till Steinbach, Philipp Meyerr 
 //
@@ -62,7 +62,7 @@ module IEEE8021QEtherSwitch
         }
         
         // Implementation of the forwarding part
-        beswitch: <default("MACRelayUnit")> like IMACRelayUnit {
+        beswitch: <default("MacRelayUnit")> like IMacRelayUnit {
             parameters:
                 @display("p=100,50");
             gates:
@@ -71,7 +71,7 @@ module IEEE8021QEtherSwitch
         }
         
         //The mac table associated with the beswitch
-        macTable: <default("MACAddressTable")> like IMACAddressTable {
+        macTable: <default("MacAddressTable")> like IMacAddressTable {
             @display("p=170,50");
         }
         

@@ -18,13 +18,13 @@ package core4inet.linklayer.port;
 import core4inet.linklayer.inControl.CT_AVB_8021Q_InControl;
 import core4inet.linklayer.shaper.TT_AVBClassA_AVBClassB_PCF_RC_8021Q_Shaper;
 
-import inet.linklayer.ethernet.EtherMACFullDuplex;
+import inet.linklayer.ethernet.EtherMacFullDuplex;
 
 //
-// The TTEAVBPHYPort is a compund module that contains the input Shaper, output Shaper and MAC (EtherMACFullDuplex)
+// The TTEAVBPHYPort is a compund module that contains the input Shaper, output Shaper and MAC (EtherMacFullDuplex)
 // It represents a physical port for a real-time Ethernet device (Switch or Host)
 //
-// @see ~IPort, ~EtherMACFullDuplex, ~TTEInput, ~TT_AVBClassA_PCF_RC_BE_Shaper, ~TT_PCF_RC_BE_Shaper, ~PCF_RC_BE_Shaper, ~BE_Shaper
+// @see ~IPort, ~EtherMacFullDuplex, ~TTEInput, ~TT_AVBClassA_PCF_RC_BE_Shaper, ~TT_PCF_RC_BE_Shaper, ~PCF_RC_BE_Shaper, ~BE_Shaper
 //
 // @author Philipp Meyer
 //
@@ -77,7 +77,7 @@ module TTEAVBPHYPort like IPort
             	taggedVIDs = taggedVIDs;
         }
 
-        mac: EtherMACFullDuplex {
+        mac: EtherMacFullDuplex {
             parameters:
                 promiscuous = true;
                 queueModule = "^.shaper";

@@ -28,15 +28,15 @@ import core4inet.nodes.inet.RTNetworkLayer;
 
 import inet.linklayer.loopback.LoopbackInterface;
 import inet.networklayer.common.InterfaceTable;
-import inet.networklayer.ipv4.IPv4RoutingTable;
+import inet.networklayer.ipv4.Ipv4RoutingTable;
 import inet.applications.contract.IPingApp;
 import inet.applications.contract.ISCTPApp;
 import inet.applications.contract.ITCPApp;
 import inet.applications.contract.IUDPApp;
 import inet.applications.contract.INetPerfMeterApp;
-import inet.transportlayer.contract.ISCTP;
-import inet.transportlayer.contract.ITCP;
-import inet.transportlayer.contract.IUDP;
+import inet.transportlayer.contract.ISctp;
+import inet.transportlayer.contract.ITcp;
+import inet.transportlayer.contract.IUdp;
 
 
 //
@@ -57,16 +57,16 @@ module RTIPHost
         bool forwarding = default(true);
         bool multicastForwarding = default(false);
         int numNetPerfMeterApps = default(0);  // no of netPerfMeter apps. Specify the app types in INI file with netPerfMeterApp[0..1].typename="NetPerfMeter" syntax
-        int numTcpApps = default(0);  // no of TCP apps. Specify the app types in INI file with tcpApp[0..1].typename="TCPEchoApp" syntax
-        int numUdpApps = default(0);  // no of UDP apps. Specify the app types in INI file with udpApp[0..1].typename="UDPVideoStreamCli" syntax
-        int numSctpApps = default(0); // no of SCTP apps. Specify the app types in INI file with sctpApp[0..1].typename="SCTPServer" syntax
+        int numTcpApps = default(0);  // no of Tcp apps. Specify the app types in INI file with tcpApp[0..1].typename="TcpEchoApp" syntax
+        int numUdpApps = default(0);  // no of Udp apps. Specify the app types in INI file with udpApp[0..1].typename="UdpVideoStreamClient" syntax
+        int numSctpApps = default(0); // no of Sctp apps. Specify the app types in INI file with sctpApp[0..1].typename="SctpServer" syntax
         int numPingApps = default(0);  // no of PING apps. Specify the app types in INI file with pingApp[0..1].typename="PingApp" syntax
         bool hasTcp = default(numTcpApps>0 || numNetPerfMeterApps>0);
         bool hasUdp = default(numUdpApps>0 || numNetPerfMeterApps>0);
         bool hasSctp = default(numSctpApps>0 || numNetPerfMeterApps>0);
-        string tcpType = default(firstAvailable("TCP", "TCP_lwIP", "TCP_NSC", "TCP_None"));  // tcp implementation (e.g. ~TCP, ~TCP_lwIP, ~TCP_NSC) or ~TCPSpoof
-        string udpType = default(firstAvailable("UDP","UDP_None"));
-        string sctpType = default(firstAvailable("SCTP","SCTP_None"));
+        string tcpType = default(firstAvailable("Tcp", "TcpLwip", "TcpNsc", "TCP_None"));  // tcp implementation (e.g. ~Tcp, ~TcpLwip, ~TcpNsc) or ~TcpSpoof
+        string udpType = default(firstAvailable("Udp","UDP_None"));
+        string sctpType = default(firstAvailable("Sctp","SCTP_None"));
         int numApps = default(0); //default(1) ? ListenerApp
         double hardware_delay @unit(s) = default(0us);
         *.interfaceTableModule = default(absPath(".interfaceTable"));
@@ -104,17 +104,17 @@ module RTIPHost
         }
 
         // transport Layer
-        tcp: <tcpType> like ITCP if hasTcp {
+        tcp: <tcpType> like ITcp if hasTcp {
             parameters:
                 @display("p=498,150");
         }
 
-        udp: <udpType> like IUDP if hasUdp {
+        udp: <udpType> like IUdp if hasUdp {
             parameters:
                 @display("p=615,150");
         }
 
-        sctp: <sctpType> like ISCTP if hasSctp {
+        sctp: <sctpType> like ISctp if hasSctp {
             @display("p=732,141");
         }
 
@@ -124,7 +124,7 @@ module RTIPHost
                 @display("p=498,232;q=queue");
         }
 
-        routingTable: IPv4RoutingTable {
+        routingTable: Ipv4RoutingTable {
             parameters:
                 @display("p=63,104;is=s");
                 forwarding = forwarding;

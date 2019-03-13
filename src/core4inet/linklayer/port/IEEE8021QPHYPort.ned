@@ -18,13 +18,13 @@ package core4inet.linklayer.port;
 import core4inet.linklayer.inControl.IEEE8021Q.IEEE8021Q_InControl;
 import core4inet.linklayer.shaper.IEEE8021Q_Shaper;
 
-import inet.linklayer.ethernet.EtherMACFullDuplex;
+import inet.linklayer.ethernet.EtherMacFullDuplex;
 
 //
-// The IEEE8021QPHYPort is a compund module that contains the input Shaper, output Shaper and MAC (EtherMACFullDuplex)
+// The IEEE8021QPHYPort is a compund module that contains the input Shaper, output Shaper and MAC (EtherMacFullDuplex)
 // It represents a physical port for a IEEE 802.1Q Ethernet device (Switch or Host)
 //
-// @see ~EtherMACFullDuplex, ~IEEE8021Q_Shaper, ~BE_Shaper, ~BE_InControl
+// @see ~EtherMacFullDuplex, ~IEEE8021Q_Shaper, ~BE_Shaper, ~BE_InControl
 //
 // @author Philipp Meyer
 //
@@ -72,7 +72,7 @@ module IEEE8021QPHYPort
         }
         
         //MAC interface
-        mac: EtherMACFullDuplex {
+        mac: EtherMacFullDuplex {
             parameters:
                 promiscuous = true; 
                 queueModule = "^.shaper";

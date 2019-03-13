@@ -18,9 +18,9 @@ package core4inet.linklayer.ethernet;
 import core4inet.linklayer.ethernet.avb.SRPEtherEncap;
 import core4inet.linklayer.inControl.CT_AVB_BE_InControl;
 import core4inet.linklayer.shaper.TT_AVBClassA_AVBClassB_PCF_RC_8021Q_Shaper;
-import inet.linklayer.ethernet.EtherMACFullDuplex;
+import inet.linklayer.ethernet.EtherMacFullDuplex;
 
-import inet.linklayer.contract.INic;
+import inet.linklayer.contract.INetworkInterface;
 
 
 //
@@ -32,7 +32,7 @@ import inet.linklayer.contract.INic;
 // @see SRPEtherEncap, TTEAVBPHYPort, Sync, Scheduler
 //
 // @author Kai-Uwe von Deylen, Till Steinbach
-module TTEAVB8021QEtherNic like INic
+module TTEAVB8021QEtherNic like INetworkInterface
 {
     parameters:
         @display("i=block/ifcard");
@@ -90,7 +90,7 @@ module TTEAVB8021QEtherNic like INic
                 promiscuous = promiscuous;
         }
 
-        mac: EtherMACFullDuplex {
+        mac: EtherMacFullDuplex {
             parameters:
                 promiscuous = true;
                 queueModule = "^.shaper";

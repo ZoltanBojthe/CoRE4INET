@@ -25,14 +25,14 @@ import core4inet.services.avb.SRP.SRProtocol;
 import core4inet.synchronisation.base.ISync;
 import core4inet.utilities.modules.CheckedBuffer;
 
-import inet.linklayer.contract.IMACAddressTable;
+import inet.linklayer.contract.IMacAddressTable;
 import inet.networklayer.common.InterfaceTable;
 
 //
 // Module for a TTEAVBEthernet Switch.
 // Contains handler for TT, AVB, RC and BE Messages.
 //
-// @see ~SRPRelay, ~IMACAddressTable, ~InterfaceTable, ~SRPTable, ~TTEAVBPHYPort, ~AVBIncoming, ~AVBQueueBuffer, ~ISync, ~ITTEScheduler, ~CheckedBuffer, ~SRProtocol
+// @see ~SRPRelay, ~IMacAddressTable, ~InterfaceTable, ~SRPTable, ~TTEAVBPHYPort, ~AVBIncoming, ~AVBQueueBuffer, ~ISync, ~ITTEScheduler, ~CheckedBuffer, ~SRProtocol
 //
 // @author Philipp Meyer
 //
@@ -70,7 +70,7 @@ module TTEAVBEtherSwitch
         }
         
 		//The mac table associated with the be switch
-        macTable: <default("MACAddressTable")> like IMACAddressTable {
+        macTable: <default("MacAddressTable")> like IMacAddressTable {
             @display("p=346,313");
         }
         

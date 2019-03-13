@@ -20,17 +20,17 @@ import core4inet.scheduler.ITTEScheduler;
 import core4inet.synchronisation.base.ISync;
 import core4inet.utilities.modules.CheckedBuffer;
 
-import inet.linklayer.contract.IMACAddressTable;
-import inet.linklayer.contract.IMACRelayUnit;
+import inet.linklayer.contract.IMacAddressTable;
+import inet.linklayer.contract.IMacRelayUnit;
 import inet.common.lifecycle.NodeStatus;
 import inet.networklayer.common.InterfaceTable;
 
 //
 // Module for a TTEthernet Switch with variable number of ports.
-// Contains a configurable best-effort implementation (beswitch like IMACRelayUnit),
+// Contains a configurable best-effort implementation (beswitch like IMacRelayUnit),
 // TTEPHYPort modules for physical ports, sync module (Sync) and a TTEScheduler module.
 //
-// @see ~NodeStatus, ~IMACRelayUnit, ~IMACAddressTable, ~InterfaceTable, ~TTEPHYPort, ~ISync, ~ITTEScheduler, ~CheckedBuffer
+// @see ~NodeStatus, ~IMacRelayUnit, ~IMacAddressTable, ~InterfaceTable, ~TTEPHYPort, ~ISync, ~ITTEScheduler, ~CheckedBuffer
 //
 // @author Till Steinbach
 //
@@ -65,7 +65,7 @@ module TTEEtherSwitch
         }
         
         // Implementation of the best-effort forwarding part
-        beswitch: <default("MACRelayUnit")> like IMACRelayUnit {
+        beswitch: <default("MacRelayUnit")> like IMacRelayUnit {
             parameters:
                 @display("p=100,50");
             gates:
@@ -74,7 +74,7 @@ module TTEEtherSwitch
         }
         
         //The mac table associated with the be switch
-        macTable: <default("MACAddressTable")> like IMACAddressTable {
+        macTable: <default("MacAddressTable")> like IMacAddressTable {
             @display("p=170,50");
         }
         

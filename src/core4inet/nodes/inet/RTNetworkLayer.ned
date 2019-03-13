@@ -15,18 +15,18 @@
 
 package core4inet.nodes.inet;
 
-import inet.networklayer.arp.ipv4.ARP;
-import inet.networklayer.configurator.ipv4.IPv4NodeConfigurator;
+import inet.networklayer.arp.ipv4.Arp;
+import inet.networklayer.configurator.ipv4.Ipv4NodeConfigurator;
 import inet.networklayer.ipv4.ErrorHandling;
-import inet.networklayer.ipv4.ICMP;
-import inet.networklayer.ipv4.IIGMP;
+import inet.networklayer.ipv4.Icmp;
+import inet.networklayer.ipv4.IIgmp;
 import core4inet.networklayer.inet.IPv4oRE;
 
 
 //
-// Network layer of an IPv4 node.
+// Network layer of an Ipv4 node.
 //
-// Interfaces to transport layer: TCP, UDP, echo/ping, RSVP
+// Interfaces to transport layer: Tcp, Udp, echo/ping, Rsvp
 //
 // Supports Realtime Ethernet by using IPv4oRE Module
 //
@@ -36,7 +36,7 @@ module RTNetworkLayer
 {
     parameters:
         bool proxyARP = default(true);
-        string igmpType = default("IGMPv2");
+        string igmpType = default("Igmpv2");
         string interfaceTableModule;
         string routingTableModule;
         *.interfaceTableModule = default(absPath(interfaceTableModule));
@@ -48,8 +48,8 @@ module RTNetworkLayer
     gates:
         input ifIn[] @labels(IPv4Datagram);
         output ifOut[] @labels(IPv4Datagram);
-        input transportIn[] @labels(IPv4ControlInfo/down);
-        output transportOut[] @labels(IPv4ControlInfo/up);
+        input transportIn[] @labels(Ipv4ControlInfo/down);
+        output transportOut[] @labels(Ipv4ControlInfo/up);
         input pingIn[] @labels(PingPayload/down);
         output pingOut[] @labels(PingPayload/up);
         input igmpIn;
@@ -59,7 +59,7 @@ module RTNetworkLayer
         input TTin;
 
     submodules:
-        configurator: IPv4NodeConfigurator {
+        configurator: Ipv4NodeConfigurator {
             @display("p=39,158");
         }
         ip: IPv4oRE {
@@ -70,15 +70,15 @@ module RTNetworkLayer
                 queueIn[sizeof(ifIn)];
                 queueOut[sizeof(ifOut)];
         }
-        arp: ARP {
+        arp: Arp {
             parameters:
                 @display("p=202,142;q=pendingQueue");
         }
-        icmp: ICMP {
+        icmp: Icmp {
             parameters:
                 @display("p=160,63");
         }
-        igmp: <igmpType> like IIGMP {
+        igmp: <igmpType> like IIgmp {
             parameters:
                 @display("p=39,33");
         }

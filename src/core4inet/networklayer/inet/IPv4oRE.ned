@@ -15,14 +15,14 @@
 
 package core4inet.networklayer.inet;
 
-import inet.networklayer.ipv4.IPv4;
+import inet.networklayer.ipv4.Ipv4;
 
 //
 // Module for sending IP traffic over RTEthernet.
 // Which packets are send over TT, RC, AVB or IEEE 802.1Q and which are sent as BE is defined via the "filters" parameter
 //
 // @author Kai-Uwe von Deylen
-simple IPv4oRE extends IPv4 {
+simple IPv4oRE extends Ipv4 {
     
     parameters:
         @class("TT_RC_AVB_8021Q_IPv4");

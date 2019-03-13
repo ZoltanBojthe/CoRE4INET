@@ -52,7 +52,7 @@ simple IEEE8021Q_Shaper like IShaper
         int defaultPriority = default(0);
         
     gates:
-        //Input for IEEE802.1Q frames from the upper layer (EtherLLC or IMacRelayUnit)
+        //Input for IEEE802.1Q frames from the upper layer (EtherLlc or IMacRelayUnit)
         input in @labels(EtherFrame);
         //Output to the lower layer (MAC layer)
         output out @labels(EtherFrame);

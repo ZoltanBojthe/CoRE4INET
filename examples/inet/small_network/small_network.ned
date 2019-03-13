@@ -19,7 +19,7 @@ import core4inet.nodes.inet.RTIPHost;
 import core4inet.examples.inet.small_network.Node1;
 import core4inet.examples.inet.small_network.Node3;
 
-import inet.networklayer.configurator.ipv4.IPv4NetworkConfigurator;
+import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import inet.node.ethernet.Eth100M;
 
 //
@@ -51,7 +51,7 @@ network small_network
                 ethg[3];
         }
 
-        configurator: IPv4NetworkConfigurator {
+        configurator: Ipv4NetworkConfigurator {
             @display("p=89,22");
         }
     connections:

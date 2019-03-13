@@ -15,16 +15,16 @@
 
 package core4inet.linklayer.ethernet.base;
 
-import inet.linklayer.ethernet.EtherLLC;
+import inet.linklayer.ethernet.EtherLlc;
 
 //
 // This module forwards frames (~EtherFrame) to the bg buffers
 //
-// @see ~EtherLLC, ~SRProtocol
+// @see ~EtherLlc, ~SRProtocol
 // 
 // @author Till Steinbach
 //
-simple BGEtherLLC extends EtherLLC
+simple BGEtherLLC extends EtherLlc
 {
     parameters:
         @class(BGEtherLLC);

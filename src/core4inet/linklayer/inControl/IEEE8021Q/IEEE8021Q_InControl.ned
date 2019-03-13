@@ -23,7 +23,7 @@ import core4inet.utilities.classes.Timed;
 // critical traffic ID and then forwarded either as best-effort traffic to
 // the upper layer or when critical traffic to the CTC module (via sendDirect).
 //
-// @see ~Timed, ~IInControl, ~EtherLLC, ~IMacRelayUnit, ~IOutputQueue
+// @see ~Timed, ~IInControl, ~EtherLlc, ~IMacRelayUnit, ~IOutputQueue
 //
 // @author Till Steinbach
 //
@@ -56,7 +56,7 @@ simple IEEE8021Q_InControl extends Timed like IInControl
     gates:
         //Input from the lower layer (MAC layer)
         input in @labels(EtherFrame);
-        //Output for best-effort frames to the upper layer (EtherLLC or IMacRelayUnit)
+        //Output for best-effort frames to the upper layer (EtherLlc or IMacRelayUnit)
         output out @labels(EtherFrame);
 
 }

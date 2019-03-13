@@ -19,8 +19,8 @@ import core4inet.linklayer.ethernet.avb.SRPEtherEncap;
 import core4inet.linklayer.inControl.CT_AVB_BE_InControl;
 import core4inet.linklayer.shaper.TT_AVBClassA_AVBClassB_PCF_RC_BE_Shaper;
 
-import inet.linklayer.ethernet.EtherMACFullDuplex;
-import inet.linklayer.contract.INic;
+import inet.linklayer.ethernet.EtherMacFullDuplex;
+import inet.linklayer.contract.INetworkInterface;
 
 //
 // Module for a TTE AVB BE Ethernet NIC
@@ -28,11 +28,11 @@ import inet.linklayer.contract.INic;
 //
 // @todo Kommentar
 //
-// @see ~INic, ~SRPEtherEncap, ~TTEAVBPHYPort, ~Sync, ~Scheduler
+// @see ~INetworkInterface, ~SRPEtherEncap, ~TTEAVBPHYPort, ~Sync, ~Scheduler
 //
 // @author Kai-Uwe von Deylen
 //
-module TTEAVBEtherNic like INic
+module TTEAVBEtherNic like INetworkInterface
 {
     parameters:
         @display("i=block/ifcard");
@@ -80,7 +80,7 @@ module TTEAVBEtherNic like INic
                 promiscuous = promiscuous;
         }
 
-        mac: EtherMACFullDuplex {
+        mac: EtherMacFullDuplex {
             parameters:
                 promiscuous = true;
                 queueModule = "^.shaper";

@@ -18,13 +18,13 @@ package core4inet.linklayer.port;
 import core4inet.linklayer.inControl.CT_BE_InControl;
 import core4inet.linklayer.shaper.TT_PCF_RC_BE_Shaper;
 
-import inet.linklayer.ethernet.EtherMACFullDuplex;
+import inet.linklayer.ethernet.EtherMacFullDuplex;
 
 //
-// The TTEPHYPort is a compund module that contains the input Shaper, output Shaper and MAC (EtherMACFullDuplex)
+// The TTEPHYPort is a compund module that contains the input Shaper, output Shaper and MAC (EtherMacFullDuplex)
 // It represents a physical port for a real-time Ethernet device (Switch or Host)
 //
-// @see ~IPort, ~EtherMACFullDuplex, ~TTEInput, ~TT_PCF_RC_BE_Shaper, ~PCF_RC_BE_Shaper, ~BE_Shaper
+// @see ~IPort, ~EtherMacFullDuplex, ~TTEInput, ~TT_PCF_RC_BE_Shaper, ~PCF_RC_BE_Shaper, ~BE_Shaper
 //
 // @author Till Steinbach
 //
@@ -70,7 +70,7 @@ module TTEPHYPort like IPort
         }
         
         //MAC interface
-        mac: EtherMACFullDuplex {
+        mac: EtherMacFullDuplex {
             parameters:
                 promiscuous = true; //MAC must be set promiscuous to allow for CT receiption with all CT-Markers
                 queueModule = "^.shaper";//The tteOutput-Module(TTEOutput) is used as external queue for the interface
