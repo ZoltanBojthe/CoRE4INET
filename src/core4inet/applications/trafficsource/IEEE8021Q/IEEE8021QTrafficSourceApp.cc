@@ -19,7 +19,11 @@
 #include "core4inet/base/CoRE4INET_Defs.h"
 #include "core4inet/buffer/base/BGBuffer.h"
 #include "core4inet/utilities/ConfigFunctions.h"
-#include "core4inet/linklayer/ethernet/base/EtherFrameWithQTag_m.h"
+
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/packet/Packet.h"
+#include "inet/common/packet/chunk/ByteCountChunk.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
 
 namespace CoRE4INET {
 
@@ -54,24 +58,32 @@ void IEEE8021QTrafficSourceApp::sendMessage()
 {
     for (std::list<BGBuffer*>::const_iterator buf = bgbuffers.begin(); buf != bgbuffers.end(); ++buf)
     {
-        EthernetIIFrameWithQTag *frame = new EthernetIIFrameWithQTag("IEEE 802.1Q Traffic");
+        auto *packet = new inet::Packet("IEEE 802.1Q Traffic");     //TODO set blue color
+        auto frame = inet::makeShared<inet::EthernetMacHeader>();
 
         frame->setDest(this->destAddress);
+        //TODO set sourceAddress
+        //TODO set etherType
+        auto qtag = new inet::Ieee8021qHeader();
+        qtag->setVid(this->vid);
+        qtag->setPcp(priority);
+        qtag->setDe(false);
+        frame->setCTag(qtag);
 
-        cPacket *payload_packet = new cPacket();
-        payload_packet->setByteLength(static_cast<int64_t>(getPayloadBytes()));
-        frame->encapsulate(payload_packet);
-        frame->setPcp(priority);
-        frame->setVID(this->vid);
-        frame->setSchedulingPriority(static_cast<short>(SCHEDULING_PRIORITY_OFFSET_8021Q - priority));
+        packet->setSchedulingPriority(static_cast<short>(SCHEDULING_PRIORITY_OFFSET_8021Q - priority));     //TODO KLUDGE???
+
+        auto payload = inet::makeShared<inet::ByteCountChunk>(inet::B(getPayloadBytes()));
+        packet->insertAtFront(payload);
+        packet->insertAtFront(frame);
+
         //Padding
-        if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-        {
-            frame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
-        }
-        sendDirect(frame, (*buf)->gate("in"));
-    }
+        inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);    //TODO get crcMode from parameter
 
+        //PacketProtocolTag
+        packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
+
+        sendDirect(packet, (*buf)->gate("in"));
+    }
 }
 
 void IEEE8021QTrafficSourceApp::handleParameterChange(const char* parname)

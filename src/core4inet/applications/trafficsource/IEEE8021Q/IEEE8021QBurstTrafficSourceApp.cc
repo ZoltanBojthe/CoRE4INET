@@ -22,6 +22,11 @@
 //Auto-generated messages
 #include "core4inet/linklayer/ethernet/base/EtherFrameWithQTag_m.h"
 
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/packet/Packet.h"
+#include "inet/common/packet/chunk/ByteCountChunk.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
+
 namespace CoRE4INET {
 
 Define_Module(IEEE8021QBurstTrafficSourceApp);
@@ -40,31 +45,43 @@ void IEEE8021QBurstTrafficSourceApp::sendMessage()
         unsigned long size_left = this->getBurstSize();
         while (size_left > 0)
         {
-            EthernetIIFrameWithQTag *frame = new EthernetIIFrameWithQTag("IEEE 802.1Q Burst Traffic");
+            auto *packet = new inet::Packet("IEEE 802.1Q Burst Traffic");     //TODO set blue color
+            auto frame = inet::makeShared<inet::EthernetMacHeader>();
 
             frame->setDest(this->getDestAddress());
+            //TODO set sourceAddress
+            //TODO set etherType
+            auto qtag = new inet::Ieee8021qHeader();
+            qtag->setVid(this->vid);
+            qtag->setPcp(priority);
+            qtag->setDe(false);
+            frame->setCTag(qtag);
 
-            cPacket *payload_packet = new cPacket();
-            if (size_left >= getPayloadBytes())
+            packet->setSchedulingPriority(static_cast<short>(SCHEDULING_PRIORITY_OFFSET_8021Q - priority));     //TODO KLUDGE???
+
+            size_t payloadBytes = getPayloadBytes();
+            inet::B curPayload;
+            if (size_left >= payloadBytes)
             {
-                payload_packet->setByteLength(static_cast<int64_t>(getPayloadBytes()));
-                size_left -= getPayloadBytes();
+                curPayload = inet::B(payloadBytes);
+                size_left -= payloadBytes;
             }
             else
             {
-                payload_packet->setByteLength(static_cast<int64_t>(size_left));
+                curPayload = inet::B(size_left);
                 size_left = 0;
             }
-            frame->encapsulate(payload_packet);
-            frame->setPcp(priority);
-            frame->setVID(this->vid);
-            frame->setSchedulingPriority(static_cast<short>(SCHEDULING_PRIORITY_OFFSET_8021Q - priority));
+            auto payload = inet::makeShared<inet::ByteCountChunk>(curPayload);
+            packet->insertAtFront(payload);
+            packet->insertAtFront(frame);
+
             //Padding
-            if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-            {
-                frame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
-            }
-            sendDirect(frame, (*buf)->gate("in"));
+            inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);    //TODO get crcMode from parameter
+
+            //PacketProtocolTag
+            packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
+
+            sendDirect(packet, (*buf)->gate("in"));
         }
     }
 }
