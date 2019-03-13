@@ -22,8 +22,6 @@ cplusplus {{
 	#define SWITCH_PORT_BROADCAST -1
 }}
 
-class noncobject inet::Ieee802Ctrl;
-
 namespace CoRE4INET;
 
 //
@@ -33,7 +31,7 @@ namespace CoRE4INET;
 //
 // @author Till Steinbach
 //
-class ExtendedIeee802Ctrl extends Ieee802Ctrl
+class ExtendedIeee802Ctrl // extends Ieee802Ctrl	//FIXME KLUDGE
 {
     int notSwitchPort = -1; // swich port index to exclude (only in swiches)
 }

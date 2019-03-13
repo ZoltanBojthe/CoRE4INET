@@ -13,9 +13,10 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
+import inet.linklayer.ethernet.EtherFrame;
+
 cplusplus {{
     //INET
-#include "inet/linklayer/ethernet/EtherFrame_m.h"
     
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Winconsistent-missing-override"
@@ -23,8 +24,6 @@ cplusplus {{
 #  pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
 }}
-
-class inet::EthernetIIFrame;
 
 namespace CoRE4INET;
 
@@ -37,13 +36,12 @@ namespace CoRE4INET;
 //
 // @author Till Steinbach
 //
-packet CTFrame extends EthernetIIFrame
+class CTFrame extends inet::EthernetMacHeader
 {
     @customize(true);    
     
 	// Set EthernetHeader Bytelength
-	byteLength = 18;	
-	etherType = 0x891d;
+	typeOrLength = 0x891d;
 	
     // Critical traffic ID (from MAC) (for TT and RC messages). 
     abstract uint16_t ctID;  
@@ -52,3 +50,4 @@ packet CTFrame extends EthernetIIFrame
     
     string displayString="b=15,15,rect,black,kind,5";
 }
+

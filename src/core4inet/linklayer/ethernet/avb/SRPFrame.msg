@@ -15,7 +15,6 @@
 
 cplusplus {{
 //INET
-#include "inet/linklayer/common/MacAddress.h"
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Winconsistent-missing-override"
@@ -24,7 +23,7 @@ cplusplus {{
 #endif
 }}
 
-class noncobject inet::MacAddress;
+import inet.linklayer.common.MacAddress;
 
 namespace CoRE4INET;
 

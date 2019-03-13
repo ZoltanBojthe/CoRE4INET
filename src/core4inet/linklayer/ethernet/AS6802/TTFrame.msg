@@ -13,14 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-cplusplus {{
-	//CoRE4INET
-	#include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
-}}
-
-class CoRE4INET::CTFrame;
-
-packet CTFrame;
+import core4inet.linklayer.ethernet.AS6802.CTFrame;
 
 namespace CoRE4INET;
 
@@ -31,7 +24,7 @@ namespace CoRE4INET;
 //
 // @author Till Steinbach
 //
-packet TTFrame extends CTFrame
+class TTFrame extends CTFrame
 {    
 	string displayString="b=15,15,rect,black,red,5";
 }

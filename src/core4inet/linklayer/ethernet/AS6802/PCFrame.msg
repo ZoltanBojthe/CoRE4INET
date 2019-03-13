@@ -13,14 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-cplusplus {{
-    //Auto-generated Messages
-	#include "core4inet/linklayer/ethernet/AS6802/RCFrame_m.h"
-}}
-
-class CoRE4INET::RCFrame;
-
-packet RCFrame;
+import core4inet.linklayer.ethernet.AS6802.RCFrame;
 
 namespace CoRE4INET;
 
@@ -48,10 +41,10 @@ enum PCFType
 //
 // @author Till Steinbach
 //
-packet PCFrame extends RCFrame
+class PCFrame extends RCFrame
 {   
     // Set PCF Bytelength
-    byteLength = 64;
+    chunkLength = B(64);
     	
     // pcf_integration_cycle: Represents the integration cycle in which the protocol control frame was sent
     //
@@ -82,3 +75,4 @@ packet PCFrame extends RCFrame
 	
 	string displayString="b=15,15,rect,white,orange,5";
 }
+

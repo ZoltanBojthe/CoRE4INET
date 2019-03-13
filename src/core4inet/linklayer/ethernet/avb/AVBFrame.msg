@@ -15,7 +15,6 @@
 
 cplusplus {{
 //Auto-generated Messages
-#include "core4inet/linklayer/ethernet/base/EtherFrameWithQTag_m.h"
 
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Winconsistent-missing-override"
@@ -24,7 +23,7 @@ cplusplus {{
 #endif
 }}
 
-class CoRE4INET::EthernetIIFrameWithQTag;
+import inet.common.packet.chunk.Chunk;
 
 namespace CoRE4INET;
 
@@ -35,12 +34,12 @@ namespace CoRE4INET;
 //
 // @author Philipp Meyer 
 //
-packet AVBFrame extends EthernetIIFrameWithQTag
+class AVBFrame extends inet::FieldsChunk
 {    
     // ID of the AVB Stream
     //
     // 64 Bit Field
     unsigned long streamID;
     
-	string displayString="b=15,15,rect,black,blue,5";
+	//string displayString="b=15,15,rect,black,blue,5";
 }

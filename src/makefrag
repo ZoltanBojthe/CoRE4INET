@@ -19,6 +19,11 @@ CFLAGS += -std=c++11
 
 UNAME_S := $(shell uname -s)
 
+#
+# Use the new message compiler introduced in OMNeT++ 5.3
+#
+MSGC:=$(MSGC) --msg6
+
 #Currently forcing clang interface on OS X! Otherwise OMNeT++ will use gcc wrapper of clang
 ifeq ($(UNAME_S),Darwin)
 	CC = clang
