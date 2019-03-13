@@ -21,12 +21,17 @@
 #include "core4inet/services/avb/SRP/SRPTable.h"
 #include "core4inet/base/NotifierConsts.h"
 #include "core4inet/utilities/ConfigFunctions.h"
-//INET
-#include "inet/linklayer/ethernet/Ethernet.h"
-#include "inet/common/ModuleAccess.h"
-#include "inet/linklayer/ethernet/EtherMacFullDuplex.h"
-//Auto-generated Messages
 #include "core4inet/linklayer/ethernet/avb/AVBFrame_m.h"
+//INET
+#include "inet/common/ModuleAccess.h"
+#include "inet/common/ProtocolGroup.h"
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/packet/Packet.h"
+#include "inet/common/packet/chunk/ByteCountChunk.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
+#include "inet/linklayer/ethernet/EtherMacFullDuplex.h"
+#include "inet/linklayer/ethernet/Ethernet.h"
+//Auto-generated Messages
 
 namespace CoRE4INET {
 
@@ -49,13 +54,13 @@ void AVBTrafficSourceApp::initialize()
     TrafficSourceAppBase::initialize();
     Timed::initialize();
 
-    if (getPayloadBytes() <= (MIN_ETHERNET_FRAME_BYTES - ETHER_MAC_FRAME_BYTES - ETHER_8021Q_TAG_BYTES))
+    if (getPayloadBytes() <= inet::B(inet::MIN_ETHERNET_FRAME_BYTES - inet::ETHER_MAC_FRAME_BYTES - ETHER_8021Q_TAG_BYTES).get())
     {
-        frameSize = MIN_ETHERNET_FRAME_BYTES;
+        frameSize = inet::MIN_ETHERNET_FRAME_BYTES.get();
     }
     else
     {
-        frameSize = getPayloadBytes() + ETHER_MAC_FRAME_BYTES + ETHER_8021Q_TAG_BYTES;
+        frameSize = getPayloadBytes() + inet::B(inet::ETHER_MAC_FRAME_BYTES + ETHER_8021Q_TAG_BYTES).get();
     }
 
     avbOutCTC = getParentModule()->getSubmodule("avbCTC");
@@ -99,22 +104,37 @@ void AVBTrafficSourceApp::handleMessage(cMessage* msg)
 void AVBTrafficSourceApp::sendAVBFrame()
 {
     std::string frameName = "Stream " + std::to_string(streamID);
-    AVBFrame *outFrame = new AVBFrame(frameName.c_str());
-    outFrame->setTimestamp();
-    outFrame->setStreamID(streamID);
-    outFrame->setDest(multicastMAC);
-    outFrame->setVID(vlan_id);
+    auto *packet = new inet::Packet(frameName.c_str());     //TODO //string displayString="b=15,15,rect,black,blue,5";
+    auto frame = inet::makeShared<inet::EthernetMacHeader>();
 
-    cPacket *payloadPacket = new cPacket;
-    payloadPacket->setTimestamp();
-    payloadPacket->setByteLength(static_cast<int64_t>(getPayloadBytes()));
-    outFrame->encapsulate(payloadPacket);
+    frame->setDest(multicastMAC);
+    //TODO set sourceAddress
+    frame->setTypeOrLength(0x22F0); // inet::ProtocolGroup::ethertype.getProtocolNumber(&inet::Protocol::tsn);
+
+    auto qtag = new inet::Ieee8021qHeader();
+    qtag->setVid(vlan_id);
+    //qtag->setPcp(priority);
+    qtag->setDe(false);
+
+    frame->setCTag(qtag);
+
+    auto outFrame = inet::makeShared<AVBFrame>();
+    outFrame->setStreamID(streamID);
+
+    packet->setTimestamp();
+
+    auto payload = inet::makeShared<inet::ByteCountChunk>(inet::B(getPayloadBytes()));
+    packet->insertAtFront(payload);
+    packet->insertAtFront(outFrame);
+    packet->insertAtFront(frame);
+
     //Padding
-    if (outFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        outFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
-    }
-    sendDirect(outFrame, avbOutCTC->gate("in"));
+    inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);    //TODO get crcMode from parameter
+
+    //PacketProtocolTag
+    packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
+
+    sendDirect(packet, avbOutCTC->gate("in"));
 
     scheduleInterval();
 }
