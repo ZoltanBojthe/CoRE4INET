@@ -26,6 +26,11 @@
 #include "core4inet/linklayer/ethernet/AS6802/TTFrame_m.h"
 #include "core4inet/linklayer/ethernet/AS6802/RCFrame_m.h"
 
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/common/packet/Packet.h"
+#include "inet/common/packet/chunk/ByteCountChunk.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
+
 namespace CoRE4INET {
 
 
@@ -77,40 +82,43 @@ void CTTrafficSourceAppBase::sendMessage()
     {
         for (std::list<CTBuffer*>::const_iterator buf = buffer.begin(); buf != buffer.end(); ++buf)
         {
-            CTFrame *frame;
+            inet::Ptr<CTFrame> frame;
             if (dynamic_cast<TTBuffer*>(*buf))
             {
-                frame = new TTFrame("");
+                frame = inet::makeShared<TTFrame>();
             }
             else if (dynamic_cast<RCBuffer*>(*buf))
             {
-                frame = new RCFrame("");
+                frame = inet::makeShared<RCFrame>();
             }
             else
             {
                 continue;
             }
-            frame->setTimestamp();
-            cPacket *payload_packet = new cPacket;
-            payload_packet->setTimestamp();
-            payload_packet->setByteLength(static_cast<int64_t>(getPayloadBytes()));
-            frame->encapsulate(payload_packet);
-            //Padding
-            if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-            {
-                frame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
-            }
+
             if (this->ct_id > 0)
             {
                 frame->setCtID(static_cast<uint16_t>(this->ct_id));
             }
-            frame->setName((*buf)->getName());
+
+            auto packet = new inet::Packet((*buf)->getName());
+            packet->setTimestamp();
+            auto payload = inet::makeShared<inet::ByteCountChunk>(inet::B(getPayloadBytes()));
+            packet->insertAtFront(payload);
+            packet->insertAtFront(frame);
+
+            //Padding
+            inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);    //TODO get crcMode from parameter
+
+            //PacketProtocolTag
+            packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
+
             if ((*buf)->gate("in")->getPathStartGate())
             {
                 Incoming* in = dynamic_cast<Incoming *>((*buf)->gate("in")->getPathStartGate()->getOwner());
                 if (in)
                 {
-                    sendDirect(frame, in->gate("in"));
+                    sendDirect(packet, in->gate("in"));
                 }
                 else
                 {
@@ -122,7 +130,7 @@ void CTTrafficSourceAppBase::sendMessage()
             }
             else //It is ok to directly send a frame to a buffer if no incoming is attached!
             {
-                sendDirect(frame, (*buf)->gate("in"));
+                sendDirect(packet, (*buf)->gate("in"));
             }
         }
     }
