@@ -47,7 +47,7 @@ class BGEtherEncap : public virtual inet::EtherEncap
          *
          * @param msg cMessage pointer
          */
-        virtual void handleMessage(cMessage *msg) override;
+        virtual void handleMessage(omnetpp::cMessage *msg) override;
 }; // class BGEtherEncap
 
 
