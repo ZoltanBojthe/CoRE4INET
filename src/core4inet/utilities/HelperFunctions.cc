@@ -135,14 +135,11 @@ void setTransparentClock(PCFrame *pcf, double static_tx_delay, Timer* timer)
     pcf->setTransparent_clock(transparentClock);
 }
 
-bool isCT(const inet::EtherFrame *frame, uint32_t ctMarker, uint32_t ctMask)
+bool isCT(const inet::EthernetMacHeader *frame, uint32_t ctMarker, uint32_t ctMask)
 {
-    if (const inet::EthernetIIFrame *e2f = dynamic_cast<const inet::EthernetIIFrame*>(frame))
+    if (frame->getTypeOrLength() != 0x891d)
     {
-        if (e2f->getEtherType() != 0x891d)
-        {
-            return false;
-        }
+        return false;
     }
     unsigned char macBytes[6];
     frame->getDest().getAddressBytes(macBytes);
@@ -156,7 +153,7 @@ bool isCT(const inet::EtherFrame *frame, uint32_t ctMarker, uint32_t ctMask)
     return false;
 }
 
-uint16_t getCTID(const inet::EtherFrame *frame)
+uint16_t getCTID(const inet::EthernetMacHeader *frame)
 {
     unsigned char macBytes[6];
     frame->getDest().getAddressBytes(macBytes);
@@ -173,7 +170,7 @@ unsigned long bandwidthFromSizeAndInterval(size_t framesize, size_t intervalFram
 {
     return static_cast<unsigned long>(ceil(
             (second / interval) * static_cast<double>(intervalFrames)
-                    * static_cast<double>(((framesize + PREAMBLE_BYTES + SFD_BYTES) * 8) + INTERFRAME_GAP_BITS)));
+                    * static_cast<double>(inet::b(inet::B(framesize) + inet::PREAMBLE_BYTES + inet::SFD_BYTES + inet::INTERFRAME_GAP_BITS).get())));
 }
 
 Register_PerRunConfigOptionU(CFGID_AVB_OBSERVATION_WINDOW_A, "AVB-ObservationWindow-A", "s",

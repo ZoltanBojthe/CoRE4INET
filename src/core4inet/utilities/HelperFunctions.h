@@ -137,7 +137,7 @@ void setTransparentClock(PCFrame *pcf, double static_tx_delay, Timer* scheduler)
  * @param frame Pointer to the frame to check.
  * @return true if frame is critical, else false
  */
-bool isCT(const inet::EtherFrame *frame, uint32_t ctMarker, uint32_t ctMask);
+bool isCT(const inet::EthernetMacHeader *frame, uint32_t ctMarker, uint32_t ctMask);
 
 /**
  * @brief Returns the critical traffic id for a given frame.
@@ -150,7 +150,7 @@ bool isCT(const inet::EtherFrame *frame, uint32_t ctMarker, uint32_t ctMask);
  *
  * @sa isCT(EtherFrame *frame)
  */
-uint16_t getCTID(const inet::EtherFrame *frame);
+uint16_t getCTID(const inet::EthernetMacHeader *frame);
 #endif
 
 #ifdef WITH_AVB_COMMON
