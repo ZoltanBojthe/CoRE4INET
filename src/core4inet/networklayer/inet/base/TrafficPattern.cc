@@ -66,7 +66,7 @@ bool TrafficPattern::matches(const cPacket *cpacket)
         return false;
     if (tosMask != 0) {
         if (auto ipv4Header = inet::dynamicPtrCast<const inet::Ipv4Header>(datagram)) {
-            if ((tos & tosMask) != (datagram->getTypeOfService() & tosMask))
+            if ((tos & tosMask) != (ipv4Header->getTypeOfService() & tosMask))
                 return false;
         }
      }
