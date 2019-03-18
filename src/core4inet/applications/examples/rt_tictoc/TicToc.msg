@@ -13,6 +13,8 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
+import inet.common.packet.chunk.Chunk;
+
 namespace CoRE4INET;
 
 //
@@ -20,9 +22,10 @@ namespace CoRE4INET;
 //
 // @author Till Steinbach
 //
-packet TicToc {
+class TicToc extends inet::FieldsChunk
+{
     //All messages use minimum size payload
-    byteLength = 46;
+    chunkLength = inet::B(46);
     //Counter transportet through the network
     unsigned int count = 0;
     //Start time to calculate roundtrip time
@@ -34,7 +37,7 @@ packet TicToc {
 //
 // @author Till Steinbach
 //
-packet Tic extends TicToc{
+class Tic extends TicToc{
     //Request message
     string request = "Hello!";
 }
@@ -44,7 +47,8 @@ packet Tic extends TicToc{
 //
 // @author Till Steinbach
 //
-packet Toc extends TicToc{
+class Toc extends TicToc{
     //Response message
     string response = "World!";
 }
+

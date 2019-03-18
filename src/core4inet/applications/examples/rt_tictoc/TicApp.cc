@@ -22,6 +22,8 @@
 #include "core4inet/linklayer/ethernet/AS6802/TTFrame_m.h"
 #include "core4inet/linklayer/ethernet/AS6802/RCFrame_m.h"
 
+#include "inet/common/packet/Packet.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
 
 namespace CoRE4INET {
 
@@ -47,23 +49,30 @@ void TicApp::handleMessage(cMessage *msg)
 
     if (msg->arrivedOn("schedulerIn"))
     {
-        Tic *tic = new Tic();
-        tic->setTimestamp();
+        auto *packet = new inet::Packet("Tic");
+        packet->setTimestamp();
+        auto tic = inet::makeShared<Tic>();
         tic->setRoundtrip_start(simTime());
         tic->setCount(par("counter"));
-        CTFrame *frame = new TTFrame("Tic");
-        frame->setTimestamp();
+        auto frame = inet::makeShared<TTFrame>();
         frame->setCtID(par("ct_id"));
-        frame->encapsulate(tic);
+        packet->insertAtFront(tic);
+        packet->insertAtFront(frame);
+
+        //Padding
+        inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);    //TODO get crcMode from parameter
+
+        //PacketProtocolTag
+        packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
 
         EV_DETAIL << "Sending Tic Message\n";
         std::list<CTBuffer*> buffer = ctbuffers[frame->getCtID()];
         for (std::list<CTBuffer*>::const_iterator buf = buffer.begin(); buf != buffer.end(); ++buf)
         {
             Incoming* in = dynamic_cast<Incoming *>((*buf)->gate("in")->getPathStartGate()->getOwner());
-            sendDirect(frame->dup(), in->gate("in"));
+            sendDirect(packet->dup(), in->gate("in"));
         }
-        delete frame;
+        delete packet;
 
         if(SchedulerActionTimeEvent *event = dynamic_cast<SchedulerActionTimeEvent *>(msg))
         {
@@ -77,13 +86,13 @@ void TicApp::handleMessage(cMessage *msg)
     }
     else if (msg->arrivedOn("RCin"))
     {
-        RCFrame *rcframe = dynamic_cast<RCFrame*>(msg);
-        Toc *toc = dynamic_cast<Toc*>(rcframe->decapsulate());
+        auto packet = check_and_cast<inet::Packet*>(msg);
+        emit(rxPkSignal, packet);
+        auto rcframe = packet->popAtFront<RCFrame>();
+        auto toc = packet->popAtFront<Toc>();
         bubble(toc->getResponse());
         par("counter").setIntValue(static_cast<long>(toc->getCount()));
-        emit(rxPkSignal, rcframe);
         emit(roundtripSignal, toc->getRoundtrip_start() - simTime());
-        delete toc;
         delete msg;
     }
     else

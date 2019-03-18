@@ -22,6 +22,9 @@
 #include "core4inet/linklayer/ethernet/AS6802/RCFrame_m.h"
 #include "core4inet/linklayer/ethernet/AS6802/TTFrame_m.h"
 
+#include "inet/common/packet/Packet.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
+
 namespace CoRE4INET {
 
 Define_Module(TocApp);
@@ -37,33 +40,43 @@ void TocApp::handleMessage(cMessage *msg)
 
     if (msg->arrivedOn("TTin"))
     {
-        TTFrame *ttframe = dynamic_cast<TTFrame*>(msg);
-        if (ttframe)
+        auto inpacket = check_and_cast<inet::Packet*>(msg);
+        if (true)   //KLUDGE: if TTFrame
         {
-            Tic *tic = dynamic_cast<Tic*>(ttframe->decapsulate());
-            delete msg;
+            auto ttframe = inpacket->popAtFront<TTFrame>();
+            //TODO check ttframe typeorlength field
+            auto tic = inpacket->peekAtFront<Tic>();
             bubble(tic->getRequest());
             par("counter").setIntValue(static_cast<long>(tic->getCount()));
 
-            Toc *toc = new Toc();
-            toc->setTimestamp();
+            auto packet = new inet::Packet("Toc");
+            packet->setTimestamp();
+
+            auto toc = inet::makeShared<Toc>();
             toc->setRoundtrip_start(tic->getRoundtrip_start());
             toc->setCount(tic->getCount() + 1);
-            delete tic;
 
-            CTFrame *frame = new RCFrame("Toc");
-            frame->setTimestamp();
+            auto frame = inet::makeShared<RCFrame>();            delete msg;
             frame->setCtID(par("ct_id"));
-            frame->encapsulate(toc);
+            packet->insertAtFront(toc);
+            packet->insertAtFront(frame);
+
+            //Padding
+            inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);    //TODO get crcMode from parameter
+
+            //PacketProtocolTag
+            packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
+
+            delete msg;
 
             EV_DETAIL << "Answering Tic Message with Toc Message\n";
             std::list<CTBuffer*> buffer = ctbuffers[frame->getCtID()];
             for (std::list<CTBuffer*>::const_iterator buf = buffer.begin(); buf != buffer.end(); ++buf)
             {
                 Incoming* in = dynamic_cast<Incoming *>((*buf)->gate("in")->getPathStartGate()->getOwner());
-                sendDirect(frame->dup(), in->gate("in"));
+                sendDirect(packet->dup(), in->gate("in"));
             }
-            delete frame;
+            delete packet;
         }
         else{
             delete msg;
