@@ -14,6 +14,7 @@
 // 
 
 import core4inet.linklayer.ethernet.AS6802.RCFrame;
+import inet.common.packet.chunk.Chunk;
 
 namespace CoRE4INET;
 
@@ -35,16 +36,15 @@ enum PCFType
 };
 
 //
-// Represents a Protocol Control Frame (PCF)
-//
-// @see ~RCFrame
-//
+// Represents a Protocol Control Frame (PCF) payload of Ethernet II frame
+// (EtherType value is 0x891d)
+// 
 // @author Till Steinbach
 //
-class PCFrame extends RCFrame
+class PCFrame extends inet::FieldsChunk
 {   
     // Set PCF Bytelength
-    chunkLength = B(64);
+    chunkLength = inet::B(46);
     	
     // pcf_integration_cycle: Represents the integration cycle in which the protocol control frame was sent
     //
@@ -73,6 +73,6 @@ class PCFrame extends RCFrame
 	// 64 Bit field
 	uint64_t transparent_clock;
 	
-	string displayString="b=15,15,rect,white,orange,5";
+	// string displayString="b=15,15,rect,white,orange,5";
 }
 
