@@ -10,8 +10,10 @@
 
 //==============================================================================
 
+#include "inet/common/packet/Packet.h"
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
+#include "inet/networklayer/common/L3Tools.h"
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
 #include "inet/transportlayer/tcp_common/TcpHeader.h"
@@ -37,43 +39,56 @@ TrafficPattern::~TrafficPattern()
 
 //==============================================================================
 
-bool TrafficPattern::matches(const cPacket *packet)
+bool TrafficPattern::matches(const cPacket *cpacket)
 {
-    const inet::IPv4Datagram *datagram = dynamic_cast<const inet::IPv4Datagram*>(packet);
-    if (!datagram)
+    const inet::Packet *packet = dynamic_cast<const inet::Packet*>(cpacket);
+    if (!packet)
         return false;
 
+    auto protocolTag = packet->findTag<inet::PacketProtocolTag>();
+    if (!protocolTag)
+        return false;
+    const inet::Protocol *curProtocol = protocolTag->getProtocol();
+    if (curProtocol != &inet::Protocol::ipv4 && curProtocol != &inet::Protocol::ipv6)
+        return false;
+
+    const auto& datagram = inet::peekNetworkProtocolHeader(packet, *curProtocol);
+
     if (srcPrefixLength > 0
-            && ((srcAddr.getType() == inet::L3Address::IPv6)
-                    || !datagram->getSrcAddress().prefixMatches(srcAddr.toIPv4(), srcPrefixLength)))
+            && ((srcAddr.getType() == inet::L3Address::IPv6)        //TODO L3Address.matches(other, length) also works with IPv6 addresses
+                    || !datagram->getSourceAddress().matches(srcAddr, srcPrefixLength)))
         return false;
     if (destPrefixLength > 0
-            && ((destAddr.getType() == inet::L3Address::IPv6)
-                    || !datagram->getDestAddress().prefixMatches(destAddr.toIPv4(), destPrefixLength)))
+            && ((destAddr.getType() == inet::L3Address::IPv6)        //TODO L3Address.matches(other, length) also works with IPv6 addresses
+                    || !datagram->getDestinationAddress().matches(destAddr, destPrefixLength)))
         return false;
-    if (protocol >= 0 && datagram->getTransportProtocol() != protocol)
+    if (protocol >= 0 && inet::ProtocolGroup::ipprotocol.getProtocolNumber(datagram->getProtocol()) != protocol)
         return false;
-    if (tosMask != 0 && (tos & tosMask) != (datagram->getTypeOfService() & tosMask))
-        return false;
+    if (tosMask != 0) {
+        if (auto ipv4Header = inet::dynamicPtrCast<const inet::Ipv4Header>(datagram)) {
+            if ((tos & tosMask) != (datagram->getTypeOfService() & tosMask))
+                return false;
+        }
+     }
     if (srcPortMin >= 0 || destPortMin >= 0)
     {
         int srcPort = -1, destPort = -1;
-        const cPacket *encPacket = packet->getEncapsulatedPacket();
-        const inet::UDPPacket *udpPacket = dynamic_cast<const inet::UDPPacket*>(encPacket);
-        if (udpPacket)
+        auto curProtocol = datagram->getProtocol();
+        if (*curProtocol == inet::Protocol::udp)
         {
+            auto udpPacket = packet->peekAt<inet::UdpHeader>(datagram->getChunkLength());
             srcPort = static_cast<int>(udpPacket->getSourcePort());
             destPort = static_cast<int>(udpPacket->getDestinationPort());
         }
-        const inet::tcp::TcpHeader *tcpSegment = dynamic_cast<const inet::tcp::TcpHeader*>(encPacket);
-        if (tcpSegment)
+        else if (*curProtocol == inet::Protocol::tcp)
         {
+            auto tcpSegment = packet->peekAt<inet::tcp::TcpHeader>(datagram->getChunkLength());
             srcPort = tcpSegment->getSrcPort();
             destPort = tcpSegment->getDestPort();
         }
-        const inet::sctp::SctpMessage *sctpPacket = dynamic_cast<const inet::sctp::SctpMessage*>(encPacket);
-        if (sctpPacket)
+        else if (*curProtocol == inet::Protocol::sctp)
         {
+            auto sctpPacket = packet->peekAt<inet::sctp::SctpHeader>(datagram->getChunkLength());
             srcPort = static_cast<int>(sctpPacket->getSrcPort());
             destPort = static_cast<int>(sctpPacket->getDestPort());
         }
