@@ -20,7 +20,7 @@
 #include "core4inet/utilities/ConfigFunctions.h"
 
 //INET
-#include "inet/linklayer/ethernet/EtherFrame_m.h"
+#include "inet/common/packet/Packet.h"
 
 namespace CoRE4INET {
 
@@ -44,7 +44,7 @@ void RCIncoming::handleMessage(cMessage *msg)
 {
     if (msg->arrivedOn("in"))
     {
-        if (inet::EtherFrame *etherframe = dynamic_cast<inet::EtherFrame *>(msg))
+        if (inet::Packet *etherframe = dynamic_cast<inet::Packet *>(msg))
         {
             recordPacketReceived(etherframe);
 
