@@ -44,11 +44,11 @@ bool TrafficPattern::matches(const cPacket *packet)
         return false;
 
     if (srcPrefixLength > 0
-            && ((srcAddr.getType() == inet::L3Address::Ipv6)
+            && ((srcAddr.getType() == inet::L3Address::IPv6)
                     || !datagram->getSrcAddress().prefixMatches(srcAddr.toIPv4(), srcPrefixLength)))
         return false;
     if (destPrefixLength > 0
-            && ((destAddr.getType() == inet::L3Address::Ipv6)
+            && ((destAddr.getType() == inet::L3Address::IPv6)
                     || !datagram->getDestAddress().prefixMatches(destAddr.toIPv4(), destPrefixLength)))
         return false;
     if (protocol >= 0 && datagram->getTransportProtocol() != protocol)

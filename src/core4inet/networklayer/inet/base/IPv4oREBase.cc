@@ -58,12 +58,12 @@ IPv4oREBase::~IPv4oREBase()
 void IPv4oREBase::addFilter(IPoREFilter *filter)
 {
     TrafficPattern *tp = filter->getTrafficPattern();
-    if (!tp->getSrcAddr().isUnspecified() && (((tp->getSrcAddr().getType()==inet::L3Address::Ipv6) && tp->getSrcPrefixLength() > 128) ||
-                                            ((tp->getSrcAddr().getType()!=inet::L3Address::Ipv6) && tp->getSrcPrefixLength() > 32)))
+    if (!tp->getSrcAddr().isUnspecified() && (((tp->getSrcAddr().getType()==inet::L3Address::IPv6) && tp->getSrcPrefixLength() > 128) ||
+                                            ((tp->getSrcAddr().getType()!=inet::L3Address::IPv6) && tp->getSrcPrefixLength() > 32)))
         throw cRuntimeError("srcPrefixLength is invalid");
-    if (!tp->getDestAddr().isUnspecified() && (((tp->getDestAddr().getType()==inet::L3Address::Ipv6) && tp->getDestPrefixLength() > 128) ||
-                                             ((tp->getDestAddr().getType()!=inet::L3Address::Ipv6) && tp->getDestPrefixLength() > 32)))
-        throw cRuntimeError("srcPrefixLength is invalid");
+    if (!tp->getDestAddr().isUnspecified() && (((tp->getDestAddr().getType()==inet::L3Address::IPv6) && tp->getDestPrefixLength() > 128) ||
+                                             ((tp->getDestAddr().getType()!=inet::L3Address::IPv6) && tp->getDestPrefixLength() > 32)))
+        throw cRuntimeError("destPrefixLength is invalid");
     if (tp->getProtocol() != -1 && (tp->getProtocol() < 0 || tp->getProtocol() > 0xff))
         throw cRuntimeError("protocol is not a valid protocol number");
     if (tp->getTos() != -1 && (tp->getTos() < 0 || tp->getTos() > 0xff))
