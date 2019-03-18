@@ -39,9 +39,9 @@ import inet.networklayer.common.InterfaceTable;
 module TTEAVBEtherHost
 {
     parameters:
-        @display("bgb=894,314;i=device/device");
+        @display("bgb=894,423;i=device/device");
         @networkNode;
-        
+
         // Number of Applications running on the device
         int numApps = default(0);
         // Optional: Number of Buffers with Incoming Module for TT and RC traffic 
@@ -53,16 +53,16 @@ module TTEAVBEtherHost
         double hardware_delay @unit(s) = default(0us);
         // Promiscuous mode for best-efford traffic handling
         bool be_promiscuous = default(true);
-        
+
         *.interfaceTableModule = default(absPath(".interfaceTable"));
-        
+
     gates:
         inout ethg;
 
     submodules:
         // Physical port of the host
         phy[numPorts]: TTEAVBPHYPort {
-            @display("p=380,255,c,50");
+            @display("p=380,340,c,50");
             promiscuous = be_promiscuous;
         }
 
@@ -80,30 +80,30 @@ module TTEAVBEtherHost
         avbABuffer[numPorts]: AVBQueueBuffer {
             parameters:
                 srClass = "A";
-                @display("p=341,193");
+                @display("p=290,192");
         }
 
         // AVB class B buffer
         avbBBuffer[numPorts]: AVBQueueBuffer {
             parameters:
                 srClass = "B";
-                @display("p=419,193");
+                @display("p=470,192");
         }
 
 		// Stream Reservation Protocol ethernet encapsulation
         encap: SRPEtherEncap {
             parameters:
-                @display("p=141,255");
+                @display("p=577,278");
         }
 
         // Sync module for synchronisation of the scheduler
         sync: <default("DummySync")> like ISync {
-            @display("p=208,169");
+            @display("p=78,246");
         }
-        
+
         // Scheduler for the device
         scheduler: <default("Scheduler")> like ITTEScheduler {
-            @display("p=274,169");
+            @display("p=78,341");
         }
 
 		// Applications for the device
@@ -113,29 +113,29 @@ module TTEAVBEtherHost
 
 		// Best-efford buffer for incoming traffic 
         bgIn: BGQueueBuffer {
-            @display("p=60,37");
+            @display("p=576,36");
         }
-        
+
 		// Best-efford buffer for outgoing traffic
         bgOut: BGQueueBuffer {
-            @display("p=109,37");
+            @display("p=653,36");
         }
-		
+
 		// Stream Reservation Protocol table
         srpTable: SRPTable {
-            @display("p=141,99");
+            @display("p=78,55");
         }
 
 		// Stream Reservation Protocol implementation
         srpProtocol: SRProtocol {
-            @display("p=141,169");
+            @display("p=758,212");
         }
-        
+
         // Holds interface names
         interfaceTable: InterfaceTable {
-            @display("p=208,99");
+            @display("p=78,148");
         }
-        
+
     connections allowunconnected:
         phy[0].phys <--> ethg;
         encap.lowerLayerOut --> phy[0].upperLayerIn;
