@@ -46,6 +46,7 @@ void AVBIncoming::handleMessage(cMessage* msg)
 {
     if (msg && msg->arrivedOn("in"))
     {
+        auto inPacket = check_and_cast<inet::Packet*>(msg);
         if (AVBFrame *inFrame = dynamic_cast<AVBFrame*>(msg))
         {
             std::list<cModule*> listeners = srptable->getListenersForTalkerAddress(inFrame->getDest(),
@@ -53,7 +54,7 @@ void AVBIncoming::handleMessage(cMessage* msg)
             SR_CLASS srClass = srptable->getSrClassForTalkerAddress(inFrame->getDest(), inFrame->getVID());
             if (listeners.empty())
             {
-                emit(droppedSignal, inFrame);
+                emit(droppedSignal, inPacket);
             }
             else
             {
@@ -67,16 +68,16 @@ void AVBIncoming::handleMessage(cMessage* msg)
                             outputStr = "AVBAout";
                         else if (srClass == SR_CLASS::B)
                             outputStr = "AVBBout";
-                        sendDelayed(inFrame->dup(), getHardwareDelay(),
+                        sendDelayed(inPacket->dup(), getHardwareDelay(),
                                 gate(outputStr.c_str(), (*listener)->getIndex()));
-                        emit(rxPkSignal, inFrame);
+                        emit(rxPkSignal, inPacket);
                     }
                     else
                     {
                         if ((*listener)->hasGate("AVBin"))
                         {
-                            sendDirect(inFrame->dup(), (*listener)->gate("AVBin"));
-                            emit(rxPkSignal, inFrame);
+                            sendDirect(inPacket->dup(), (*listener)->gate("AVBin"));
+                            emit(rxPkSignal, inPacket);
                         }
                     }
                 }

@@ -41,7 +41,7 @@ class TTIncoming : public virtual CTIncoming, public virtual Scheduled
         /**
          * @brief Stores the frame until the configured permanence point in time.
          */
-        inet::EtherFrame *frame;
+        inet::Packet *frame;
 
         /**
          * @brief Caches receive_window_start parameter

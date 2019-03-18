@@ -34,25 +34,25 @@ void PCFIncoming::handleMessage(cMessage *msg)
 {
     if (msg->arrivedOn("in"))
     {
-        if (PCFrame *frame = dynamic_cast<PCFrame *>(msg))
-        {
-            recordPacketReceived(frame);
+        auto packet = check_and_cast<inet::Packet*>(msg);
+        recordPacketReceived(packet);
+        auto ethHeader = packet->peekAtFront<inet::EthernetMacHeader>();
+        if (ethHeader->getTypeOrLength() != 0x891d) {
+            EV_ERROR << "FRAME DROPPED, wrong type:" << static_cast<int>(ethHeader->getTypeOrLength()) << " should be 0x891d" << endl;
+            emit(droppedSignal, packet);
+            delete packet;
+            return;
+        }
 
-            if (frame->getType() != static_cast<uint8_t>(pcfType))
-            {
-                EV_ERROR << "FRAME DROPPED, wrong type:" << static_cast<int>(frame->getType()) << " should be " << pcfType << endl;
-                emit(droppedSignal, frame);
-                delete frame;
-            }
-            else
-            {
-                sendDelayed(frame, getHardwareDelay(), "out");
-            }
-        }
-        else
+        auto frame = packet->peekAt<PCFrame>(ethHeader->getChunkLength());
+        if (frame->getType() != static_cast<uint8_t>(pcfType))
         {
-            throw cRuntimeError("Received non-PCF frame");
+            EV_ERROR << "FRAME DROPPED, wrong type:" << static_cast<int>(frame->getType()) << " should be " << pcfType << endl;
+            emit(droppedSignal, packet);
+            delete packet;
+            return;
         }
+        sendDelayed(packet, getHardwareDelay(), "out");
     }
 }
 
