@@ -38,8 +38,13 @@ class AVBFrame extends inet::FieldsChunk
 {    
     // ID of the AVB Stream
     //
+    // This field is not stored in a real AVB frame. In a real network the streamid
+    // is identified just through the multicast destination mac address.
+    // It is just contained for debuging.
+    //
     // 64 Bit Field
     unsigned long streamID;
     
 	//string displayString="b=15,15,rect,black,blue,5";
 }
+
