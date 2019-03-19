@@ -86,8 +86,7 @@ class BEShaper : public TC
          * @brief Forwards the messages from the different buffers and LLC
          * according to the specification for BEMessages.
          *
-         * Best-effort messages are send immediately, lower priority fra#include "inet/linklayer/ethernet/EtherFrame.h"
-         * mes are queued
+         * Best-effort messages are send immediately, lower priority frames are queued
          * as long as there are best-effort messages waiting.
          * If the mac layer is idle, messages are picked from the queues according
          * to the priorities, using the template class.
