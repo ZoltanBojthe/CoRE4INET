@@ -44,14 +44,20 @@ void AVBIncoming::initialize()
 
 void AVBIncoming::handleMessage(cMessage* msg)
 {
-    if (msg && msg->arrivedOn("in"))
+    ASSERT(msg && msg->arrivedOn("in"));
     {
         auto inPacket = check_and_cast<inet::Packet*>(msg);
-        if (AVBFrame *inFrame = dynamic_cast<AVBFrame*>(msg))
+        const auto& ethHeader = inPacket->popAtFront<inet::EthernetMacHeader>();
+        const auto& avbHeader = inPacket->popAtFront<AVBFrame>();
+
+        auto ctag = ethHeader->getCTag();
+        if (ctag == nullptr)
+            throw cRuntimeError("Missing ethernet CTAG.");
+
         {
-            std::list<cModule*> listeners = srptable->getListenersForTalkerAddress(inFrame->getDest(),
-                    inFrame->getVID());
-            SR_CLASS srClass = srptable->getSrClassForTalkerAddress(inFrame->getDest(), inFrame->getVID());
+            std::list<cModule*> listeners = srptable->getListenersForTalkerAddress(ethHeader->getDest(),
+                    ctag->getVid());
+            SR_CLASS srClass = srptable->getSrClassForTalkerAddress(ethHeader->getDest(), ctag->getVid());
             if (listeners.empty())
             {
                 emit(droppedSignal, inPacket);
@@ -82,17 +88,10 @@ void AVBIncoming::handleMessage(cMessage* msg)
                     }
                 }
             }
-            delete inFrame;
+            delete msg;
         }
-        else
-        {
-            throw cRuntimeError("Received non-AVBFrame frame");
-        }
-    }
-    else
-    {
-        delete msg;
     }
 }
 
 } /* namespace CoRE4INET */
+
