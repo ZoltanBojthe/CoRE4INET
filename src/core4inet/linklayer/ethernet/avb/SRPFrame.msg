@@ -23,6 +23,7 @@ cplusplus {{
 #endif
 }}
 
+import inet.common.packet.chunk.Chunk;
 import inet.linklayer.common.MacAddress;
 
 namespace CoRE4INET;
@@ -34,17 +35,18 @@ namespace CoRE4INET;
 //
 // @author Philipp Meyer
 //
-packet SRPFrame{    
+class SRPFrame  extends inet::FieldsChunk {    
+    chunkLength = inet::B(8);
     // ID of the AVB Stream
     // 64 Bit Field (48bit MAC + 16bit UniqueID)
 	uint64_t streamID;
 		
 	// for internal implementation:
-	string displayString="b=15,15,rect,black,black,5";
+	//string displayString="b=15,15,rect,black,black,5";
 }
 
-packet TalkerAdvertise extends SRPFrame{
-    byteLength = 25;
+class TalkerAdvertise extends SRPFrame{
+    chunkLength = inet::B(25);
     
     // DataFrameParameters => destination adress and vlan identifier
 	// 64 Bit Field
@@ -62,20 +64,20 @@ packet TalkerAdvertise extends SRPFrame{
 	uint32_t accumulatedLatency;
 }
 
-packet TalkerFailed extends TalkerAdvertise{
-    byteLength = 34;
+class TalkerFailed extends TalkerAdvertise{
+    chunkLength = inet::B(34);
     // FailureInformation
 	//
 	// 72 Bit Field
 }
 
-packet ListenerReady extends SRPFrame{
-	byteLength = 8;	
+class ListenerReady extends SRPFrame{
+	chunkLength = inet::B(8);
 	uint16_t vlan_identifier;
 }
 
-packet ListenerAskingFailed extends SRPFrame{
-    byteLength = 17;
+class ListenerAskingFailed extends SRPFrame{
+    chunkLength = inet::B(17);
     uint16_t vlan_identifier;
     
     // FailureInformation
@@ -83,10 +85,11 @@ packet ListenerAskingFailed extends SRPFrame{
 	// 72 Bit Field	
 }
 
-packet ListenerReadyFailed extends ListenerReady{
-    byteLength = 17;
+class ListenerReadyFailed extends ListenerReady{
+    chunkLength = inet::B(17);
     
     // FailureInformation
 	//
 	// 72 Bit Field
 }
+
