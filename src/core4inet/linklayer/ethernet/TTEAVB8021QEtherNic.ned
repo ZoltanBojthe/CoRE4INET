@@ -18,10 +18,9 @@ package core4inet.linklayer.ethernet;
 import core4inet.linklayer.ethernet.avb.SRPEtherEncap;
 import core4inet.linklayer.inControl.CT_AVB_BE_InControl;
 import core4inet.linklayer.shaper.TT_AVBClassA_AVBClassB_PCF_RC_8021Q_Shaper;
-import inet.linklayer.ethernet.EtherMacFullDuplex;
 
 import inet.linklayer.contract.INetworkInterface;
-
+import inet.linklayer.ethernet.EtherMacFullDuplex;
 
 //
 // Module for a TTE AVB BE Ethernet NIC
@@ -40,8 +39,8 @@ module TTEAVB8021QEtherNic like INetworkInterface
         double hardware_delay @unit(s) = default(0us);
         bool promiscuous = default(true); // TODO: sinnvoller default
         *.interfaceTableModule = default(absPath(interfaceTableModule));
-    gates:
 
+    gates:
         // Connection to the physical ethernet gate
         inout ethg;
 
@@ -50,10 +49,10 @@ module TTEAVB8021QEtherNic like INetworkInterface
 
         // best effort output to upper layer
         output upperLayerOut;
-        
+
         // background (BE) traffic input
         input bgIn;
-        
+
         // background (BE) traffic out
         output bgOut;
 
@@ -71,15 +70,14 @@ module TTEAVB8021QEtherNic like INetworkInterface
 
         // rate-constrained Protocol-Control-Frame traffic from upper layer
         input PCFin @directIn @labels(PCFrame);
-        
+
         // stream reservation protocol input
         input srpIn;
-        
+
         // stream reservation protocol output
         output srpOut;
 
     submodules:
-
         shaper: TT_AVBClassA_AVBClassB_PCF_RC_8021Q_Shaper {
             @display("p=88,75");
         }
@@ -103,7 +101,6 @@ module TTEAVB8021QEtherNic like INetworkInterface
         }
 
     connections:
-
         mac.phys <--> ethg;
 
         mac.upperLayerIn <-- shaper.out;
@@ -126,3 +123,5 @@ module TTEAVB8021QEtherNic like INetworkInterface
         encap.bgOut --> bgOut;
         bgIn --> encap.bgIn;
 }
+
+
