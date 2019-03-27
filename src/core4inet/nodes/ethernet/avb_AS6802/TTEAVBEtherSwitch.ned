@@ -24,10 +24,11 @@ import core4inet.services.avb.SRP.SRPTable;
 import core4inet.services.avb.SRP.SRProtocol;
 import core4inet.synchronisation.base.ISync;
 import core4inet.utilities.modules.CheckedBuffer;
-
 import inet.common.MessageDispatcher;
 import inet.linklayer.contract.IMacAddressTable;
+import inet.linklayer.ethernet.IEtherEncap;
 import inet.networklayer.common.InterfaceTable;
+
 
 //
 // Module for a TTEAVBEthernet Switch.
@@ -41,7 +42,7 @@ module TTEAVBEtherSwitch
 {
     parameters:
         @networkNode();
-        @display("i=block/switch;bgb=1280,648");
+        @display("i=block/switch;bgb=1278,839");
 
         // Optional: Number of Buffers with Incoming Module for TT and RC traffic 
         // (When not manually declared in own deriving .ned file)
@@ -63,7 +64,7 @@ module TTEAVBEtherSwitch
     submodules:
         // Implementation of the best-effort forwarding part
         beswitch: SRPRelay {
-            @display("p=791.265,227.91");
+            @display("p=791,415");
         }
 
 		//The mac table associated with the be switch
@@ -81,14 +82,19 @@ module TTEAVBEtherSwitch
             @display("p=308,250");
         }
 
+        up: MessageDispatcher {
+            parameters:
+                @display("p=890,195;b=600,5");
+        }
+
         down: MessageDispatcher {
             parameters:
-                @display("p=991,311;b=800,5");
+                @display("p=890,497;b=600,5");
         }
         // Physical ports of the switch
         phy[sizeof(ethg)]: TTEAVBPHYPort {
             parameters:
-                @display("p=712,568,c,130");
+                @display("p=711,754,c,130");
                 //For the switch it is necessary to have promiscuous mode enabled
                 promiscuous = true;
         }
@@ -96,7 +102,7 @@ module TTEAVBEtherSwitch
 		// AVB critical traffic control
         avbCTC: AVBIncoming {
             parameters:
-                @display("p=677.31,362.73");
+                @display("p=677,548");
                 hardware_delay = hardware_delay;
             gates:
                 AVBAout[sizeof(ethg)];
@@ -107,14 +113,14 @@ module TTEAVBEtherSwitch
         avbABuffer[sizeof(ethg)]: AVBQueueBuffer {
             parameters:
                 srClass = "A";
-                @display("p=712,455,c,130");
+                @display("p=711,642,c,130");
         }
 
 		// AVB class B buffer
         avbBBuffer[sizeof(ethg)]: AVBQueueBuffer {
             parameters:
                 srClass = "B";
-                @display("p=635,454,c,130");
+                @display("p=632,640,c,130");
         }
 
         // Sync module for synchronisation of the scheduler
@@ -136,7 +142,11 @@ module TTEAVBEtherSwitch
 
         // Stream Reservation Protocol implementation
         srpProtocol: SRProtocol {
-            @display("p=791,110");
+            @display("p=791,80");
+        }
+
+        encap: <default("EtherEncap")> like IEtherEncap {
+            @display("p=789,272");
         }
 
     connections:
@@ -153,6 +163,13 @@ module TTEAVBEtherSwitch
         beswitch.ifOut --> ProcessingDelay {  delay = (hardware_delay/2); } --> down.in++;
         beswitch.ifIn <-- ProcessingDelay {  delay = (hardware_delay/2); } <-- down.out++;
 
-        srpProtocol.out --> beswitch.srpIn;
-        srpProtocol.in <-- beswitch.srpOut;
+        srpProtocol.out --> up.in++;
+        srpProtocol.in <-- up.out++;
+
+        encap.upperLayerOut --> up.in++;
+        encap.upperLayerIn <-- up.out++;
+
+        encap.lowerLayerIn <-- beswitch.upperLayerOut;
+        encap.lowerLayerOut --> beswitch.upperLayerIn;
 }
+
