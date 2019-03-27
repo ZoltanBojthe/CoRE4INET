@@ -56,15 +56,12 @@ class SRPRelay : public virtual inet::Ieee8021dRelay
             return 1 > inet::Ieee8021dRelay::numInitStages() ? 1 : inet::Ieee8021dRelay::numInitStages();
         }
 
-        /**
-         *
-         */
-        virtual void handleMessage(cMessage * msg) override;
+        virtual void handleLowerPacket(inet::Packet *packet) override;
+        virtual bool isUpperMessage(cMessage *message) override;
+
     private:
-        void dispatchSRP(SRPFrame * srp);
-
-        void deliverSRP(inet::EtherFrame * frame);
-
+        void dispatchSRP(inet::Packet *packet);
+        void deliverSRP(inet::Packet *packet);
 };
 
 }

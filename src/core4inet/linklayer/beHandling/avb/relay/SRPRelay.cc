@@ -17,8 +17,13 @@
 
 //CoRE4INET
 #include "core4inet/base/avb/AVBDefs.h"
+
+//INET
+#include "inet/common/ProtocolTag_m.h"
+
 //Auto-generated Messages
 #include "core4inet/linklayer/contract/ExtendedIeee802Ctrl_m.h"
+
 
 namespace CoRE4INET {
 
@@ -29,49 +34,49 @@ void SRPRelay::initialize(int stage)
     inet::Ieee8021dRelay::initialize(stage);
 }
 
-void SRPRelay::handleMessage(cMessage * msg)
+/*
+void SRPRelay::handleUpperPacket(inet::Packet *packet)
 {
-    if (!isOperational)
+    if (packet->arrivedOn("srpIn"))
     {
-        EV_ERROR << "Message '" << msg << "' arrived when module status is down, dropped it." << endl;
-        delete msg;
-        return;
+        SRPFrame * srpFrame = check_and_cast<SRPFrame*>(msg);
+        dispatchSRP(srpFrame);
+
     }
+}
+*/
 
-    if (msg && !msg->isSelfMessage())
+void SRPRelay::handleLowerPacket(inet::Packet *packet)
+{
+    const auto& frame = packet->peekAtFront<inet::EthernetMacHeader>();
+    if ((frame->getDest() == SRP_ADDRESS || frame->getDest() == bridgeAddress))
     {
-        // messages from Stp process
-        if (msg->arrivedOn("srpIn"))
-        {
-            SRPFrame * srpFrame = check_and_cast<SRPFrame*>(msg);
-            dispatchSRP(srpFrame);
+        // copied from Ieee8021dRelay::handleLowerPacket()
+        numReceivedNetworkFrames++;
+        EV_INFO << "Received " << packet << " from network." << endl;
+        delete packet->removeTagIfPresent<DispatchProtocolReq>();
+        // end of copy
 
-        }
-        else if (msg->arrivedOn("ifIn"))
-        {
-            inet::EtherFrame * frame = check_and_cast<inet::EtherFrame*>(msg);
-            if ((frame->getDest() == SRP_ADDRESS || frame->getDest() == bridgeAddress))
-            {
-                EV_DETAIL << "Deliver SRPFrame to the SRP module" << endl;
-                deliverSRP(frame); // deliver to the SRP module
-            }
-            else
-            {
-                inet::Ieee8021dRelay::handleMessage(msg);
-            }
-        }
+        EV_DETAIL << "Deliver SRPFrame to the SRP module" << endl;
+        deliverSRP(frame); // deliver to the SRP module
     }
     else
-        throw cRuntimeError("This module doesn't handle self-messages!");
+    {
+        inet::Ieee8021dRelay::handleLowerPacket(msg);
+    }
 }
 
-void SRPRelay::dispatchSRP(SRPFrame * srp)
+bool SRPRelay::isUpperMessage(cMessage *message)
 {
-    ExtendedIeee802Ctrl * controlInfo = dynamic_cast<ExtendedIeee802Ctrl *>(srp->removeControlInfo());
-    if (!controlInfo)
-    {
-        throw cRuntimeError("SRP is missing ControlInfo");
-    }
+    return
+            message->arrivedOn("srpIn");
+}
+
+void SRPRelay::dispatchSRP(inet::Packet *packet) // (SRPFrame * srp)
+{
+    int outInterfaceId = packet->getTag<InterfaceReq>()->getInterfaceId();
+    InterfaceEntry *outInterface = ifTable->getInterfaceById(outInterfaceId);
+
     int portNum = controlInfo->getSwitchPort();
     int notPortNum = controlInfo->getNotSwitchPort();
     inet::MacAddress address = controlInfo->getDest();
@@ -79,7 +84,7 @@ void SRPRelay::dispatchSRP(SRPFrame * srp)
     if (portNum >= static_cast<int>(portCount))
         throw cRuntimeError("Output port %d doesn't exist!", portNum);
 
-    inet::EthernetIIFrame * frame = new inet::EthernetIIFrame(srp->getName());
+    const auto& frame = packet->peekAtFront<inet::EthernetMac>();
     frame->setSrc(bridgeAddress);
     frame->setDest(address);
     frame->setByteLength(ETHER_MAC_FRAME_BYTES);
@@ -113,7 +118,7 @@ void SRPRelay::dispatchSRP(SRPFrame * srp)
     }
 }
 
-void SRPRelay::deliverSRP(inet::EtherFrame * frame)
+void SRPRelay::deliverSRP(inet::Packet *packet)
 {
     SRPFrame * srp = check_and_cast<SRPFrame *>(frame->decapsulate());
 
