@@ -35,7 +35,9 @@ class SRProtocol : public virtual cSimpleModule, public cListener
         /**
          * @brief Module representing the srpTable
          */
-        SRPTable *srpTable;
+        SRPTable *srpTable = nullptr;
+
+        IInterfaceTable *ifTable = nullptr;
 
     public:
         /**

@@ -17,15 +17,21 @@
 
 //Std
 #include <algorithm>
+
 //CoRE4INET
 #include "core4inet/base/avb/AVBDefs.h"
 #include "core4inet/linklayer/contract/ExtendedIeee802Ctrl_m.h"
 #include "core4inet/base/NotifierConsts.h"
-//Auto-generated Messages
-#include "core4inet/linklayer/ethernet/avb/SRPFrame_m.h"
 
 //INET
 #include "inet/common/ModuleAccess.h"
+#include "inet/common/Protocol.h"
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/linklayer/common/InterfaceTag_m.h"
+#include "inet/linklayer/common/MacAddressTag_m.h"
+
+//Auto-generated Messages
+#include "core4inet/linklayer/ethernet/avb/SRPFrame_m.h"
 
 namespace CoRE4INET {
 
@@ -45,21 +51,23 @@ void SRProtocol::initialize()
     srpTable->subscribe(NF_AVB_TALKER_REGISTERED, this);
     srpTable->subscribe(NF_AVB_LISTENER_REGISTERED, this);
     srpTable->subscribe(NF_AVB_LISTENER_UPDATED, this);
+
+    ifTable = inet::getModuleFromPar<inet::IInterfaceTable>(par("interfaceTableModule"), this);
 }
 
 void SRProtocol::handleMessage(cMessage *msg)
 {
     if (msg->arrivedOn("in"))
     {
-        inet::Ieee802Ctrl *etherctrl = dynamic_cast<inet::Ieee802Ctrl *>(msg->removeControlInfo());
-        if (!etherctrl)
+        auto *packet = check_and_cast<inet::Packet*>(msg);
+        int arrivalGate = packet->getTag<inet::InterfaceInd>()->getInterfaceId();
+        const auto& srpFrame = packet->peekAtFront<SRPFrame>();
+
         {
-            error("packet `%s' from lower layer received without Ieee802Ctrl", msg->getName());
-        }
-        else
-        {
-            int arrivedOn = etherctrl->getSwitchPort();
-            cModule *port = getParentModule()->getSubmodule("phy", arrivedOn);
+            inet::InterfaceEntry *gateIfEntry = CHK(ifTable->getInterfaceById(arrivalGate));
+            cModule *nicModule = gateIfEntry->getParentModule();
+            if (!gateIfEntry)
+                throw cRuntimeError("gate's Interface is nullptr");
 
             if (TalkerAdvertise* talkerAdvertise = dynamic_cast<TalkerAdvertise*>(msg))
             {
@@ -76,7 +84,7 @@ void SRProtocol::handleMessage(cMessage *msg)
                 {
                     srClass = SR_CLASS::A;
                 }
-                srpTable->updateTalkerWithStreamId(talkerAdvertise->getStreamID(), port,
+                srpTable->updateTalkerWithStreamId(talkerAdvertise->getStreamID(), nicModule,
                         talkerAdvertise->getDestination_address(), srClass, talkerAdvertise->getMaxFrameSize(),
                         talkerAdvertise->getMaxIntervalFrames(), talkerAdvertise->getVlan_identifier());
             }
@@ -86,18 +94,18 @@ void SRProtocol::handleMessage(cMessage *msg)
                 std::list<cModule*> listeners = srpTable->getListenersForStreamId(listenerReady->getStreamID(),
                         listenerReady->getVlan_identifier());
                 //Is this a new or updated stream
-                if (std::find(listeners.begin(), listeners.end(), port) != listeners.end())
+                if (std::find(listeners.begin(), listeners.end(), nicModule) != listeners.end())
                 {
                     update = true;
                 }
 
-                unsigned long utilizedBandwidth = srpTable->getBandwidthForModule(port);
+                unsigned long utilizedBandwidth = srpTable->getBandwidthForModule(nicModule);
                 //Add Higher Priority Bandwidth
-                utilizedBandwidth += static_cast<unsigned long>(port->getSubmodule("shaper")->par("AVBHigherPriorityBandwidth"));
+                utilizedBandwidth += static_cast<unsigned long>(nicModule->getSubmodule("shaper")->par("AVBHigherPriorityBandwidth"));
                 unsigned long requiredBandwidth = srpTable->getBandwidthForStream(listenerReady->getStreamID(),
                         listenerReady->getVlan_identifier());
 
-                cGate *physOutGate = port->getSubmodule("mac")->gate("phys$o");
+                cGate *physOutGate = nicModule->getSubmodule("mac")->gate("phys$o");
                 cChannel *outChannel = physOutGate->findTransmissionChannel();
 
                 unsigned long totalBandwidth = static_cast<unsigned long>(outChannel->getNominalDatarate());
@@ -108,12 +116,12 @@ void SRProtocol::handleMessage(cMessage *msg)
                         || ((utilizedBandwidth + requiredBandwidth)
                                 <= (static_cast<double>(totalBandwidth) * reservableBandwidth)))
                 {
-                    srpTable->updateListenerWithStreamId(listenerReady->getStreamID(), port,
+                    srpTable->updateListenerWithStreamId(listenerReady->getStreamID(), nicModule,
                             listenerReady->getVlan_identifier());
                     if (!update)
                     {
                         EV_DETAIL << "Listener for stream " << listenerReady->getStreamID() << " registered on port "
-                                << port->getFullName() << ". Utilized Bandwidth: "
+                                << nicModule->getFullName() << ". Utilized Bandwidth: "
                                 << static_cast<double>(utilizedBandwidth + requiredBandwidth)
                                         / static_cast<double>(1000000) << " of "
                                 << (static_cast<double>(totalBandwidth) * reservableBandwidth)
@@ -124,61 +132,74 @@ void SRProtocol::handleMessage(cMessage *msg)
                 else
                 {
                     EV_DETAIL << "Listener for stream " << listenerReady->getStreamID()
-                            << " could not be registered on port " << port->getFullName() << ". Required bandwidth: "
+                            << " could not be registered on port " << nicModule->getFullName() << ". Required bandwidth: "
                             << static_cast<double>(requiredBandwidth) / static_cast<double>(1000000)
                             << "MBit/s, remaining bandwidth "
                             << ((static_cast<double>(totalBandwidth) * reservableBandwidth)
                                     - static_cast<double>(utilizedBandwidth)) / static_cast<double>(1000000)
                             << "MBit/s.";
-                    SRPFrame *srp;
+                    auto outPacket = new inet::Packet();
+                    inet::Ptr<SRPFrame> srp;
                     if (srpTable->getListenersForStreamId(listenerReady->getStreamID(),
                             listenerReady->getVlan_identifier()).size() > 0)
                     {
                         bubble("Listener Ready Failed!");
-                        ListenerReadyFailed *lrf = new ListenerReadyFailed("Listener Ready Failed", inet::IEEE802CTRL_DATA);
+                        auto lrf = inet::makeShared<ListenerReadyFailed>();
+                        packet->setName("Listener Ready Failed");
+                        packet->setKind(inet::IEEE802CTRL_DATA);
                         lrf->setVlan_identifier(listenerReady->getVlan_identifier());
                         srp = lrf;
                     }
                     else
                     {
                         bubble("Listener Asking Failed!");
-                        ListenerAskingFailed *laf = new ListenerAskingFailed("Listener Asking Failed", inet::IEEE802CTRL_DATA);
+                        auto laf = inet::makeShared<ListenerAskingFailed>();
+                        packet->setName("Listener Asking Failed");
+                        packet->setKind(inet::IEEE802CTRL_DATA);
                         laf->setVlan_identifier(listenerReady->getVlan_identifier());
                         srp = laf;
                     }
                     srp->setStreamID(listenerReady->getStreamID());
+                    outPacket->insertAtFront(srp);
 
-                    ExtendedIeee802Ctrl *new_etherctrl = new ExtendedIeee802Ctrl();
-                    new_etherctrl->setEtherType(MSRP_ETHERTYPE);
-                    new_etherctrl->setDest(SRP_ADDRESS);
+                    outPacket->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::srp);
+                    auto macAddressReq = outPacket->addTag<inet::MacAddressReq>();
+                    // macAddressReq->setSrcAddress());
+                    macAddressReq->setDestAddress(SRP_ADDRESS);
                     cModule* talker = srpTable->getTalkerForStreamId(listenerReady->getStreamID(),
                             listenerReady->getVlan_identifier());
                     if (talker && talker->isName("phy"))
                     {
                         new_etherctrl->setSwitchPort(talker->getIndex());
-                        srp->setControlInfo(new_etherctrl);
-                        send(srp, gate("out"));
+                        outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(interfaceId);
+                        send(outPacket, gate("out"));
                     }
+                    else
+                        delete outPacket;
                 }
             }
             else if (ListenerAskingFailed* listenerFailed = dynamic_cast<ListenerAskingFailed*>(msg))
             {
                 bubble("Listener Asking Failed!");
-                ExtendedIeee802Ctrl *new_etherctrl = new ExtendedIeee802Ctrl();
-                new_etherctrl->setEtherType(MSRP_ETHERTYPE);
-                new_etherctrl->setDest(SRP_ADDRESS);
+                auto outPacket = new inet::Packet();
+                inet::Ptr<SRPFrame> srp;
+                outPacket->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::srp);
+                auto macAddressReq = outPacket->addTag<inet::MacAddressReq>();
+                // macAddressReq->setSrcAddress());
+                macAddressReq->setDestAddress(SRP_ADDRESS);
+                outPacket->insertAtFront(srp);
                 cModule* talker = srpTable->getTalkerForStreamId(listenerFailed->getStreamID(),
                         listenerFailed->getVlan_identifier());
                 if (talker && talker->isName("phy"))
                 {
-                    new_etherctrl->setSwitchPort(talker->getIndex());
                     //Necessary because controlInfo is not duplicated
-                    ListenerAskingFailed* listenerFailedCopy = listenerFailed->dup();
-                    listenerFailedCopy->setControlInfo(new_etherctrl);
-                    send(listenerFailedCopy, gate("out"));
+                    new_etherctrl->setSwitchPort(talker->getIndex());
+                    outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(interfaceId);
+                    send(outPacket, gate("out"));
                 }
+                else
+                    delete outPacket;
             }
-            delete etherctrl;
         }
     }
     delete msg;
@@ -192,7 +213,8 @@ void SRProtocol::receiveSignal(cComponent *src, simsignal_t id, cObject *obj, __
     {
         if (SRPTable::TalkerEntry *tentry = dynamic_cast<SRPTable::TalkerEntry*>(obj))
         {
-            TalkerAdvertise *talkerAdvertise = new TalkerAdvertise("Talker Advertise", inet::IEEE802CTRL_DATA);
+            auto *outPacket = new inet::Packet("Talker Advertise", inet::IEEE802CTRL_DATA);
+            const auto& talkerAdvertise = inet::makeShared<TalkerAdvertise>();
             //talkerAdvertise->setStreamDA(tentry->address);
             talkerAdvertise->setStreamID(tentry->streamId);
             talkerAdvertise->setMaxFrameSize(static_cast<uint16_t>(tentry->framesize));
@@ -204,19 +226,21 @@ void SRProtocol::receiveSignal(cComponent *src, simsignal_t id, cObject *obj, __
             if (tentry->srClass == SR_CLASS::B)
                 talkerAdvertise->setPriorityAndRank(PRIOANDRANK_SRCLASSB);
 
-            ExtendedIeee802Ctrl *etherctrl = new ExtendedIeee802Ctrl();
-            etherctrl->setEtherType(MSRP_ETHERTYPE);
-            etherctrl->setDest(SRP_ADDRESS);
-            etherctrl->setSwitchPort(SWITCH_PORT_BROADCAST);
-            talkerAdvertise->setControlInfo(etherctrl);
+            outPacket->insertAtFront(talkerAdvertise);
+
+            outPacket->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::srp);
+            auto macAddressReq = outPacket->addTag<inet::MacAddressReq>();
+            // macAddressReq->setSrcAddress());
+            macAddressReq->setDestAddress(SRP_ADDRESS);
 
             //If talker was received from phy we have to exclude the incoming port
             if (strcmp(tentry->module->getName(), "phy") == 0)
             {
                 etherctrl->setNotSwitchPort(tentry->module->getIndex());
+//                outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(interfaceId);
             }
 
-            send(talkerAdvertise, gate("out"));
+            send(outPacket, gate("out"));
         }
         else
         {
@@ -239,17 +263,22 @@ void SRProtocol::receiveSignal(cComponent *src, simsignal_t id, cObject *obj, __
             //Send listener ready only when talker is not a local application
             if (talker && talker->isName("phy"))
             {
-                ListenerReady *listenerReady = new ListenerReady("Listener Ready", inet::IEEE802CTRL_DATA);
+                auto *outPacket = new inet::Packet("Listener Ready", inet::IEEE802CTRL_DATA);
+                const auto& listenerReady = inet::makeShared<ListenerReady>();
                 listenerReady->setStreamID(lentry->streamId);
                 listenerReady->setVlan_identifier(lentry->vlan_id);
 
-                ExtendedIeee802Ctrl *etherctrl = new ExtendedIeee802Ctrl();
-                etherctrl->setEtherType(MSRP_ETHERTYPE);
-                etherctrl->setDest(SRP_ADDRESS);
-                etherctrl->setSwitchPort(talker->getIndex());
-                listenerReady->setControlInfo(etherctrl);
+                outPacket->insertAtFront(listenerReady);
 
-                send(listenerReady, gate("out"));
+                outPacket->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::srp);
+                auto macAddressReq = outPacket->addTag<inet::MacAddressReq>();
+                // macAddressReq->setSrcAddress());
+                macAddressReq->setDestAddress(SRP_ADDRESS);
+
+                etherctrl->setSwitchPort(talker->getIndex());
+                outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(interfaceId);
+
+                send(outPacket, gate("out"));
             }
         }
         else
