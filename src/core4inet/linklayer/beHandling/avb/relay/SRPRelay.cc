@@ -20,6 +20,7 @@
 
 //INET
 #include "inet/common/ProtocolTag_m.h"
+#include "inet/linklayer/common/InterfaceTag_m.h"
 
 //Auto-generated Messages
 #include "core4inet/linklayer/contract/ExtendedIeee802Ctrl_m.h"
@@ -54,15 +55,15 @@ void SRPRelay::handleLowerPacket(inet::Packet *packet)
         // copied from Ieee8021dRelay::handleLowerPacket()
         numReceivedNetworkFrames++;
         EV_INFO << "Received " << packet << " from network." << endl;
-        delete packet->removeTagIfPresent<DispatchProtocolReq>();
+        delete packet->removeTagIfPresent<inet::DispatchProtocolReq>();
         // end of copy
 
         EV_DETAIL << "Deliver SRPFrame to the SRP module" << endl;
-        deliverSRP(frame); // deliver to the SRP module
+        deliverSRP(packet); // deliver to the SRP module
     }
     else
     {
-        inet::Ieee8021dRelay::handleLowerPacket(msg);
+        inet::Ieee8021dRelay::handleLowerPacket(packet);
     }
 }
 
@@ -74,65 +75,51 @@ bool SRPRelay::isUpperMessage(cMessage *message)
 
 void SRPRelay::dispatchSRP(inet::Packet *packet) // (SRPFrame * srp)
 {
-    int outInterfaceId = packet->getTag<InterfaceReq>()->getInterfaceId();
-    InterfaceEntry *outInterface = ifTable->getInterfaceById(outInterfaceId);
+    const auto& frame = packet->peekAtFront<inet::EthernetMacHeader>();
 
-    int portNum = controlInfo->getSwitchPort();
-    int notPortNum = controlInfo->getNotSwitchPort();
-    inet::MacAddress address = controlInfo->getDest();
+    int outInterfaceId = -1;
+    if (auto ir = packet->findTag<inet::InterfaceReq>())
+        outInterfaceId = ir->getInterfaceId();
+    inet::InterfaceEntry *outInterface = ifTable->getInterfaceById(outInterfaceId);
 
-    if (portNum >= static_cast<int>(portCount))
-        throw cRuntimeError("Output port %d doesn't exist!", portNum);
+    int arrivalInterfaceId = -1;
+    if (auto ii = packet->findTag<inet::InterfaceInd>())
+        arrivalInterfaceId = ii->getInterfaceId();
 
-    const auto& frame = packet->peekAtFront<inet::EthernetMac>();
-    frame->setSrc(bridgeAddress);
-    frame->setDest(address);
-    frame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    frame->setEtherType(MSRP_ETHERTYPE);
-    frame->encapsulate(srp);
+    if (outInterfaceId >= 0 && outInterface == nullptr)
+        throw cRuntimeError("Output port %d doesn't exist!", outInterfaceId);
 
-    delete controlInfo;
+    //TODO frame->setSrc(bridgeAddress);
 
-    if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-        frame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
-
-    //Broadcast
-    if (portNum < 0)
+    if (outInterfaceId < 0)
     {
-        for (size_t i = 0; i < portCount; ++i)
-        {
-            if (static_cast<int>(i) != notPortNum)
-            {
-                send(frame->dup(), "ifOut", static_cast<int>(i));
-                EV_INFO << "Sending SRP frame " << frame << " with destination = " << frame->getDest() << ", port = "
+        //Broadcast
+        int numPorts = ifTable->getNumInterfaces();
+        for (int i = 0; i < numPorts; i++) {
+            auto *ie = ifTable->getInterface(i);
+            if (ie->isLoopback() || !ie->isBroadcast())
+                continue;
+            if (ie->getInterfaceId() != arrivalInterfaceId) {
+                send(packet->dup(), "ifOut", static_cast<int>(i));
+                EV_INFO << "Sending SRP frame " << packet << " with destination = " << frame->getDest() << ", port = "
                         << i << endl;
             }
         }
-        delete frame;
+        delete packet;
     }
     else
     {
-        send(frame, "ifOut", portNum);
-        EV_INFO << "Sending SRP frame " << frame << " with destination = " << frame->getDest() << ", port = " << portNum
+        send(packet, "ifOut", outInterfaceId);
+        EV_INFO << "Sending SRP frame " << frame << " with destination = " << frame->getDest() << ", port = " << outInterfaceId
                 << endl;
     }
 }
 
 void SRPRelay::deliverSRP(inet::Packet *packet)
 {
-    SRPFrame * srp = check_and_cast<SRPFrame *>(frame->decapsulate());
 
-    inet::Ieee802Ctrl * controlInfo = new inet::Ieee802Ctrl();
-    controlInfo->setSrc(frame->getSrc());
-    controlInfo->setSwitchPort(frame->getArrivalGate()->getIndex());
-    controlInfo->setDest(frame->getDest());
-
-    srp->setControlInfo(controlInfo);
-
-    delete frame; // we have the SRP packet, so delete the frame
-
-    EV_INFO << "Sending SRP frame " << srp << " to the SRP module" << endl;
-    send(srp, "srpOut");
+    EV_INFO << "Sending SRP frame " << packet << " to the SRP module" << endl;
+    send(packet, "srpOut");
 }
 
 }
