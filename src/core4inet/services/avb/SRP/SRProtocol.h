@@ -20,6 +20,9 @@
 #include "core4inet/base/CoRE4INET_Defs.h"
 #include "core4inet/services/avb/SRP/SRPTable.h"
 
+//INET
+#include "inet/networklayer/contract/IInterfaceTable.h"
+
 namespace CoRE4INET {
 
 /**
@@ -37,7 +40,7 @@ class SRProtocol : public virtual cSimpleModule, public cListener
          */
         SRPTable *srpTable = nullptr;
 
-        IInterfaceTable *ifTable = nullptr;
+        inet::IInterfaceTable *ifTable = nullptr;
 
     public:
         /**
