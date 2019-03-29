@@ -170,8 +170,8 @@ void SRProtocol::handleMessage(cMessage *msg)
                             listenerReady->getVlan_identifier());
                     if (talker && talker->isName("phy"))
                     {
-                        new_etherctrl->setSwitchPort(talker->getIndex());
-                        outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(interfaceId);
+                        auto ie = check_and_cast<inet::InterfaceEntry*>(talker);
+                        outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(ie->getInterfaceId());    // new_etherctrl->setSwitchPort(talker->getIndex());
                         send(outPacket, gate("out"));
                     }
                     else
@@ -193,8 +193,8 @@ void SRProtocol::handleMessage(cMessage *msg)
                 if (talker && talker->isName("phy"))
                 {
                     //Necessary because controlInfo is not duplicated
-                    new_etherctrl->setSwitchPort(talker->getIndex());
-                    outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(interfaceId);
+                    auto ie = check_and_cast<inet::InterfaceEntry*>(talker);
+                    outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(ie->getInterfaceId());    // new_etherctrl->setSwitchPort(talker->getIndex());
                     send(outPacket, gate("out"));
                 }
                 else
@@ -234,10 +234,9 @@ void SRProtocol::receiveSignal(cComponent *src, simsignal_t id, cObject *obj, __
             macAddressReq->setDestAddress(SRP_ADDRESS);
 
             //If talker was received from phy we have to exclude the incoming port
-            if (strcmp(tentry->module->getName(), "phy") == 0)
-            {
-                etherctrl->setNotSwitchPort(tentry->module->getIndex());
-//                outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(interfaceId);
+            if (strcmp(tentry->module->getName(), "phy") == 0) {
+                auto ie = check_and_cast<inet::InterfaceEntry*>(tentry->module);
+                outPacket->addTag<inet::InterfaceInd>()->setInterfaceId(ie->getInterfaceId());    // etherctrl->setNotSwitchPort(tentry->module->getIndex());
             }
 
             send(outPacket, gate("out"));
@@ -275,8 +274,8 @@ void SRProtocol::receiveSignal(cComponent *src, simsignal_t id, cObject *obj, __
                 // macAddressReq->setSrcAddress());
                 macAddressReq->setDestAddress(SRP_ADDRESS);
 
-                etherctrl->setSwitchPort(talker->getIndex());
-                outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(interfaceId);
+                auto ie = check_and_cast<inet::InterfaceEntry*>(talker);
+                outPacket->addTag<inet::InterfaceReq>()->setInterfaceId(ie->getInterfaceId());    // etherctrl->setSwitchPort(talker->getIndex());
 
                 send(outPacket, gate("out"));
             }
