@@ -32,11 +32,5 @@ simple SRPRelay extends Ieee8021dRelay
 {
     parameters:
         @class(SRPRelay);
-        @display("i=block/broadcast;bgb=425,114");
-        
-    gates:
-        //SRP message in from SRP protocol module
-        input srpIn @loose;
-        //SRP message out to SRP protocol module
-        output srpOut @loose;
 }
+

@@ -80,38 +80,22 @@ void SRPRelay::dispatchSRP(inet::Packet *packet) // (SRPFrame * srp)
     int outInterfaceId = -1;
     if (auto ir = packet->findTag<inet::InterfaceReq>())
         outInterfaceId = ir->getInterfaceId();
-    inet::InterfaceEntry *outInterface = ifTable->getInterfaceById(outInterfaceId);
 
     int arrivalInterfaceId = -1;
     if (auto ii = packet->findTag<inet::InterfaceInd>())
         arrivalInterfaceId = ii->getInterfaceId();
-
-    if (outInterfaceId >= 0 && outInterface == nullptr)
-        throw cRuntimeError("Output port %d doesn't exist!", outInterfaceId);
 
     //TODO frame->setSrc(bridgeAddress);
 
     if (outInterfaceId < 0)
     {
         //Broadcast
-        int numPorts = ifTable->getNumInterfaces();
-        for (int i = 0; i < numPorts; i++) {
-            auto *ie = ifTable->getInterface(i);
-            if (ie->isLoopback() || !ie->isBroadcast())
-                continue;
-            if (ie->getInterfaceId() != arrivalInterfaceId) {
-                send(packet->dup(), "ifOut", static_cast<int>(i));
-                EV_INFO << "Sending SRP frame " << packet << " with destination = " << frame->getDest() << ", port = "
-                        << i << endl;
-            }
-        }
-        delete packet;
+        broadcast(packet, arrivalInterfaceId);
     }
     else
     {
-        send(packet, "ifOut", outInterfaceId);
-        EV_INFO << "Sending SRP frame " << frame << " with destination = " << frame->getDest() << ", port = " << outInterfaceId
-                << endl;
+        inet::InterfaceEntry *ie = ifTable->getInterfaceById(outInterfaceId);
+        dispatch(packet, ie);
     }
 }
 
