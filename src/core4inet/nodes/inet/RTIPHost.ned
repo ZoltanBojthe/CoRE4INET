@@ -29,10 +29,7 @@ import core4inet.nodes.inet.RTNetworkLayer;
 import inet.linklayer.loopback.LoopbackInterface;
 import inet.networklayer.common.InterfaceTable;
 import inet.networklayer.ipv4.Ipv4RoutingTable;
-import inet.applications.contract.IPingApp;
-import inet.applications.contract.ISCTPApp;
-import inet.applications.contract.ITCPApp;
-import inet.applications.contract.IUDPApp;
+import inet.applications.contract.IApp;
 import inet.applications.contract.INetPerfMeterApp;
 import inet.transportlayer.contract.ISctp;
 import inet.transportlayer.contract.ITcp;
@@ -79,28 +76,13 @@ module RTIPHost
                 @display("p=849,65");
         }
         // application Layer
-        tcpApp[numTcpApps]: <> like ITCPApp {
-            parameters:
-                @display("p=498,65,row,60");
-        }
-
         app[numApps]: <> like IApplication {
             @display("p=849,232,row,70");
         }
 
-        udpApp[numUdpApps]: <> like IUDPApp {
+        inetApp[numUdpApps]: <> like IApp {
             parameters:
                 @display("p=615,65,row,60");
-        }
-
-        sctpApp[numSctpApps]: <> like ISCTPApp {
-            parameters:
-                @display("p=732,65,row,60");
-        }
-
-        pingApp[numPingApps]: <default("PingApp")> like IPingApp {
-            parameters:
-                @display("p=849,141,row,60");
         }
 
         // transport Layer
