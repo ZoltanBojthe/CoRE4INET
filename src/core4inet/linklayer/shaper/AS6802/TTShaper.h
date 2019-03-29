@@ -185,7 +185,7 @@ class TTShaper : public TC, public virtual Timed
          * @param message The message that should be transmitted
          * @returns true if transmission is allowed else false
          */
-        virtual bool isTransmissionAllowed(inet::EtherFrame *message);
+        virtual bool isTransmissionAllowed(inet::Packet *message);
 
         /**
          * @brief Registers a time-triggered buffer that feeds the module.
@@ -327,7 +327,7 @@ void TTShaper<TC>::handleMessage(cMessage *msg)
     }
     else
     {
-        if (TC::getNumPendingRequests() && isTransmissionAllowed(dynamic_cast<inet::EtherFrame*>(msg)))
+        if (TC::getNumPendingRequests() && isTransmissionAllowed(dynamic_cast<inet::Packet*>(msg)))
         {
             TC::handleMessage(msg);
         }
@@ -389,7 +389,7 @@ cMessage* TTShaper<TC>::pop()
     }
     else
     {
-        inet::EtherFrame *frontMsg = static_cast<inet::EtherFrame*>(front());
+        inet::Packet *frontMsg = static_cast<inet::Packet*>(front());
         if (isTransmissionAllowed(frontMsg))
         {
             return TC::pop();
@@ -574,7 +574,7 @@ void TTShaper<TC>::handleParameterChange(const char* parname)
 }
 
 template<class TC>
-bool TTShaper<TC>::isTransmissionAllowed(inet::EtherFrame *message)
+bool TTShaper<TC>::isTransmissionAllowed(inet::Packet *message)
 {
     if (!message || !TC::outChannel)
     {

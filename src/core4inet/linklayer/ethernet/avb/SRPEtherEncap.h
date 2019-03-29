@@ -17,6 +17,7 @@
 #define CORE4INET_SRPETHERENCAP_H_
 
 //CoRE4INET
+#include "core4inet/base/CoRE4INET_Defs.h"
 #include "core4inet/linklayer/ethernet/base/BGEtherEncap.h"
 //Auto-generated Messages
 #include "core4inet/linklayer/ethernet/avb/SRPFrame_m.h"
@@ -69,7 +70,7 @@ class SRPEtherEncap : public virtual BGEtherEncap
          *
          * @param frame EtherFrame pointer
          */
-        void deliverSRP(inet::EtherFrame * frame);
+        void deliverSRP(inet::Packet * frame);
 };
 
 } /* namespace CoRE4INET */

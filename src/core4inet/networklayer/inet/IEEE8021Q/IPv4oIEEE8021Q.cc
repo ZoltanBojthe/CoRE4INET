@@ -26,9 +26,10 @@
 #include "core4inet/networklayer/inet/base/IPoREFilter.h"
 #include "core4inet/networklayer/inet/IEEE8021Q/IEEE8021QDestinationInfo.h"
 
+#include "inet/linklayer/common/Ieee802Ctrl.h"
+#include "inet/linklayer/ethernet/Ethernet.h"
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
-#include "inet/linklayer/common/Ieee802Ctrl.h"
 
 //==============================================================================
 

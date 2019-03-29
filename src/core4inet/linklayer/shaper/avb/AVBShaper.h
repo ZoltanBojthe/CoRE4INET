@@ -239,7 +239,7 @@ void AVBShaper<SRCLASS, TC>::handleMessage(cMessage *msg)
         if (TC::getNumPendingRequests() && avbBuffer->getCredit() >= 0)
         {
             TC::framesRequested--;
-            AVBFrame* sizeMsg = dynamic_cast<AVBFrame*>(msg->dup());
+            inet::Packet* sizeMsg = dynamic_cast<inet::Packet*>(msg->dup());
             sizeMsg->setByteLength(sizeMsg->getByteLength() + inet::B(inet::PREAMBLE_BYTES + inet::SFD_BYTES + inet::INTERFRAME_GAP_BITS).get());
             cSimpleModule::send(msg, cModule::gateBaseId("out"));
             ASSERT(state == IDLE_STATE);
@@ -311,10 +311,10 @@ cMessage* AVBShaper<SRCLASS, TC>::pop()
     {
         cMessage *msg = static_cast<cMessage*>(avbQueue.pop());
         cComponent::emit(avbQueueLengthSignal, static_cast<unsigned long>(avbQueue.getLength()));
-        avbQueueSize-=static_cast<size_t>(check_and_cast<inet::EtherFrame*>(msg)->getByteLength());
+        avbQueueSize -= static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
         cComponent::emit(avbQueueSizeSignal, static_cast<unsigned long>(avbQueueSize));
-        AVBFrame* sizeMsg = dynamic_cast<AVBFrame*>(msg->dup());
-        sizeMsg->setByteLength(sizeMsg->getByteLength() + PREAMBLE_BYTES + SFD_BYTES + (INTERFRAME_GAP_BITS / 8));
+        auto *sizeMsg = dynamic_cast<inet::Packet*>(msg->dup());
+        sizeMsg->setByteLength(sizeMsg->getByteLength() + inet::B(inet::PREAMBLE_BYTES + inet::SFD_BYTES + inet::INTERFRAME_GAP_BITS).get());
         SimTime duration = TC::outChannel->calculateDuration(sizeMsg);
         delete sizeMsg;
         avbBuffer->sendSlope(duration);

@@ -111,7 +111,8 @@ void CTInControl<IC>::handleMessage(cMessage *msg)
 {
     if (msg && msg->arrivedOn("in"))
     {
-        inet::EtherFrame *frame = dynamic_cast<inet::EtherFrame *>(msg);
+        auto packet = check_and_cast<inet::Packet *>(msg);
+        const auto& frame = packet->peekAtFront<inet::EthernetMacHeader>();
 
         //Auf CTCs verteilen oder BE traffic
         if (frame && isCT(frame, ctMarker, ctMask))
@@ -119,7 +120,7 @@ void CTInControl<IC>::handleMessage(cMessage *msg)
             this->recordPacketReceived(frame);
 
             std::unordered_map<uint16_t, std::list<CTIncoming *> >::iterator ct_incomingList = ct_incomings.find(
-                    getCTID(frame));
+                    getCTID(frame.get()));
             if (ct_incomingList != ct_incomings.end())
             {
                 //Send to all CTCs for the CT-ID
@@ -127,9 +128,9 @@ void CTInControl<IC>::handleMessage(cMessage *msg)
                         ct_incoming != ct_incomingList->second.end(); ct_incoming++)
                 {
                     IC::setParameters(frame);
-                    cSimpleModule::sendDirect(frame->dup(), (*ct_incoming)->gate("in"));
+                    cSimpleModule::sendDirect(packet->dup(), (*ct_incoming)->gate("in"));
                 }
-                delete frame;
+                delete packet;
             }
             else
             {
@@ -149,7 +150,7 @@ void CTInControl<IC>::handleMessage(cMessage *msg)
                     cModule::getParentModule()->getParentModule()->getDisplayString().setTagArg("tt", 0,
                             "WARNING: Input configuration problem - No matching buffer configured");
                 }
-                delete frame;
+                delete packet;
             }
         }
         else
