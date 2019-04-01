@@ -46,21 +46,20 @@ enum AttributeSubtype {     //KLUDGE
 //
 // @author Philipp Meyer
 //
-class SRPFrame  extends inet::FieldsChunk {    
+class SRPFrame  extends inet::FieldsChunk {
     chunkLength = inet::B(8);
     uint8_t protocolVersion = 0;
     AttributeType attributeType;
     // ID of the AVB Stream
     // 64 Bit Field (48bit MAC + 16bit UniqueID)
 	uint64_t streamID;
-		
+
 	// for internal implementation:
 	//string displayString="b=15,15,rect,black,black,5";
 }
 
 class TalkerAdvertise extends SRPFrame{
     chunkLength = inet::B(25);
-    
     attributeType = TALKER_ADVERTISE;
     // DataFrameParameters => destination adress and vlan identifier
 	// 64 Bit Field
@@ -90,7 +89,7 @@ class SrpListener extends SRPFrame{
 	chunkLength = inet::B(8);
     attributeType = SRP_LISTENER;
     AttributeSubtype attributeSubtype = static_cast<AttributeSubtype>(-1);  //KLUDGE field - what is the real difference between the SrpListener variants?
-	uint16_t vlan_identifier;
+    uint16_t vlan_identifier;
 }
 
 class ListenerReady extends SrpListener{
@@ -101,7 +100,7 @@ class ListenerReady extends SrpListener{
 class ListenerAskingFailed extends SrpListener{
     chunkLength = inet::B(17);
     attributeSubtype = SRP_LISTENER_ASKING_FAILED;
-    
+
     // FailureInformation
 	//
 	// 72 Bit Field	
@@ -109,8 +108,8 @@ class ListenerAskingFailed extends SrpListener{
 
 class ListenerReadyFailed extends ListenerReady{
     chunkLength = inet::B(17);
-    
     attributeSubtype = SRP_LISTENER_READY_FAILED;
+
     // FailureInformation
 	//
 	// 72 Bit Field
