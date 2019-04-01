@@ -83,14 +83,16 @@ void AVBInControl<IC>::handleMessage(cMessage *msg)
 }
 
 template<class IC>
-bool AVBInControl<IC>::isAVB(const inet::Packet *frame) const
+bool AVBInControl<IC>::isAVB(const inet::Packet *packet) const
 {
-    //TODO: Major: Detect AVB frame only using priority
-    if (dynamic_cast<const EthernetIIFrameWithQTag*>(frame))
-    {
-        if (dynamic_cast<const AVBFrame*>(frame))
+    auto protocolTag = packet->findTag<inet::PacketProtocolTag>();
+    if (protocolTag && *protocolTag->getProtocol() == inet::Protocol::ethernetMac) {
+        const auto& frame = packet->peekAtFront<inet::EthernetMacHeader>();
+        //TODO: Major: Detect AVB frame only using priority
+        if (auto ctag = frame->getCTag())
         {
-            return true;
+            return ((ctag->getPcp() == AVB_VIDEO_PRIORITY) ||
+                    (ctag->getPcp() == AVB_VOICE_PRIORITY));
         }
     }
     return false;
@@ -99,3 +101,4 @@ bool AVBInControl<IC>::isAVB(const inet::Packet *frame) const
 }
 
 #endif
+
