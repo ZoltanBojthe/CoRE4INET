@@ -40,7 +40,7 @@ import inet.networklayer.common.InterfaceTable;
 module TTEAVBEtherHostMultiPorts
 {
     parameters:
-        @display("bgb=969.83997,553.3925;i=device/device");
+        @display("bgb=969,553;i=device/device");
         @networkNode;
 
         // Number of Applications running on the device
@@ -52,7 +52,7 @@ module TTEAVBEtherHostMultiPorts
         double hardware_delay @unit(s) = default(0us);
         // Promiscuous mode for best-efford traffic handling
         bool be_promiscuous = default(true);
-        
+
         int numPorts = default(1);
 
         *.interfaceTableModule = default(absPath(".interfaceTable"));
@@ -66,14 +66,14 @@ module TTEAVBEtherHostMultiPorts
 
         // Physical port of the host
         phy[numPorts]: TTEAVBPHYPort {
-            @display("p=380,255,c,50");
+            @display("p=405.01123,452.44498,c,50");
             promiscuous = be_promiscuous;
         }
 
 		// AVB critical traffic control
         avbCTC: AVBIncoming {
             parameters:
-                @display("p=380,118");
+                @display("p=296,215");
                 hardware_delay = hardware_delay;
             gates:
                 AVBAout[numPorts];
@@ -84,25 +84,25 @@ module TTEAVBEtherHostMultiPorts
         avbABuffer[numPorts]: AVBQueueBuffer {
             parameters:
                 srClass = "A";
-                @display("p=341,193,c,50");
+                @display("p=266,378,c,50");
         }
 
         // AVB class B buffer
         avbBBuffer[numPorts]: AVBQueueBuffer {
             parameters:
                 srClass = "B";
-                @display("p=419,193,c,50");
+                @display("p=344,378,c,50");
         }
 
 		// Stream Reservation Protocol ethernet encapsulation
         encap[numPorts]: SRPEtherEncap {
             parameters:
-                @display("p=141,255,c,50");
+                @display("p=623,239,c,50");
         }
 
         adapter: SRPEtherEncapAdapter {
             parameters:
-                @display("p=73.73692,173.41832");
+                @display("p=702,145");
             gates:
                 encapIn[numPorts];
                 encapOut[numPorts];
@@ -110,12 +110,12 @@ module TTEAVBEtherHostMultiPorts
 
         // Sync module for synchronisation of the scheduler
         sync: <default("DummySync")> like ISync {
-            @display("p=208,169");
+            @display("p=81,277");
         }
 
         // Scheduler for the device
         scheduler: <default("Scheduler")> like ITTEScheduler {
-            @display("p=274,169");
+            @display("p=81,396");
         }
 
 		// Applications for the device
@@ -125,29 +125,32 @@ module TTEAVBEtherHostMultiPorts
 
 		// Best-efford buffer for incoming traffic 
         bgIn[numPorts]: BGQueueBuffer {
-            @display("p=60,37,c,50");
+            @display("p=508,108,c,50");
         }
 
 		// Best-efford buffer for outgoing traffic
         bgOut[numPorts]: BGQueueBuffer {
-            @display("p=109,37,c,50");
+            @display("p=576,108,c,50");
         }
 
 		// Stream Reservation Protocol table
         srpTable: SRPTable {
-            @display("p=141,99");
+            @display("p=81,60");
         }
 
 		// Stream Reservation Protocol implementation
         // Holds interface names
         interfaceTable: InterfaceTable {
-            @display("p=208,99");
+            @display("p=81,167");
         }
 
         srpProtocol: SRProtocol {
-            @display("p=150.76924,173.84616");
+            @display("p=702,51");
         }
+
     connections allowunconnected:
+        //TODO app[numApps] are unconnected
+
         for i=0..numPorts-1 {
             phy[i].phys <--> ethg[i];
             encap[i].lowerLayerOut --> phy[i].upperLayerIn;
