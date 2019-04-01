@@ -115,9 +115,9 @@ void CTInControl<IC>::handleMessage(cMessage *msg)
         const auto& frame = packet->peekAtFront<inet::EthernetMacHeader>();
 
         //Auf CTCs verteilen oder BE traffic
-        if (frame && isCT(frame, ctMarker, ctMask))
+        if (frame && isCT(frame.get(), ctMarker, ctMask))
         {
-            this->recordPacketReceived(frame);
+            this->recordPacketReceived(packet);
 
             std::unordered_map<uint16_t, std::list<CTIncoming *> >::iterator ct_incomingList = ct_incomings.find(
                     getCTID(frame.get()));
@@ -127,14 +127,14 @@ void CTInControl<IC>::handleMessage(cMessage *msg)
                 for (std::list<CTIncoming*>::iterator ct_incoming = ct_incomingList->second.begin();
                         ct_incoming != ct_incomingList->second.end(); ct_incoming++)
                 {
-                    IC::setParameters(frame);
+                    IC::setParameters(packet);
                     cSimpleModule::sendDirect(packet->dup(), (*ct_incoming)->gate("in"));
                 }
                 delete packet;
             }
             else
             {
-                cComponent::emit(droppedPkSignal, frame);
+                cComponent::emit(droppedPkSignal, packet);
                 IC::hadError = true;
                 if (getEnvir()->isGUI())
                 {
