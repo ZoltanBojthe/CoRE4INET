@@ -15,6 +15,8 @@
 
 //==============================================================================
 
+//CoRE4INET
+#include "core4inet/base/CoRE4INET_Defs.h"
 #include "core4inet/linklayer/ethernet/base/BGEtherEncap.h"
 
 //==============================================================================
