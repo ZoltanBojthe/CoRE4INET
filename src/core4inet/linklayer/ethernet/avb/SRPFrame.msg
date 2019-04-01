@@ -52,41 +52,41 @@ class SRPFrame  extends inet::FieldsChunk {
     AttributeType attributeType;
     // ID of the AVB Stream
     // 64 Bit Field (48bit MAC + 16bit UniqueID)
-	uint64_t streamID;
+    uint64_t streamID;
 
-	// for internal implementation:
-	//string displayString="b=15,15,rect,black,black,5";
+    // for internal implementation:
+    //string displayString="b=15,15,rect,black,black,5";
 }
 
 class TalkerAdvertise extends SRPFrame{
     chunkLength = inet::B(25);
     attributeType = TALKER_ADVERTISE;
     // DataFrameParameters => destination adress and vlan identifier
-	// 64 Bit Field
-	inet::MacAddress destination_address; //only one Talker allowed per destination_address
-	uint16_t vlan_identifier;
-	// TSpec => Max frame size and sending interval of an AVB stream
-	// 32 Bit Field
-	uint16_t MaxFrameSize;
-	uint16_t MaxIntervalFrames;
-	// PriorityAndRank => Data Frame Priority: 6 = SRClass A & 5 = SRClass B
-	// 8 Bit Field (3 Bit Data Frame Priority | 1 Bit Rank | 4 Bit Reserved (Zero filled))
-	uint8_t priorityAndRank;	
-	// notused
-	// 32 Bit Field
-	uint32_t accumulatedLatency;
+    // 64 Bit Field
+    inet::MacAddress destination_address; //only one Talker allowed per destination_address
+    uint16_t vlan_identifier;
+    // TSpec => Max frame size and sending interval of an AVB stream
+    // 32 Bit Field
+    uint16_t MaxFrameSize;
+    uint16_t MaxIntervalFrames;
+    // PriorityAndRank => Data Frame Priority: 6 = SRClass A & 5 = SRClass B
+    // 8 Bit Field (3 Bit Data Frame Priority | 1 Bit Rank | 4 Bit Reserved (Zero filled))
+    uint8_t priorityAndRank;    
+    // notused
+    // 32 Bit Field
+    uint32_t accumulatedLatency;
 }
 
 class TalkerFailed extends TalkerAdvertise{
     chunkLength = inet::B(34);
     attributeType = TALKER_FAILED;
     // FailureInformation
-	//
-	// 72 Bit Field
+    //
+    // 72 Bit Field
 }
 
 class SrpListener extends SRPFrame{
-	chunkLength = inet::B(8);
+    chunkLength = inet::B(8);
     attributeType = SRP_LISTENER;
     AttributeSubtype attributeSubtype = static_cast<AttributeSubtype>(-1);  //KLUDGE field - what is the real difference between the SrpListener variants?
     uint16_t vlan_identifier;
@@ -102,8 +102,8 @@ class ListenerAskingFailed extends SrpListener{
     attributeSubtype = SRP_LISTENER_ASKING_FAILED;
 
     // FailureInformation
-	//
-	// 72 Bit Field	
+    //
+    // 72 Bit Field 
 }
 
 class ListenerReadyFailed extends ListenerReady{
@@ -111,7 +111,7 @@ class ListenerReadyFailed extends ListenerReady{
     attributeSubtype = SRP_LISTENER_READY_FAILED;
 
     // FailureInformation
-	//
-	// 72 Bit Field
+    //
+    // 72 Bit Field
 }
 
