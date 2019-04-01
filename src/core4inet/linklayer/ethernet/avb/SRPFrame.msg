@@ -28,6 +28,17 @@ import inet.linklayer.common.MacAddress;
 
 namespace CoRE4INET;
 
+enum AttributeType {
+    SRP_TALKER_ADVERTISE = 1;
+    SRP_TALKER_FAILED = 2;
+    SRP_LISTENER = 3;
+};
+
+enum AttributeSubtype {     //KLUDGE
+    SRP_LISTENER_READY = 31;
+    SRP_LISTENER_ASKING_FAILED = 32;
+    SRP_LISTENER_READY_FAILED = 33;
+}
 //
 // Represents a Stream Reservation Protokol Frame (SRP)
 //
@@ -37,6 +48,8 @@ namespace CoRE4INET;
 //
 class SRPFrame  extends inet::FieldsChunk {    
     chunkLength = inet::B(8);
+    uint8_t protocolVersion = 0;
+    AttributeType attributeType;
     // ID of the AVB Stream
     // 64 Bit Field (48bit MAC + 16bit UniqueID)
 	uint64_t streamID;
@@ -48,6 +61,7 @@ class SRPFrame  extends inet::FieldsChunk {
 class TalkerAdvertise extends SRPFrame{
     chunkLength = inet::B(25);
     
+    attributeType = TALKER_ADVERTISE;
     // DataFrameParameters => destination adress and vlan identifier
 	// 64 Bit Field
 	inet::MacAddress destination_address; //only one Talker allowed per destination_address
@@ -66,19 +80,27 @@ class TalkerAdvertise extends SRPFrame{
 
 class TalkerFailed extends TalkerAdvertise{
     chunkLength = inet::B(34);
+    attributeType = TALKER_FAILED;
     // FailureInformation
 	//
 	// 72 Bit Field
 }
 
-class ListenerReady extends SRPFrame{
+class SrpListener extends SRPFrame{
 	chunkLength = inet::B(8);
+    attributeType = SRP_LISTENER;
+    AttributeSubtype attributeSubtype = static_cast<AttributeSubtype>(-1);  //KLUDGE field - what is the real difference between the SrpListener variants?
 	uint16_t vlan_identifier;
 }
 
-class ListenerAskingFailed extends SRPFrame{
+class ListenerReady extends SrpListener{
+    chunkLength = inet::B(8);
+    attributeSubtype = SRP_LISTENER_READY;
+}
+
+class ListenerAskingFailed extends SrpListener{
     chunkLength = inet::B(17);
-    uint16_t vlan_identifier;
+    attributeSubtype = SRP_LISTENER_ASKING_FAILED;
     
     // FailureInformation
 	//
@@ -88,6 +110,7 @@ class ListenerAskingFailed extends SRPFrame{
 class ListenerReadyFailed extends ListenerReady{
     chunkLength = inet::B(17);
     
+    attributeSubtype = SRP_LISTENER_READY_FAILED;
     // FailureInformation
 	//
 	// 72 Bit Field
