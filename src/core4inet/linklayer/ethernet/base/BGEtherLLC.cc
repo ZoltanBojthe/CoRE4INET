@@ -19,21 +19,21 @@ namespace CoRE4INET {
 
 Define_Module(BGEtherLLC);
 
-void BGEtherLLC::handleMessage(cMessage *msg)
+void BGEtherLLC::handleMessageWhenUp(cMessage *msg)
 {
-    if (msg->arrivedOn("bgIn"))
-    {
-        send(msg, gate("lowerLayerOut"));
-    }
-    else if (msg->arrivedOn("lowerLayerIn"))
-    {
-        send(msg->dup(), gate("bgOut"));
-        EtherLlc::handleMessage(msg);
+    if (msg->arrivedOn("bgIn")) {
+        // from upper layer
+        EV_INFO << "Received " << msg << " from BG." << endl;
+        processPacketFromHigherLayer(check_and_cast<inet::Packet *>(msg));
     }
     else
-    {
-        EtherLlc::handleMessage(msg);
-    }
+        Ieee8022Llc::handleMessageWhenUp(msg);
+}
+
+void BGEtherLLC::processPacketFromMac(inet::Packet *packet)
+{
+    send(packet->dup(), gate("bgOut"));
+    Ieee8022Llc::processPacketFromMac(packet);
 }
 
 }

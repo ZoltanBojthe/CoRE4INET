@@ -15,7 +15,7 @@
 
 package core4inet.linklayer.ethernet.base;
 
-import inet.linklayer.ethernet.EtherLlc;
+import inet.linklayer.ieee8022.Ieee8022Llc;
 
 //
 // This module forwards frames (~EtherFrame) to the bg buffers
@@ -24,12 +24,12 @@ import inet.linklayer.ethernet.EtherLlc;
 // 
 // @author Till Steinbach
 //
-simple BGEtherLLC extends EtherLlc
+simple BGEtherLLC extends Ieee8022Llc
 {
     parameters:
         @class(BGEtherLLC);
         @display("i=block/fork");
-        
+
     gates:
         //best-effort message in
         input bgIn @loose;

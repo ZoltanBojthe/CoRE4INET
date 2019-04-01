@@ -16,8 +16,11 @@
 #ifndef CORE4INET_BGETHERLLC_H
 #define CORE4INET_BGETHERLLC_H
 
+//CoRE4INET
+#include "core4inet/base/CoRE4INET_Defs.h"
+
 //INET
-#include "inet/linklayer/ethernet/EtherLlc.h"
+#include "inet/linklayer/ieee8022/Ieee8022Llc.h"
 
 namespace CoRE4INET {
 
@@ -28,7 +31,7 @@ namespace CoRE4INET {
  *
  * @author Till Steinbach
  */
-class BGEtherLLC : public virtual inet::EtherLlc
+class BGEtherLLC : public virtual inet::Ieee8022Llc
 {
   protected:
     /**
@@ -36,7 +39,8 @@ class BGEtherLLC : public virtual inet::EtherLlc
      *
      * @param msg cMessage pointer
      */
-    virtual void handleMessage(cMessage *msg) override;
+    virtual void handleMessageWhenUp(cMessage *msg) override;
+    virtual void processPacketFromMac(inet::Packet *packet) override;
 };
 
 }
