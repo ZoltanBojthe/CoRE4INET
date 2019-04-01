@@ -60,7 +60,7 @@ class SRPFrame  extends inet::FieldsChunk {
 
 class TalkerAdvertise extends SRPFrame{
     chunkLength = inet::B(25);
-    attributeType = TALKER_ADVERTISE;
+    attributeType = SRP_TALKER_ADVERTISE;
     // DataFrameParameters => destination adress and vlan identifier
     // 64 Bit Field
     inet::MacAddress destination_address; //only one Talker allowed per destination_address
@@ -79,7 +79,7 @@ class TalkerAdvertise extends SRPFrame{
 
 class TalkerFailed extends TalkerAdvertise{
     chunkLength = inet::B(34);
-    attributeType = TALKER_FAILED;
+    attributeType = SRP_TALKER_FAILED;
     // FailureInformation
     //
     // 72 Bit Field
