@@ -113,7 +113,7 @@ void AVBTrafficSourceApp::sendAVBFrame()
 
     auto qtag = new inet::Ieee8021qHeader();
     qtag->setVid(vlan_id);
-    //qtag->setPcp(priority);
+    qtag->setPcp(AVB_VIDEO_PRIORITY);
     qtag->setDe(false);
 
     frame->setCTag(qtag);

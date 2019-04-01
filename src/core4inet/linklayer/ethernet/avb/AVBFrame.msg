@@ -27,6 +27,10 @@ import inet.common.packet.chunk.Chunk;
 
 namespace CoRE4INET;
 
+enum AVBPriority {
+    AVB_VIDEO_PRIORITY = 4;
+    AVB_VOICE_PRIORITY = 5;
+}
 //
 // Represents a AVB Frame
 //

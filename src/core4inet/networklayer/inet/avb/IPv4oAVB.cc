@@ -458,9 +458,9 @@ void IPv4oAVB<base>::sendAVBFrame(cPacket* packet, __attribute__((unused))     c
 
     outFrame->encapsulate(packet);
 
-    if (outFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+    if (outFrame->getByteLength() < inet::MIN_ETHERNET_FRAME_BYTES)
     {
-        outFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
+        outFrame->setByteLength(inet::MIN_ETHERNET_FRAME_BYTES);
     }
     base::sendDirect(outFrame, avbDestInfo->getDestModule()->gate("in"));
 
