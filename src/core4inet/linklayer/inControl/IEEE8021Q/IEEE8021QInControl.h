@@ -18,6 +18,9 @@
 
 #include <algorithm>    // std::sort
 
+//CoRE4INET
+#include "core4inet/utilities/ConfigFunctions.h"
+
 //INET Auto-generated Messages
 #include "inet/linklayer/ethernet/EtherFrame_m.h"
 
@@ -80,63 +83,59 @@ void IEEE8021QInControl<IC>::handleMessage(cMessage *msg)
 {
     if (msg->arrivedOn("in"))
     {
-        if (inet::EtherFrame *frame = dynamic_cast<inet::EtherFrame*>(msg))
+        auto packet = check_and_cast<inet::Packet*>(msg);
+        auto frame = packet->removeAtFront<inet::EthernetMacHeader>();
+        if (auto frameQtag = frame->getCTagForUpdate())
         {
-
-            if (EthernetIIFrameWithQTag* qframe = dynamic_cast<EthernetIIFrameWithQTag*>(frame))
+            //VLAN tag if requested
+            if (this->untaggedVID && frameQtag->getVid() == 0)
             {
-                //VLAN tag if requested
-                if (this->untaggedVID && qframe->getVID() == 0)
+                frameQtag->setVid(this->untaggedVID);
+            }
+            //VLAN check if port is tagged with VLAN
+            bool found = false;
+            for (std::vector<int>::iterator vid = this->taggedVIDs.begin(); vid != this->taggedVIDs.end(); ++vid)
+            {
+                //Shortcut due to sorted vector
+                if ((*vid) > frameQtag->getVid())
                 {
-                    qframe->setVID(this->untaggedVID);
+                    break;
                 }
-                //VLAN check if port is tagged with VLAN
-                bool found = false;
-                for (std::vector<int>::iterator vid = this->taggedVIDs.begin(); vid != this->taggedVIDs.end(); ++vid)
+                if ((*vid) == frameQtag->getVid())
                 {
-                    //Shortcut due to sorted vector
-                    if ((*vid) > qframe->getVID())
-                    {
-                        break;
-                    }
-                    if ((*vid) == qframe->getVID())
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    EV_WARN << "Received IEEE 802.1Q frame with VID " << qframe->getVID()
-                            << " but port was not tagged with that VID. Frame was dropped";
-                    delete qframe;
-                    return;
+                    found = true;
+                    break;
                 }
             }
+            if (!found)
+            {
+                EV_WARN << "Received IEEE 802.1Q frame with VID " << frameQtag->getVid()
+                        << " but port was not tagged with that VID. Frame was dropped";
+                delete packet;
+                return;
+            }
+        }
+        packet->insertAtFront(frame);
+        //FIXME update FCS, too
 
-            this->recordPacketReceived(frame);
+        this->recordPacketReceived(packet);
 
-            if (IC::isPromiscuous() || frame->getDest().isMulticast())
+        if (IC::isPromiscuous() || frame->getDest().isMulticast())
+        {
+            cSimpleModule::send(msg, "out");
+        }
+        else
+        {
+            inet::MacAddress address;
+            address.setAddress(packet->getArrivalGate()->getPathStartGate()->getOwnerModule()->par("address"));
+            if (frame->getDest().equals(address))
             {
                 cSimpleModule::send(msg, "out");
             }
             else
             {
-                inet::MacAddress address;
-                address.setAddress(frame->getArrivalGate()->getPathStartGate()->getOwnerModule()->par("address"));
-                if (frame->getDest().equals(address))
-                {
-                    cSimpleModule::send(msg, "out");
-                }
-                else
-                {
-                    IC::handleMessage(msg);
-                }
+                IC::handleMessage(msg);
             }
-        }
-        else
-        {
-            throw cRuntimeError("Received message on port in that is no EtherFrame");
         }
     }
     else
