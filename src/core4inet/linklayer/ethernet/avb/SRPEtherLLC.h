@@ -58,7 +58,7 @@ class SRPEtherLLC : public BGEtherLLC
          *
          * @param frame EtherFrame pointer
          */
-        void deliverSRP(inet::EtherFrame * frame);
+        void deliverSRP(inet::Packet *frame);
 };
 
 }

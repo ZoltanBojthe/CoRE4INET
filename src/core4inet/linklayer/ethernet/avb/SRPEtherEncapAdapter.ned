@@ -23,13 +23,13 @@ simple SRPEtherEncapAdapter
     parameters:
         @class(SRPEtherEncapAdapter);
         @display("i=block/join");
-        
+
     gates:
         //SRP message in from SRP protocol module
         input srpIn;
         //SRP message out to SRP protocol module
         output srpOut;
-        
-        input encapIn[];
-        output encapOut[];
+
+        input encapIn;
+        output encapOut;
 }

@@ -84,7 +84,7 @@ void SRPEtherLLC::dispatchSRP(SRPFrame * srp)
     }
 }
 
-void SRPEtherLLC::deliverSRP(inet::EtherFrame * frame)
+void SRPEtherLLC::deliverSRP(inet::Packet *frame)
 {
     SRPFrame * srp = check_and_cast<SRPFrame *>(frame->decapsulate());
 

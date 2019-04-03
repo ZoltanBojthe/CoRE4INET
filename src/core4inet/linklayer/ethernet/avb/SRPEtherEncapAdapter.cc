@@ -15,6 +15,8 @@
 
 #include "SRPEtherEncapAdapter.h"
 
+#include "inet/common/packet/Packet.h"
+
 namespace CoRE4INET {
 
 Define_Module(SRPEtherEncapAdapter);
@@ -26,38 +28,38 @@ void SRPEtherEncapAdapter::initialize()
     WATCH(portCount);
 }
 
-void SRPEtherEncapAdapter::handleMessage(cMessage *msg) {
-    if (msg && msg->arrivedOn("srpIn")) {
-        SRPFrame * srpFrame = check_and_cast<SRPFrame*>(msg);
-        ExtendedIeee802Ctrl * controlInfo = dynamic_cast<ExtendedIeee802Ctrl *>(srpFrame->removeControlInfo());
-        if (ListenerReady* listenerReady = dynamic_cast<ListenerReady*>(srpFrame)) {
-            listenerReady->setControlInfo(controlInfo->dup());
-            send(listenerReady, "encapOut", controlInfo->getSwitchPort());
-        } else if (TalkerAdvertise* talkerAdvertise = dynamic_cast<TalkerAdvertise*>(srpFrame)) {
+void SRPEtherEncapAdapter::handleMessage(cMessage *msg)
+{
+    if (msg == nullptr)
+        return;     //FIXME why needed it?
+
+    auto packet = check_and_cast<inet::Packet*>(msg);
+    auto controlInfo = msg->getControlInfo();
+    if (msg->arrivedOn("srpIn")) {
+        const auto& srpFrame = packet->peekAtFront<SRPFrame>();
+
+        if (srpFrame->getAttributeType() ==  SRP_LISTENER && CHK(inet::dynamicPtrCast<const SrpListener>(srpFrame))->getAttributeSubtype() == SRP_LISTENER_READY) {
+            send(msg, "encapOut", controlInfo->getSwitchPort());
+        }
+        else if (srpFrame->getAttributeType() ==  SRP_TALKER_ADVERTISE) {
             if(controlInfo->getNotSwitchPort() == -1) {
                 for (size_t i = 0; i < portCount; i++) {
-                    TalkerAdvertise* newtalkerAdvertise = talkerAdvertise->dup();
-                    newtalkerAdvertise->setControlInfo(controlInfo->dup());
-                    send(newtalkerAdvertise, "encapOut", static_cast<int>(i));
+                    auto newMsg = msg->dup();
+                    newMsg->setControlInfo(controlInfo->dup());
+                    send(newMsg, "encapOut", static_cast<int>(i));
                 }
             }
-            delete talkerAdvertise;
+            delete msg;
         } else {
             for (size_t i = 0; i < portCount; ++i) {
-                SRPFrame* newSrpFrame = srpFrame->dup();
-                newSrpFrame->setControlInfo(controlInfo->dup());
-                send(newSrpFrame, "encapOut", static_cast<int>(i));
+                auto newMsg = msg->dup();
+                newMsg->setControlInfo(controlInfo->dup());
+                send(newMsg, "encapOut", static_cast<int>(i));
             }
-            delete srpFrame;
+            delete msg;
         }
-
-        delete controlInfo;
-    } else if (msg && msg->arrivedOn("encapIn")) {
-        SRPFrame * srpFrame = check_and_cast<SRPFrame*>(msg);
-        inet::Ieee802Ctrl * controlInfo = dynamic_cast<inet::Ieee802Ctrl *>(srpFrame->removeControlInfo());
-        controlInfo->setSwitchPort(srpFrame->getArrivalGate()->getIndex());
-        srpFrame->setControlInfo(controlInfo);
-        send(srpFrame, "srpOut");
+    } else if (msg->arrivedOn("encapIn")) {
+        send(msg, "srpOut");
     } else {
         delete msg;
     }
