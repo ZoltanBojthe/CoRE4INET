@@ -56,7 +56,7 @@ class SRPEtherEncap : public virtual BGEtherEncap
          *
          * @param msg cMessage pointer
          */
-        virtual void handleMessage(cMessage *msg) override;
+        virtual void handleMessageWhenUp(cMessage *msg) override;
 
     private:
         /**

@@ -47,7 +47,7 @@ SRPEtherEncap::~SRPEtherEncap()
 
 //==============================================================================
 
-void SRPEtherEncap::handleMessage(cMessage *msg)
+void SRPEtherEncap::handleMessageWhenUp(cMessage *msg)
 {
     if (msg && msg->arrivedOn("srpIn"))
     {
@@ -65,12 +65,12 @@ void SRPEtherEncap::handleMessage(cMessage *msg)
         }
         else
         {
-            BGEtherEncap::handleMessage(msg);
+            BGEtherEncap::handleMessageWhenUp(msg);
         }
     }
     else
     {
-        BGEtherEncap::handleMessage(msg);
+        BGEtherEncap::handleMessageWhenUp(msg);
     }
 }
 
