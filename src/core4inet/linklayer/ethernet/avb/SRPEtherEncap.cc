@@ -20,6 +20,10 @@
 #include "core4inet/base/avb/AVBDefs.h"
 #include "core4inet/linklayer/contract/ExtendedIeee802Ctrl_m.h"
 
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/linklayer/common/InterfaceTag_m.h"
+#include "inet/linklayer/common/MacAddressTag_m.h"
+
 //==============================================================================
 
 namespace CoRE4INET {
@@ -47,16 +51,17 @@ void SRPEtherEncap::handleMessage(cMessage *msg)
 {
     if (msg && msg->arrivedOn("srpIn"))
     {
-        SRPFrame * srpFrame = check_and_cast<SRPFrame*>(msg);
+        auto * srpFrame = check_and_cast<inet::Packet*>(msg);
         dispatchSRP(srpFrame);
     }
     else if (msg && msg->arrivedOn("lowerLayerIn"))
     {
-        inet::EtherFrame * frame = check_and_cast<inet::EtherFrame*>(msg);
+        inet::Packet * packet = check_and_cast<inet::Packet*>(msg);
+        const auto& frame = packet->peekAtFront<inet::EthernetMacHeader>();
         if (frame->getDest() == SRP_ADDRESS)
         {
             EV_DETAIL << "Deliver SRPFrame to the SRP module" << endl;
-            deliverSRP(frame); // deliver to the SRP module
+            deliverSRP(packet); // deliver to the SRP module
         }
         else
         {
@@ -71,57 +76,55 @@ void SRPEtherEncap::handleMessage(cMessage *msg)
 
 //==============================================================================
 
-void SRPEtherEncap::dispatchSRP(SRPFrame * srp)
+void SRPEtherEncap::dispatchSRP(inet::Packet *packet)
 {
-    ExtendedIeee802Ctrl * controlInfo = dynamic_cast<ExtendedIeee802Ctrl *>(srp->removeControlInfo());
-    int portNum = controlInfo->getSwitchPort();
-    int notPortNum = controlInfo->getNotSwitchPort();
-    inet::MacAddress address = controlInfo->getDest();
+    int outInterfaceId = -1;
+    if (auto ir = packet->findTag<inet::InterfaceReq>())
+        outInterfaceId = ir->getInterfaceId();
 
     if (portNum >= 1)
         throw cRuntimeError("Output port %d doesn't exist!", portNum);
 
-    inet::EthernetIIFrame * frame = new inet::EthernetIIFrame(srp->getName());
-    frame->setDest(address);
-    frame->setSrc(controlInfo->getSrc());
-    frame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    frame->setEtherType(MSRP_ETHERTYPE);
-    frame->encapsulate(srp);
+    int arrivalInterfaceId = -1;
+    if (auto ii = packet->findTag<inet::InterfaceInd>())
+        arrivalInterfaceId = ii->getInterfaceId();
 
-    delete controlInfo;
-
-    if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-        frame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
+    auto macAddressReq = packet->getTag<inet::MacAddressReq>();
+    const auto& frame = inet::makeShared<inet::EthernetMacHeader>();
+    frame->setDest(macAddressReq->getDestAddress());
+    frame->setSrc(macAddressReq->getSrcAddress());
+    frame->setTypeOrLength(MSRP_ETHERTYPE);
+    packet->insertAtFront(frame);
+    addPaddingAndFcs(packet, fcsMode);
+    packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
 
     if (notPortNum != 0)
     {
-        send(frame, "lowerLayerOut");
-        EV_INFO << "Sending SRP frame " << frame << " with destination = " << frame->getDest() << ", port = " << portNum
+        send(packet, "lowerLayerOut");
+        EV_INFO << "Sending SRP frame " << packet << " with destination = " << frame->getDest() << ", port = " << portNum
                 << endl;
     }
     else
     {
-        delete frame;
+        delete packet;
     }
 }
 
 //==============================================================================
 
-void SRPEtherEncap::deliverSRP(inet::EtherFrame * frame)
+void SRPEtherEncap::deliverSRP(inet::Packet * packet)
 {
-    SRPFrame * srp = check_and_cast<SRPFrame *>(frame->decapsulate());
+    const auto& frame = packet->popAtFront<inet::EthernetMacHeader>();
+//    SRPFrame * srp = check_and_cast<SRPFrame *>(frame->decapsulate());
 
-    inet::Ieee802Ctrl * controlInfo = new inet::Ieee802Ctrl();
-    controlInfo->setSrc(frame->getSrc());
-    controlInfo->setSwitchPort(0);
-    controlInfo->setDest(frame->getDest());
+    auto addrTag = packet->addTag<inet::MacAddressInd>();
+    addrTag->setSrcAddress(frame->getSrc());
+    addrTag->setDestAddress(frame->getDest());
 
-    srp->setControlInfo(controlInfo);
+    controlInfo->setSwitchPort(0);  //TODO
 
-    delete frame; // we have the SRP packet, so delete the frame
-
-    EV_INFO << "Sending SRP frame " << srp << " to the SRP module" << endl;
-    send(srp, "srpOut");
+    EV_INFO << "Sending SRP frame " << packt << " to the SRP module" << endl;
+    send(packet, "srpOut");
 }
 
 //==============================================================================

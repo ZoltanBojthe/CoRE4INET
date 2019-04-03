@@ -64,13 +64,13 @@ class SRPEtherEncap : public virtual BGEtherEncap
          *
          * @param srp SRPFrame pointer
          */
-        void dispatchSRP(SRPFrame * srp);
+        void dispatchSRP(inet::Packet *packet);
         /**
          * @brief Delivers SRPFrame to SRProtocol module
          *
          * @param frame EtherFrame pointer
          */
-        void deliverSRP(inet::Packet * frame);
+        void deliverSRP(inet::Packet *packet);
 };
 
 } /* namespace CoRE4INET */
