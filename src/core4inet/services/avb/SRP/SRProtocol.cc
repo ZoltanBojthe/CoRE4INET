@@ -210,7 +210,7 @@ void SRProtocol::handleMessage(cMessage *msg)
                 processTalkerAdvertise(packet);
                 break;
             case SRP_LISTENER: {
-                auto listenerBase = CHK(inet::dynamicPtrCast<SrpListener>(srpFrame));
+                auto listenerBase = CHK(inet::dynamicPtrCast<const SrpListener>(srpFrame));
                 switch(listenerBase->getAttributeSubtype()) {
                     case SRP_LISTENER_READY:
                         processListenerReady(packet);
