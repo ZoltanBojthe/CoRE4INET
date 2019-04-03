@@ -29,7 +29,7 @@ simple BGEtherEncap extends EtherEncap
     parameters:
         @class(BGEtherEncap);
         @display("i=block/fork");
-    
+
     gates:
         // background in
         input bgIn;

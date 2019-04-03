@@ -27,41 +27,21 @@ namespace CoRE4INET {
 
 Define_Module(BGEtherEncap);
 
-//==============================================================================
-
-BGEtherEncap::BGEtherEncap() {
-
-}
-
-//==============================================================================
-
-BGEtherEncap::~BGEtherEncap() {
-}
-
-//==============================================================================
-
-void BGEtherEncap::handleMessage(cMessage *msg)
+void BGEtherEncap::handleMessageWhenUp(cMessage *msg)
 {
-    if (msg->arrivedOn("bgIn"))
-    {
+    if (msg->arrivedOn("bgIn")) {
+        // from upper layer
+        EV_INFO << "Received " << msg << " from BG." << endl;
         send(msg, gate("lowerLayerOut"));
     }
-    else if (msg->arrivedOn("lowerLayerIn"))
-    {
-        if (gate("bgOut")->isConnected() && gate("bgOut")->isPathOK()) {
-            send(msg->dup(), gate("bgOut"));
-        }
-        if (gate("upperLayerOut")->isConnected() && gate("upperLayerOut")->isPathOK()) {
-            EtherEncap::handleMessage(msg->dup());
-        }
-        delete msg;
-    }
     else
-    {
-        EtherEncap::handleMessage(msg);
-    }
+        EtherEncap::handleMessageWhenUp(msg);
 }
 
-//==============================================================================
+void BGEtherEncap::processPacketFromMac(inet::Packet *packet)
+{
+    send(packet->dup(), gate("bgOut"));
+    EtherEncap::processPacketFromMac(packet);
+}
 
 } /* namespace CoRE4INET */

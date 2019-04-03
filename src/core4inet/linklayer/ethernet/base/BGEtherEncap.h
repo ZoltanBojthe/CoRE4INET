@@ -30,26 +30,13 @@ namespace CoRE4INET {
  */
 class BGEtherEncap : public virtual inet::EtherEncap
 {
-    public:
-        /**
-         * @brief Constructor
-         */
-        BGEtherEncap();
-
-        /**
-         * @brief Destructor
-         */
-        virtual ~BGEtherEncap() override;
-
-    protected:
-        /**
-         * @brief Handles incoming messages
-         *
-         * @param msg cMessage pointer
-         */
-        virtual void handleMessage(omnetpp::cMessage *msg) override;
+  protected:
+    virtual void handleMessageWhenUp(cMessage *msg) override;
+    virtual void processPacketFromMac(inet::Packet *packet) override;
 }; // class BGEtherEncap
 
 
 } /* namespace CoRE4INET */
+
 #endif /* BGETHERENCAP_H_ */
+
