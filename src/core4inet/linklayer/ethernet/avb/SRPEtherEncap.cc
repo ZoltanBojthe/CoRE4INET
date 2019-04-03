@@ -82,6 +82,8 @@ void SRPEtherEncap::dispatchSRP(inet::Packet *packet)
     if (auto ir = packet->findTag<inet::InterfaceReq>())
         outInterfaceId = ir->getInterfaceId();
 
+    int portNum = 0; int notPortNum = -1;    //FIXME KLUDGE
+
     if (portNum >= 1)
         throw cRuntimeError("Output port %d doesn't exist!", portNum);
 
@@ -121,7 +123,7 @@ void SRPEtherEncap::deliverSRP(inet::Packet * packet)
     addrTag->setSrcAddress(frame->getSrc());
     addrTag->setDestAddress(frame->getDest());
 
-    controlInfo->setSwitchPort(0);  //TODO
+    // controlInfo->setSwitchPort(0);  //FIXME KLUDGE
 
     EV_INFO << "Sending SRP frame " << packet << " to the SRP module" << endl;
     send(packet, "srpOut");
