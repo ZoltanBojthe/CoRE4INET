@@ -60,6 +60,10 @@ class SRProtocol : public virtual cSimpleModule, public cListener
          * @param msg the incoming message
          */
         virtual void handleMessage(cMessage *msg) override;
+        void processTalkerAdvertise(inet::Packet *packet);
+        void processListenerReady(inet::Packet *packet);
+        void processListenerAskingFailed(inet::Packet *packet);
+
 
         /**
          * @brief handles signals containing srpTable changes
