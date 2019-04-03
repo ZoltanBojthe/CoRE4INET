@@ -123,7 +123,7 @@ void SRPEtherEncap::deliverSRP(inet::Packet * packet)
 
     controlInfo->setSwitchPort(0);  //TODO
 
-    EV_INFO << "Sending SRP frame " << packt << " to the SRP module" << endl;
+    EV_INFO << "Sending SRP frame " << packet << " to the SRP module" << endl;
     send(packet, "srpOut");
 }
 
