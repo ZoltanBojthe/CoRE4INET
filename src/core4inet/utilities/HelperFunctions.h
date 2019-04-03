@@ -34,6 +34,8 @@
 #include "core4inet/base/avb/AVBDefs_m.h"
 #endif
 
+//INET
+#include "inet/common/packet/Packet.h"
 #include "inet/linklayer/common/MacAddress.h"
 
 namespace CoRE4INET {
@@ -129,7 +131,7 @@ inet::MacAddress generateAutoMulticastAddress();
  *
  * @author Till Steinbach
  */
-void setTransparentClock(PCFrame *pcf, double static_tx_delay, Timer* scheduler);
+void setTransparentClock(inet::Packet *packet, double static_tx_delay, Timer* scheduler);
 
 /**
  * @brief Helper function checks whether a Frame is critical traffic.

@@ -22,6 +22,9 @@
 //Auto-generated Messages
 #include "core4inet/linklayer/ethernet/AS6802/PCFrame_m.h"
 
+//INET
+#include "inet/common/Protocol.h"
+#include "inet/common/ProtocolTag_m.h"
 #include "inet/common/packet/Packet.h"
 
 namespace CoRE4INET {
@@ -203,10 +206,15 @@ void PCFShaper<TC>::handleMessage(cMessage *msg)
     {
         if (TC::getNumPendingRequests())
         {
-            PCFrame *pcf = dynamic_cast<PCFrame*>(msg);
-            if (pcf)
-            {
-                setTransparentClock(pcf, cModule::getParentModule()->par("static_tx_delay").doubleValue(), getTimer());
+            if (auto packet = dynamic_cast<inet::Packet*>(msg)) {
+                bool isPcf = false;    // PCFrame *pcf = dynamic_cast<PCFrame*>(msg);
+                if (auto ptag = packet->findTag<inet::PacketProtocolTag>()) {
+                    if (ptag && *ptag->getProtocol() == inet::Protocol::tteth)
+                        isPcf = true;
+                }
+                if (isPcf) {
+                    setTransparentClock(packet, cModule::getParentModule()->par("static_tx_delay").doubleValue(), getTimer());
+                }
             }
             TC::framesRequested--;
             cSimpleModule::send(msg, cModule::gateBaseId("out"));
@@ -274,10 +282,15 @@ cMessage* PCFShaper<TC>::pop()
         pcfQueueSize-=static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
         cComponent::emit(pcfQueueSizeSignal, static_cast<unsigned long>(pcfQueueSize));
 
-        PCFrame *pcf = dynamic_cast<PCFrame*>(msg);
-        if (pcf)
-        {
-            setTransparentClock(pcf, cModule::getParentModule()->par("static_tx_delay").doubleValue(), getTimer());
+        if (auto packet = dynamic_cast<inet::Packet*>(msg)) {
+            bool isPcf = false;    // PCFrame *pcf = dynamic_cast<PCFrame*>(msg);
+            if (auto ptag = packet->findTag<inet::PacketProtocolTag>()) {
+                if (ptag && *ptag->getProtocol() == inet::Protocol::tteth)
+                    isPcf = true;
+            }
+            if (isPcf) {
+                setTransparentClock(packet, cModule::getParentModule()->par("static_tx_delay").doubleValue(), getTimer());
+            }
         }
         return msg;
     }

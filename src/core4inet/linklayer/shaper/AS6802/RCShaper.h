@@ -24,6 +24,8 @@
 #include "core4inet/linklayer/ethernet/AS6802/PCFrame_m.h"
 
 //INET
+#include "inet/common/Protocol.h"
+#include "inet/common/ProtocolTag_m.h"
 #include "inet/linklayer/ethernet/EtherMacFullDuplex.h"
 
 //Std
@@ -261,10 +263,15 @@ void RCShaper<TC>::handleMessage(cMessage *msg)
             }
             rcBuffer->resetBag();
             //Set Transparent clock when frame is PCF
-            PCFrame *pcf = dynamic_cast<PCFrame*>(msg);
-            if (pcf)
-            {
-                setTransparentClock(pcf, cModule::getParentModule()->par("static_tx_delay").doubleValue(), getTimer());
+            if (auto packet = dynamic_cast<inet::Packet*>(msg)) {
+                bool isPcf = false;    // PCFrame *pcf = dynamic_cast<PCFrame*>(msg);
+                if (auto ptag = packet->findTag<inet::PacketProtocolTag>()) {
+                    if (ptag && *ptag->getProtocol() == inet::Protocol::tteth)
+                        isPcf = true;
+                }
+                if (isPcf) {
+                    setTransparentClock(packet, cModule::getParentModule()->par("static_tx_delay").doubleValue(), getTimer());
+                }
             }
             TC::framesRequested--;
             cSimpleModule::send(msg, cModule::gateBaseId("out"));
@@ -368,10 +375,15 @@ cMessage* RCShaper<TC>::pop()
             }
             rcBuffer->resetBag();
 
-            PCFrame *pcf = dynamic_cast<PCFrame*>(message);
-            if (pcf)
-            {
-                setTransparentClock(pcf, cModule::getParentModule()->par("static_tx_delay").doubleValue(), getTimer());
+            if (auto packet = dynamic_cast<inet::Packet*>(message)) {
+                bool isPcf = false;    // PCFrame *pcf = dynamic_cast<PCFrame*>(message);
+                if (auto ptag = packet->findTag<inet::PacketProtocolTag>()) {
+                    if (ptag && *ptag->getProtocol() == inet::Protocol::tteth)
+                        isPcf = true;
+                }
+                if (isPcf) {
+                    setTransparentClock(packet, cModule::getParentModule()->par("static_tx_delay").doubleValue(), getTimer());
+                }
             }
             return message;
         }

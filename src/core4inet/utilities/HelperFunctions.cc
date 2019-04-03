@@ -103,15 +103,16 @@ inet::MacAddress generateAutoMulticastAddress()
 }
 
 #ifdef WITH_AS6802_COMMON
-void setTransparentClock(PCFrame *pcf, double static_tx_delay, Timer* timer)
+void setTransparentClock(inet::Packet *packet, double static_tx_delay, Timer* timer)
 {
+    auto pcf = packet->removeAtFront<PCFrame>();
     uint64_t transparentClock = pcf->getTransparent_clock();
 
     //Add static delay for this port
     transparentClock += secondsToTransparentClock(static_tx_delay);
 
     //Add dynamic delay for the device
-    cArray parlist = pcf->getParList();
+    cArray parlist = packet->getParList();
     long start = -1;
     for (int i = 0; i < parlist.size(); i++)
     {
@@ -133,6 +134,7 @@ void setTransparentClock(PCFrame *pcf, double static_tx_delay, Timer* timer)
 
     //Set new transparent clock
     pcf->setTransparent_clock(transparentClock);
+    packet->insertAtFront(pcf);
 }
 
 bool isCT(const inet::EthernetMacHeader *frame, uint32_t ctMarker, uint32_t ctMask)
