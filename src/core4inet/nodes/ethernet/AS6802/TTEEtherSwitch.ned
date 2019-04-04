@@ -39,7 +39,7 @@ import inet.networklayer.common.InterfaceTable;
 module TTEEtherSwitch
 {
     parameters:
-        @display("i=block/switch;bgb=547,312");
+        @display("i=block/switch;bgb=547,363");
         @networkNode;
         @labels(node,ethernet-node);
 
@@ -70,7 +70,7 @@ module TTEEtherSwitch
 
         // Implementation of the best-effort forwarding part
         beswitch: <default("MacRelayUnit")> like IMacRelayUnit {
-            @display("p=350,169");
+            @display("p=350,237");
         }
 
         //The mac table associated with the be switch
@@ -84,12 +84,12 @@ module TTEEtherSwitch
         }
 
         encap: <default("EtherEncap")> like IEtherEncap {
-            @display("p=350,62");
+            @display("p=350,169");
         }
         // Physical ports of the switch
         phy[sizeof(ethg)]: TTEPHYPort {
             parameters:
-                @display("p=201,257,row,150");
+                @display("p=201,325,row,150");
                 //For the switch it is necessary to have promiscuous mode enabled
                 promiscuous = true;
         }
@@ -111,10 +111,10 @@ module TTEEtherSwitch
 
         up: MessageDispatcher {
             parameters:
-                @display("p=350,122;b=350,5");
+                @display("p=350,117;b=350,5");
         }
         down: MessageDispatcher {
-            @display("p=350,222;b=350,5");
+            @display("p=350,290;b=350,5");
         }
 
     connections:
