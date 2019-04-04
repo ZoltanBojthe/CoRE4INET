@@ -27,32 +27,32 @@ import core4inet.buffer.AS6802.RCQueueBuffer;
 //
 module Switch1 extends TTEEtherSwitch
 {
-    @display("bgb=351,311");
+    @display("bgb=747,310");
     submodules:
         vl_100_ctc: TTIncoming {
             parameters:
-                @display("p=170,130");
+                @display("p=606,50");
         }
         vl_100: TTDoubleBuffer {
             parameters:
-                @display("p=240,130");
+                @display("p=676,50");
         }
         vl_101_ctc: RCIncoming {
             parameters:
-                @display("p=170,200");
+                @display("p=606,120");
                 hardware_delay = hardware_delay;
         }
         vl_101: RCQueueBuffer {
             parameters:
-                @display("p=240,200");
+                @display("p=676,120");
         }
         vl_102_ctc: TTIncoming {
             parameters:
-                @display("p=170,270");
+                @display("p=606,190");
         }
         vl_102: TTDoubleBuffer {
             parameters:
-                @display("p=240,270");
+                @display("p=676,190");
         }
     connections:
         vl_100_ctc.out --> vl_100.in;
