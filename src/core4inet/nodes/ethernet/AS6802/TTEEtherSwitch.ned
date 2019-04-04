@@ -23,6 +23,7 @@ import inet.common.MessageDispatcher;
 import inet.common.lifecycle.NodeStatus;
 import inet.linklayer.contract.IMacAddressTable;
 import inet.linklayer.contract.IMacRelayUnit;
+import inet.linklayer.ethernet.IEtherEncap;
 import inet.networklayer.common.InterfaceTable;
 
 
@@ -49,6 +50,8 @@ module TTEEtherSwitch
         double hardware_delay @unit(s) = default(8us);
 
         *.interfaceTableModule = default(absPath(".interfaceTable"));
+        beswitch.hasStp = default(false);
+        encap.fcsMode = default("declared");
 
     gates:
         // Physical ports of the switch
@@ -67,7 +70,7 @@ module TTEEtherSwitch
 
         // Implementation of the best-effort forwarding part
         beswitch: <default("MacRelayUnit")> like IMacRelayUnit {
-            @display("p=349,142");
+            @display("p=350,169");
         }
 
         //The mac table associated with the be switch
@@ -80,10 +83,13 @@ module TTEEtherSwitch
             @display("p=47,130");
         }
 
+        encap: <default("EtherEncap")> like IEtherEncap {
+            @display("p=350,62");
+        }
         // Physical ports of the switch
         phy[sizeof(ethg)]: TTEPHYPort {
             parameters:
-                @display("p=207,247,column,50");
+                @display("p=201,257,row,150");
                 //For the switch it is necessary to have promiscuous mode enabled
                 promiscuous = true;
         }
@@ -103,11 +109,21 @@ module TTEEtherSwitch
             @display("p=246,50");
         }
 
+        up: MessageDispatcher {
+            parameters:
+                @display("p=350,122;b=350,5");
+        }
         down: MessageDispatcher {
-            @display("p=350,200;b=350,5");
+            @display("p=350,222;b=350,5");
         }
 
     connections:
+        encap.lowerLayerIn <-- beswitch.upperLayerOut;
+        encap.lowerLayerOut --> beswitch.upperLayerIn;
+
+        encap.upperLayerIn <-- up.out++;
+        encap.upperLayerOut --> up.in++;
+
         down.in++ <-- ProcessingDelay {  delay = (hardware_delay/2); } <-- beswitch.ifOut;
         down.out++ --> ProcessingDelay {  delay = (hardware_delay/2); } --> beswitch.ifIn;
         for i=0..sizeof(ethg)-1 {
