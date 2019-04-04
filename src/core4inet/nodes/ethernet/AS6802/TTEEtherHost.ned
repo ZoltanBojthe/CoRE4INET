@@ -41,7 +41,7 @@ module TTEEtherHost
         @display("bgb=894,314;i=device/device");
         @networkNode;
         @labels(node,ethernet-node);
-        
+
         // Number of Applications running on the device
         int numApps = default(0);
         // Optional: Number of Buffers with Incoming Module for TT and RC traffic 
@@ -51,9 +51,10 @@ module TTEEtherHost
         int numPorts = default(1);
         // Forwardingdelay of the device hardware
         double hardware_delay @unit(s) = default(0us);
-        
+
         *.interfaceTableModule = default(absPath(".interfaceTable"));
-        
+        encap.fcsMode = default("declared");
+
     gates:
         // Physical port of the host
         inout ethg @loose @labels(EtherFrame-conn);
@@ -63,12 +64,12 @@ module TTEEtherHost
         status: NodeStatus {
             @display("p=60,37;is=n");
         }
-        
+
         // Physical port of the host
         phy[numPorts]: TTEPHYPort {
             @display("p=235,255,c,50");
         }
-        
+
         // Encap for best-effort traffic
         encap: BGEtherEncap {
             parameters:
@@ -79,37 +80,37 @@ module TTEEtherHost
         sync: <default("DummySync")> like ISync {
             @display("p=141,169");
         }
-        
+
         // Scheduler for the device
         scheduler: <default("Scheduler")> like ITTEScheduler {
             @display("p=235,169");
         }
-        
+
         // Applications for the device
         app[numApps]: < > like IApplication {
             @display("p=234,37,row,70");
         }
-        
+
         // Best-efford buffer for incoming traffic 
         bgIn: BGQueueBuffer {
             @display("p=141,37");
         }
-        
+
         // Best-efford buffer for outgoing traffic 
         bgOut: BGQueueBuffer {
             @display("p=141,99");
         }
-        
+
         // Buffers with Incoming Module for TT and RC traffic (optional)
         checkedBuffer[numBuffer]: CheckedBuffer {
             @display("p=350,100");
         }
-        
+
         // Holds interface names
         interfaceTable: InterfaceTable {
             @display("p=234,100");
         }
-        
+
     connections allowunconnected:
         phy[0].phys <--> ethg;
         encap.lowerLayerOut --> phy[0].upperLayerIn;
