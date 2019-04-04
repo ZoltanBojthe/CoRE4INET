@@ -15,7 +15,9 @@
 
 #include "SRPEtherEncapAdapter.h"
 
+//INET
 #include "inet/common/packet/Packet.h"
+#include "inet/linklayer/common/InterfaceTag_m.h"
 
 namespace CoRE4INET {
 
@@ -39,10 +41,14 @@ void SRPEtherEncapAdapter::handleMessage(cMessage *msg)
         const auto& srpFrame = packet->peekAtFront<SRPFrame>();
 
         if (srpFrame->getAttributeType() ==  SRP_LISTENER && CHK(inet::dynamicPtrCast<const SrpListener>(srpFrame))->getAttributeSubtype() == SRP_LISTENER_READY) {
-            send(msg, "encapOut", controlInfo->getSwitchPort());
+            send(msg, "encapOut");
         }
         else if (srpFrame->getAttributeType() ==  SRP_TALKER_ADVERTISE) {
-            if(controlInfo->getNotSwitchPort() == -1) {
+            int arrivalInterfaceId = -1;
+            if (auto ii = packet->findTag<inet::InterfaceInd>())
+                arrivalInterfaceId = ii->getInterfaceId();      // getNotSwitchPort()
+            if(arrivalInterfaceId == -1) {
+                //TODO why not skip only the arrival interface/notSwitchPort?
                 for (size_t i = 0; i < portCount; i++) {
                     auto newMsg = msg->dup();
                     newMsg->setControlInfo(controlInfo->dup());
@@ -51,6 +57,7 @@ void SRPEtherEncapAdapter::handleMessage(cMessage *msg)
             }
             delete msg;
         } else {
+            //TODO why not skip the arrival interface/notSwitchPort?
             for (size_t i = 0; i < portCount; ++i) {
                 auto newMsg = msg->dup();
                 newMsg->setControlInfo(controlInfo->dup());
@@ -61,7 +68,7 @@ void SRPEtherEncapAdapter::handleMessage(cMessage *msg)
     } else if (msg->arrivedOn("encapIn")) {
         send(msg, "srpOut");
     } else {
-        delete msg;
+        throw cRuntimeError("Message arrived on unknown gate '%s'", msg->getArrivalGate()->getFullName());
     }
 }
 
