@@ -31,7 +31,7 @@ simple BE_InControl extends Timed like IInControl
     parameters:
         @display("i=block/classifier");
         @class(BE_InControl);
-        
+
         //Signal is emitted when when frame is received. Contains the received frame.
         @signal[rxPk](type=inet::Packet; unit=packets);
         //End-to-end latency recorded when frame is received. Contains the time from frame creation until received in the Buffer
@@ -44,14 +44,14 @@ simple BE_InControl extends Timed like IInControl
         @statistic[bandwidth](title="Bandwidth used over Interval"; source=rxPk; unit=B; record="IntervalSumVector(packetBytes)?"; interpolationmode=linear);
         //Floating utilized Bandwidth over Interval
         @statistic[bandwidthFloating](title="Floating Bandwidth for each Interval"; source=rxPk; unit=B; record="floatingIntervalSumVector(packetBytes)?"; interpolationmode=sample-hold);
-        
+
         // if true, all packets are received, otherwise only the ones with matching destination MAC address (This does not affect CT-Frames)
         bool promiscuous = default(false);
-        
+
     gates:
         //Input from the lower layer (MAC layer)
         input in @labels(EtherFrame);
         //Output for best-effort frames to the upper layer (EtherLlc or IMacRelayUnit)
         output out @labels(EtherFrame);
-
 }
+
