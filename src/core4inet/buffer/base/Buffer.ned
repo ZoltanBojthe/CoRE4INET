@@ -32,9 +32,9 @@ simple Buffer like IBuffer
         @display("i=block/buffer");
 
         //Signal is emitted when when frame is received. Contains the received frame.
-        @signal[rxPk](type=inet::EtherFrame);
+        @signal[rxPk](type=inet::Packet);
         //Signal is emitted when when frame is transmitted. Contains the transmitted frame.
-        @signal[txPk](type=inet::EtherFrame);
+        @signal[txPk](type=inet::Packet);
 
         //Statistic of the number of packets that were received by the buffer
         @statistic[rxPk](title="Received Packets"; source=rxPk; unit=packets; record=count);

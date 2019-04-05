@@ -31,7 +31,7 @@ simple MultiCTTrafficSinkApp extends ApplicationBase
         @display("i=block/sink");
         
         //Signal emitted when a frame is received, contains received EtherFrame
-        @signal[rxPk:*](type=inet::EtherFrame);
+        @signal[rxPk:*](type=inet::Packet);
         //Statistic of the amount of packets that were received by the application
         @statisticTemplate[rxPk](title="Received Packets"; record=count; unit=packets); 
         //Statistic of the amount of bytes that were received by the application

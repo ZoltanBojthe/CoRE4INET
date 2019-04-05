@@ -34,7 +34,7 @@ simple IEEE8021Q_InControl extends Timed like IInControl
         @class(IEEE8021Q_InControl);
 
         //Signal is emitted when when frame is received. Contains the received frame.
-        @signal[rxPk](type=inet::EtherFrame; unit=packets);
+        @signal[rxPk](type=inet::Packet; unit=packets);
         //End-to-end latency recorded when frame is received. Contains the time from frame creation until received in the Buffer
         @statistic[rxLatency](title="End-to-end latency (received)"; source="messageAge(rxPk)"; unit=s; record=stats,histogram?,vector; interpolationmode=none);
         //Maximum packet size in Interval
