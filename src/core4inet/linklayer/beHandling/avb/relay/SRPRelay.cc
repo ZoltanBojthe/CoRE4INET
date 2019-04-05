@@ -69,8 +69,7 @@ void SRPRelay::handleLowerPacket(inet::Packet *packet)
 
 bool SRPRelay::isUpperMessage(cMessage *message)
 {
-    return
-            message->arrivedOn("srpIn");
+    return message->arrivedOn("upperLayerIn");
 }
 
 void SRPRelay::dispatchSRP(inet::Packet *packet) // (SRPFrame * srp)
@@ -103,7 +102,7 @@ void SRPRelay::deliverSRP(inet::Packet *packet)
 {
 
     EV_INFO << "Sending SRP frame " << packet << " to the SRP module" << endl;
-    send(packet, "srpOut");
+    send(packet, "upperLayerOut");
 }
 
 }
