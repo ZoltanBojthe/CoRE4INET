@@ -84,6 +84,7 @@ void IEEE8021QInControl<IC>::handleMessage(cMessage *msg)
     if (msg->arrivedOn("in"))
     {
         auto packet = check_and_cast<inet::Packet*>(msg);
+        packet->trimFront();
         auto frame = packet->removeAtFront<inet::EthernetMacHeader>();
         if (auto frameQtag = frame->getCTagForUpdate())
         {
