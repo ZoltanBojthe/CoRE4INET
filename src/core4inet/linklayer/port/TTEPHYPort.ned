@@ -45,9 +45,9 @@ module TTEPHYPort extends InterfaceEntry like IPort
         double static_tx_delay @unit(s) = default(0ns);
         //Module holds Interfacenames
         string interfaceTableModule;
-        
+
         *.interfaceTableModule = default(absPath(interfaceTableModule));
-        
+
     gates:
         //Input from the upper layer for best-effort Traffic
         input upperLayerIn @loose @labels(EtherFrame);
@@ -67,14 +67,14 @@ module TTEPHYPort extends InterfaceEntry like IPort
         shaper: TT_PCF_RC_BE_Shaper {
             @display("p=48,45");
         }
-        
+
         //Module for the organisation of inbound traffic
         inControl: CT_BE_InControl {
             parameters:
                 @display("p=142,45");
                 promiscuous = promiscuous;
         }
-        
+
         //MAC interface
         mac: EtherMacFullDuplex {
             parameters:
@@ -82,7 +82,7 @@ module TTEPHYPort extends InterfaceEntry like IPort
                 queueModule = "^.shaper";//The tteOutput-Module(TTEOutput) is used as external queue for the interface
                 @display("p=87,139");
         }
-        
+
     connections:
         upperLayerIn --> shaper.in;
         upperLayerOut <-- inControl.out;
