@@ -12,12 +12,8 @@
 /**
  * Check for minimal INET Version requirements
  */
-#if INET_VERSION < 0x0306 || (INET_VERSION == 0x0306 && INET_PATCH_LEVEL < 0x05)
-#  error At least INET version 3.6.5 required
-#endif
-
-#if INET_VERSION >= 0x0363
-#  error The INET 3.99 or newer versions are incompatible with this CoRE4INET version
+#if INET_VERSION < 0x0401
+#  error At least INET version 4.1 required
 #endif
 
 #ifndef WITH_ETHERNET
