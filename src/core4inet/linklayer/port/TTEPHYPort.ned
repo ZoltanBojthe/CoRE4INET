@@ -17,8 +17,9 @@ package core4inet.linklayer.port;
 
 import core4inet.linklayer.inControl.CT_BE_InControl;
 import core4inet.linklayer.shaper.TT_PCF_RC_BE_Shaper;
-
 import inet.linklayer.ethernet.EtherMacFullDuplex;
+import inet.networklayer.common.InterfaceEntry;
+
 
 //
 // The TTEPHYPort is a compund module that contains the input Shaper, output Shaper and MAC (EtherMacFullDuplex)
@@ -28,11 +29,16 @@ import inet.linklayer.ethernet.EtherMacFullDuplex;
 //
 // @author Till Steinbach
 //
-module TTEPHYPort like IPort
+module TTEPHYPort extends InterfaceEntry like IPort
 {
     parameters:
+        @class(::inet::InterfaceEntry);
         @display("bgb=188,180;i=device/port");
-        
+
+        string address = default("auto");   // MAC address as hex string (12 hex digits), or
+                                            // "auto". "auto" values will be replaced by
+                                            // a generated MAC address in init stage 0.
+
         // if true, all packets are received, otherwise only the ones with matching destination MAC address (This does not affect CT-Frames)
         bool promiscuous = default(false);
         //Static propagation delay for the port
