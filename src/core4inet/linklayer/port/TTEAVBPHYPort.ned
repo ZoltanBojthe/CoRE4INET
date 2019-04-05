@@ -19,6 +19,7 @@ import core4inet.linklayer.inControl.CT_AVB_8021Q_InControl;
 import core4inet.linklayer.shaper.TT_AVBClassA_AVBClassB_PCF_RC_8021Q_Shaper;
 
 import inet.linklayer.ethernet.EtherMacFullDuplex;
+import inet.networklayer.common.InterfaceEntry;
 
 //
 // The TTEAVBPHYPort is a compund module that contains the input Shaper, output Shaper and MAC (EtherMacFullDuplex)
@@ -28,11 +29,12 @@ import inet.linklayer.ethernet.EtherMacFullDuplex;
 //
 // @author Philipp Meyer
 //
-module TTEAVBPHYPort like IPort
+module TTEAVBPHYPort extends InterfaceEntry like IPort
 {
     parameters:
         @display("bgb=188,180;i=device/port");
-        
+        @class(::inet::InterfaceEntry);
+
         // if true, all packets are received, otherwise only the ones with matching destination MAC address (This does not affect CT-Frames)
         bool promiscuous = default(false);
         //Module holds Interfacenames
@@ -41,9 +43,13 @@ module TTEAVBPHYPort like IPort
         int untaggedVID = default(0);
         //Interface allows frames with this VLAN to enter and leave the port
         string taggedVIDs = default("0");
-        
+
+        string address = default("auto");   // MAC address as hex string (12 hex digits), or
+                                            // "auto". "auto" values will be replaced by
+                                            // a generated MAC address in init stage 0.
+
         *.interfaceTableModule = default(absPath(interfaceTableModule));
-        
+
     gates:
         //Input from the upper layer for best-effort Traffic
         input upperLayerIn @loose @labels(EtherFrame);
@@ -57,7 +63,7 @@ module TTEAVBPHYPort like IPort
         input RCin @directIn @labels(RCFrame);
         //Input from the upper layer for rate-constrained traffic
         input PCFin @directIn @labels(PCFrame);
-		//Input from the upper layer for audio-video bridging SR-Class A traffic
+        //Input from the upper layer for audio-video bridging SR-Class A traffic
         input AVBAin @directIn @labels(AVBFrame);
         //Input from the upper layer for audio-video bridging SR-Class B traffic
         input AVBBin @directIn @labels(AVBFrame);
@@ -74,7 +80,7 @@ module TTEAVBPHYPort like IPort
                 @display("p=142,45");
                 promiscuous = promiscuous;
                 untaggedVID = untaggedVID;
-            	taggedVIDs = taggedVIDs;
+                taggedVIDs = taggedVIDs;
         }
 
         mac: EtherMacFullDuplex {
@@ -83,7 +89,7 @@ module TTEAVBPHYPort like IPort
                 queueModule = "^.shaper";
                 @display("p=87,139");
         }
-        
+
     connections:
         upperLayerIn --> shaper.in;
         upperLayerOut <-- inControl.out;
@@ -97,3 +103,4 @@ module TTEAVBPHYPort like IPort
         AVBAin --> shaper.AVBAin;
         AVBBin --> shaper.AVBBin;
 }
+
