@@ -55,6 +55,7 @@ module TTEAVBEtherHost
         bool be_promiscuous = default(true);
 
         *.interfaceTableModule = default(absPath(".interfaceTable"));
+        encap.fcsMode = default("declared");
 
     gates:
         inout ethg;

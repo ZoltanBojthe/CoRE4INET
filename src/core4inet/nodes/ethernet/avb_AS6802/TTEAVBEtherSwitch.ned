@@ -51,6 +51,8 @@ module TTEAVBEtherSwitch
         double hardware_delay @unit(s) = default(8us);
 
         *.interfaceTableModule = default(absPath(".interfaceTable"));
+        beswitch.hasStp = default(false);
+        encap.fcsMode = default("declared");
 
     gates:
         // Physical ports of the switch
