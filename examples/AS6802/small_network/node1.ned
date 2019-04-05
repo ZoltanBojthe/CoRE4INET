@@ -27,25 +27,24 @@ import core4inet.buffer.AS6802.TTDoubleBuffer;
 //
 module Node1 extends TTEEtherHost
 {
-    @display("bgb=479,314");
     submodules:
         vl_100_ctc: TTIncoming {
             parameters:
-                @display("p=350,100");
+                @display("p=487,217");
 
         }
         vl_100: TTDoubleBuffer {
             parameters:
-                @display("p=440,100");
+                @display("p=577,217");
         }
         vl_102_ctc: TTIncoming {
             parameters:
-                @display("p=350,160");
+                @display("p=487,277");
 
         }
         vl_102: TTDoubleBuffer {
             parameters:
-                @display("p=440,160");
+                @display("p=577,277");
         }
     connections:
         vl_100_ctc.out --> vl_100.in;

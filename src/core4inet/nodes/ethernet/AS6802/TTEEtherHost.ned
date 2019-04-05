@@ -67,48 +67,48 @@ module TTEEtherHost
 
         // Physical port of the host
         phy[numPorts]: TTEPHYPort {
-            @display("p=235,255,c,50");
+            @display("p=295,254,c,50");
         }
 
         // Encap for best-effort traffic
         encap: BGEtherEncap {
             parameters:
-                @display("p=141,256");
+                @display("p=295,178");
         }
 
          // Sync module for synchronisation of the scheduler
         sync: <default("DummySync")> like ISync {
-            @display("p=141,169");
+            @display("p=59,142");
         }
 
         // Scheduler for the device
         scheduler: <default("Scheduler")> like ITTEScheduler {
-            @display("p=235,169");
+            @display("p=140,35");
         }
 
         // Applications for the device
-        app[numApps]: < > like IApplication {
-            @display("p=234,37,row,70");
+        app[numApps]: <> like IApplication {
+            @display("p=487,47,row,70");
         }
 
         // Best-efford buffer for incoming traffic 
         bgIn: BGQueueBuffer {
-            @display("p=141,37");
+            @display("p=243,98");
         }
 
         // Best-efford buffer for outgoing traffic 
         bgOut: BGQueueBuffer {
-            @display("p=141,99");
+            @display("p=350,98");
         }
 
         // Buffers with Incoming Module for TT and RC traffic (optional)
         checkedBuffer[numBuffer]: CheckedBuffer {
-            @display("p=350,100");
+            @display("p=486.0425,133.5775");
         }
 
         // Holds interface names
         interfaceTable: InterfaceTable {
-            @display("p=234,100");
+            @display("p=59,240");
         }
 
     connections allowunconnected:
