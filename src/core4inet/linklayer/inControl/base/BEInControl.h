@@ -20,6 +20,7 @@
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/common/packet/Packet.h"
 #include "inet/linklayer/ethernet/EtherFrame_m.h"
+#include "inet/networklayer/common/InterfaceEntry.h"
 
 namespace CoRE4INET {
 
@@ -63,8 +64,8 @@ void BEInControl<IC>::handleMessage(cMessage *msg)
             }
             else
             {
-                inet::MacAddress address;
-                address.setAddress(msg->getArrivalGate()->getPathStartGate()->getOwnerModule()->par("address"));
+                inet::InterfaceEntry *ie = check_and_cast<inet::InterfaceEntry*>(this->getParentModule());
+                inet::MacAddress address = ie->getMacAddress();
                 if (frame->getDest().equals(address))
                 {
                     cSimpleModule::send(msg, "out");
