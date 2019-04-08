@@ -40,9 +40,9 @@ void TocApp::handleMessage(cMessage *msg)
 
     if (msg->arrivedOn("TTin"))
     {
-        auto inpacket = check_and_cast<inet::Packet*>(msg);
-        if (true)   //KLUDGE: if TTFrame
+        if (msg->isPacket())   //KLUDGE: if TTFrame
         {
+            auto inpacket = check_and_cast<inet::Packet*>(msg);
             auto ttframe = inpacket->popAtFront<TTFrame>();
             //TODO check ttframe typeorlength field
             auto tic = inpacket->peekAtFront<Tic>();
