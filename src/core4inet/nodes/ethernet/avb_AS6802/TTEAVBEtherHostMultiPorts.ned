@@ -66,7 +66,7 @@ module TTEAVBEtherHostMultiPorts
 
         // Physical port of the host
         phy[numPorts]: TTEAVBPHYPort {
-            @display("p=405.01123,452.44498,c,50");
+            @display("p=405,452,c,50");
             promiscuous = be_promiscuous;
         }
 
@@ -97,7 +97,7 @@ module TTEAVBEtherHostMultiPorts
 		// Stream Reservation Protocol ethernet encapsulation
         encap[numPorts]: SRPEtherEncap {
             parameters:
-                @display("p=623,239,c,50");
+                @display("p=610,341,c,50");
         }
 
         adapter: SRPEtherEncapAdapter {
@@ -125,12 +125,12 @@ module TTEAVBEtherHostMultiPorts
 
 		// Best-efford buffer for incoming traffic 
         bgIn[numPorts]: BGQueueBuffer {
-            @display("p=508,108,c,50");
+            @display("p=504,261,c,50");
         }
 
 		// Best-efford buffer for outgoing traffic
         bgOut[numPorts]: BGQueueBuffer {
-            @display("p=576,108,c,50");
+            @display("p=572,261,c,50");
         }
 
 		// Stream Reservation Protocol table
