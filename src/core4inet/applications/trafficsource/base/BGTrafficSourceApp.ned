@@ -36,10 +36,14 @@ simple BGTrafficSourceApp extends TrafficSourceAppBase
         string destAddress = default("auto");
         // interval between sending requests
         volatile double sendInterval @unit(s) = default(uniform(0s,1s));
-        
+
+        // ethernet type
+        int bgEtherType = default(0);  //FIXME KLUDGE
+
         //Default bgOut is best-effort buffer
         buffers = default("bgOut");
-        
+
         @signal[intervalSignal];
         @statistic[sendIntervalOverTime](title="send interval over time"; source=intervalSignal; unit=s; record=stats?,histogram?,vector?; interpolationmode=linear);
 }
+

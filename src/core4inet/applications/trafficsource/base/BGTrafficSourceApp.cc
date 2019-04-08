@@ -72,7 +72,8 @@ void BGTrafficSourceApp::sendMessage()
 
         frame->setDest(this->getDestAddress());
         //TODO set sourceAddress
-        //TODO set etherType
+        frame->setTypeOrLength(par("bgEtherType"));
+        ASSERT2(inet::isEth2Header(*frame), "the etherType parameter is too small, implemented as length");
 
         auto payload = inet::makeShared<inet::ByteCountChunk>(inet::B(payloadBytes));
         packet->insertAtFront(payload);
