@@ -61,16 +61,15 @@ module TTEAVBEtherHostMultiPorts
         inout ethg[numPorts];
 
     types:
+
     submodules:
-
-
         // Physical port of the host
         phy[numPorts]: TTEAVBPHYPort {
             @display("p=405,452,c,50");
             promiscuous = be_promiscuous;
         }
 
-		// AVB critical traffic control
+        // AVB critical traffic control
         avbCTC: AVBIncoming {
             parameters:
                 @display("p=296,215");
@@ -80,7 +79,7 @@ module TTEAVBEtherHostMultiPorts
                 AVBBout[numPorts];
         }
 
-		// AVB class A buffer
+        // AVB class A buffer
         avbABuffer[numPorts]: AVBQueueBuffer {
             parameters:
                 srClass = "A";
@@ -94,7 +93,7 @@ module TTEAVBEtherHostMultiPorts
                 @display("p=344,378,c,50");
         }
 
-		// Stream Reservation Protocol ethernet encapsulation
+        // Stream Reservation Protocol ethernet encapsulation
         encap[numPorts]: SRPEtherEncap {
             parameters:
                 @display("p=610,341,c,50");
@@ -118,27 +117,27 @@ module TTEAVBEtherHostMultiPorts
             @display("p=81,396");
         }
 
-		// Applications for the device
+        // Applications for the device
         app[numApps]: <> like IApplication {
             @display("p=380,37,row,70");
         }
 
-		// Best-efford buffer for incoming traffic 
+        // Best-efford buffer for incoming traffic 
         bgIn[numPorts]: BGQueueBuffer {
             @display("p=504,261,c,50");
         }
 
-		// Best-efford buffer for outgoing traffic
+        // Best-efford buffer for outgoing traffic
         bgOut[numPorts]: BGQueueBuffer {
             @display("p=572,261,c,50");
         }
 
-		// Stream Reservation Protocol table
+        // Stream Reservation Protocol table
         srpTable: SRPTable {
             @display("p=81,60");
         }
 
-		// Stream Reservation Protocol implementation
+        // Stream Reservation Protocol implementation
         // Holds interface names
         interfaceTable: InterfaceTable {
             @display("p=81,167");
