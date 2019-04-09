@@ -45,7 +45,7 @@ class TTEAPIPriv
         /**
          * @brief Pointer to an inet::EtherFrame for the current application request
          */
-        inet::EtherFrame *frame;
+        inet::Packet *packet;
 
         /**
          * @brief Pointer to the raw data
