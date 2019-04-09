@@ -17,10 +17,11 @@
 #define CORE4INET_CT_FRAME_H_
 
 //Auto-generated Messages
-#include "core4inet/linklayer/ethernet/AS6802/CTFrame_m.h"
+#include "inet/linklayer/ethernet/EtherFrame_m.h"
 
 namespace CoRE4INET {
 
+// CTFrame etherType = 0x891d
 /**
  * @brief Base class for the CTFrame message
  *
@@ -31,71 +32,36 @@ namespace CoRE4INET {
  *
  * @author Till Steinbach
  */
-class CTFrame : public CTFrame_Base
-{
-    public:
-        /**
-         * @brief Copy Constructor
-         */
-        CTFrame(const CTFrame& other) :
-                CTFrame_Base(other)
-        {
-        }
+    /**
+     * @brief Implements abstract CtID getter.
+     *
+     * @return critical traffic id from destination mac
+     */
+    uint16_t getCtID(const inet::EthernetMacHeader& hdr);
 
-        /**
-         * @brief Constructor
-         */
-        CTFrame() :
-                CTFrame_Base()
-        {
-        }
+    /**
+     * @brief Implements abstract CtID setter.
+     *
+     * @param ctID critical traffic id that should be set in destination mac
+     */
+    void setCtID(inet::EthernetMacHeader& hdr, uint16_t ctID);
 
-        /**
-         * @brief Assignment operator
-         */
-        CTFrame& operator=(const CTFrame& other)
-        {
-            CTFrame_Base::operator=(other);
-            return *this;
-        }
+    /**
+     * @brief Implements abstract CtMarker getter.
+     *
+     * @return critical traffic marker from destination mac
+     */
+    uint32_t getCtMarker(const inet::EthernetMacHeader& hdr);
 
-        /**
-         * @brief Duplicates CTFrame
-         */
-        virtual CTFrame *dup() const
-        {
-            return new CTFrame(*this);
-        }
+    /**
+     * @brief Implements abstract CtMarker setter.
+     *
+     * @param ctMarker critical traffic marker that should be set in destination mac
+     */
+    void setCtMarker(inet::EthernetMacHeader& hdr, uint32_t ctMarker);
 
-        /**
-         * @brief Implements abstract CtID getter.
-         *
-         * @return critical traffic id from destination mac
-         */
-        virtual uint16_t getCtID() const;
-
-        /**
-         * @brief Implements abstract CtID setter.
-         *
-         * @param ctID critical traffic id that should be set in destination mac
-         */
-        virtual void setCtID(uint16_t ctID);
-
-        /**
-         * @brief Implements abstract CtMarker getter.
-         *
-         * @return critical traffic marker from destination mac
-         */
-        virtual uint32_t getCtMarker() const;
-
-        /**
-         * @brief Implements abstract CtMarker setter.
-         *
-         * @param ctMarker critical traffic marker that should be set in destination mac
-         */
-        virtual void setCtMarker(uint32_t ctMarker);
-};
-
+    const char *ctFrameDisplayString="b=15,15,rect,black,kind,5";
+    const char *ttFrameDisplayString="b=15,15,rect,black,red,5";
 }
 
 #endif /* __CORE4INET_CT_FRAME_CC_ */

@@ -19,26 +19,26 @@ namespace CoRE4INET {
 
 Register_Class(CTFrame);
 
-unsigned short CTFrame::getCtID() const
+unsigned short getCtID(const inet::EthernetMacHeader& hdr) const
 {
-    inet::MacAddress mac = getDest();
+    inet::MacAddress mac = hdr.getDest();
     uint16_t CtID = 0;
     CtID = static_cast<uint16_t>(mac.getAddressByte(4) << 8);
     CtID = static_cast<uint16_t>(CtID | static_cast<uint16_t>(mac.getAddressByte(5)));
     return CtID;
 }
 
-void CTFrame::setCtID(uint16_t ctID)
+void setCtID(inet::EthernetMacHeader& hdr, uint16_t ctID)
 {
-    inet::MacAddress mac = getDest();
+    inet::MacAddress mac = hdr.getDest();
     mac.setAddressByte(4, static_cast<unsigned char>(ctID >> 8));
     mac.setAddressByte(5, static_cast<unsigned char>(ctID));
-    setDest(mac);
+    hdr.setDest(mac);
 }
 
-unsigned int CTFrame::getCtMarker() const
+unsigned int getCtMarker(const inet::EthernetMacHeader& hdr) const
 {
-    inet::MacAddress mac = getDest();
+    inet::MacAddress mac = hdr.getDest();
     uint32_t CtMarker = 0;
     CtMarker = static_cast<uint32_t>(mac.getAddressByte(0) << 24);
     CtMarker = CtMarker | static_cast<uint32_t>(mac.getAddressByte(1) << 16);
@@ -47,14 +47,14 @@ unsigned int CTFrame::getCtMarker() const
     return CtMarker;
 }
 
-void CTFrame::setCtMarker(uint32_t ctMarker)
+void setCtMarker(inet::EthernetMacHeader& hdr, uint32_t ctMarker)
 {
-    inet::MacAddress mac = getDest();
+    inet::MacAddress mac = hdr.getDest();
     mac.setAddressByte(0, static_cast<unsigned char>(ctMarker >> 24));
     mac.setAddressByte(1, static_cast<unsigned char>(ctMarker >> 16));
     mac.setAddressByte(2, static_cast<unsigned char>(ctMarker >> 8));
     mac.setAddressByte(3, static_cast<unsigned char>(ctMarker));
-    setDest(mac);
+    hdr.setDest(mac);
 }
 
 }

@@ -13,23 +13,21 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-import core4inet.linklayer.ethernet.AS6802.CTFrame;
-
-cplusplus {{
-#include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
-}}
+import inet.linklayer.ethernet.EtherFrame;
 
 namespace CoRE4INET;
 
 //
 // Represents a RC frame
 //
+// FIXME What is it?
+//
 // @see ~CTFrame
 //
 // @author Till Steinbach
 //
-class RCFrame extends CTFrame
-{    
+class RCFrame extends inet::EthernetMacHeader
+{
     string displayString="b=15,15,rect,black,orange,5";
 }
 
