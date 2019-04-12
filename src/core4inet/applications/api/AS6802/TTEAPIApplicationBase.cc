@@ -452,12 +452,10 @@ int32_t TTEAPIApplicationBase::tte_close_output_buf(tte_buffer_t * const buf)
     if (priv && priv->buffer)
         if (priv->buffer->gate("in"))
             if (priv->buffer->gate("in")->getPathStartGate())
-                if (dynamic_cast<cModule *>(priv->buffer->gate("in")->getPathStartGate()->getOwner()))
-                    if (dynamic_cast<cModule *>(priv->buffer->gate("in")->getPathStartGate()->getOwner())->gate("in"))
+                if (auto module = dynamic_cast<cModule *>(priv->buffer->gate("in")->getPathStartGate()->getOwner()))
+                    if (module->gate("in"))
                     {
-                        sendDirect(priv->packet,
-                                dynamic_cast<cModule *>(priv->buffer->gate("in")->getPathStartGate()->getOwner())->gate(
-                                        "in"));
+                        sendDirect(priv->packet, module->gate("in"));
                     }
 
     if (priv && priv->data)
