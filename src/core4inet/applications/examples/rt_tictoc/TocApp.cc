@@ -19,8 +19,8 @@
 #include "core4inet/incoming/base/Incoming.h"
 //Autp-generated Messages
 #include "core4inet/applications/examples/rt_tictoc/TicToc_m.h"
-#include "core4inet/linklayer/ethernet/AS6802/RCFrame_m.h"
 #include "core4inet/linklayer/ethernet/AS6802/TTFrame_m.h"
+#include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
 
 #include "inet/common/packet/Packet.h"
 #include "inet/linklayer/ethernet/EtherEncap.h"
@@ -56,8 +56,9 @@ void TocApp::handleMessage(cMessage *msg)
             toc->setRoundtrip_start(tic->getRoundtrip_start());
             toc->setCount(tic->getCount() + 1);
 
-            auto frame = inet::makeShared<RCFrame>();            delete msg;
-            frame->setCtID(par("ct_id"));
+            auto frame = inet::makeShared<inet::EthernetMacHeader>();
+            frame->setTypeOrLength(CTFrameEtherType);   //RCFrame
+            setCtID(*frame, par("ct_id"));
             packet->insertAtFront(toc);
             packet->insertAtFront(frame);
 

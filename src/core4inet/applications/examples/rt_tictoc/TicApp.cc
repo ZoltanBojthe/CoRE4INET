@@ -20,7 +20,7 @@
 //Auto-generated Messages
 #include "core4inet/applications/examples/rt_tictoc/TicToc_m.h"
 #include "core4inet/linklayer/ethernet/AS6802/TTFrame_m.h"
-#include "core4inet/linklayer/ethernet/AS6802/RCFrame_m.h"
+#include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
 
 #include "inet/common/packet/Packet.h"
 #include "inet/linklayer/ethernet/EtherEncap.h"

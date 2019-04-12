@@ -13,7 +13,6 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-import core4inet.linklayer.ethernet.AS6802.RCFrame;
 import inet.common.packet.chunk.Chunk;
 
 namespace CoRE4INET;

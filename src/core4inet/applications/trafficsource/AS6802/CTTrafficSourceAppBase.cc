@@ -24,7 +24,6 @@
 #include "core4inet/utilities/ConfigFunctions.h"
 //Auto-generated Messages
 #include "core4inet/linklayer/ethernet/AS6802/TTFrame_m.h"
-#include "core4inet/linklayer/ethernet/AS6802/RCFrame_m.h"
 
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/common/packet/Packet.h"
@@ -89,7 +88,8 @@ void CTTrafficSourceAppBase::sendMessage()
             }
             else if (dynamic_cast<RCBuffer*>(*buf))
             {
-                frame = inet::makeShared<RCFrame>();
+                // RCFrame
+                frame = inet::makeShared<inet::EthernetMacHeader>();
             }
             else
             {
