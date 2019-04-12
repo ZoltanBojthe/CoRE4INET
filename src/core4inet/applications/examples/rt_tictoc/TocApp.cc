@@ -19,7 +19,6 @@
 #include "core4inet/incoming/base/Incoming.h"
 //Autp-generated Messages
 #include "core4inet/applications/examples/rt_tictoc/TicToc_m.h"
-#include "core4inet/linklayer/ethernet/AS6802/TTFrame_m.h"
 #include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
 
 #include "inet/common/packet/Packet.h"
@@ -43,7 +42,7 @@ void TocApp::handleMessage(cMessage *msg)
         if (msg->isPacket())   //KLUDGE: if TTFrame
         {
             auto inpacket = check_and_cast<inet::Packet*>(msg);
-            auto ttframe = inpacket->popAtFront<TTFrame>();
+            auto ttframe = inpacket->popAtFront<inet::EthernetMacHeader>();
             //TODO check ttframe typeorlength field
             auto tic = inpacket->peekAtFront<Tic>();
             bubble(tic->getRequest());

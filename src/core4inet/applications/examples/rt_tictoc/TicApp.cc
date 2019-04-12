@@ -19,7 +19,6 @@
 #include "core4inet/incoming/base/Incoming.h"
 //Auto-generated Messages
 #include "core4inet/applications/examples/rt_tictoc/TicToc_m.h"
-#include "core4inet/linklayer/ethernet/AS6802/TTFrame_m.h"
 #include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
 
 #include "inet/common/packet/Packet.h"
@@ -54,7 +53,8 @@ void TicApp::handleMessage(cMessage *msg)
         auto tic = inet::makeShared<Tic>();
         tic->setRoundtrip_start(simTime());
         tic->setCount(par("counter"));
-        auto frame = inet::makeShared<TTFrame>();
+        auto frame = inet::makeShared<inet::EthernetMacHeader>();
+        frame->setTypeOrLength(CTFrameEtherType);
         frame->setCtID(par("ct_id"));
         packet->insertAtFront(tic);
         packet->insertAtFront(frame);
