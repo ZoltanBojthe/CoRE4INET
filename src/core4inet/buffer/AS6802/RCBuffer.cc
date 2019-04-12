@@ -14,9 +14,9 @@
 // 
 
 #include "core4inet/buffer/AS6802/RCBuffer.h"
+#include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
 
 //Auto-generated Messages
-#include "core4inet/linklayer/ethernet/AS6802/CTFrame_m.h"
 #include "core4inet/scheduler/SchedulerMessageEvents_m.h"
 
 //CoRE4INET

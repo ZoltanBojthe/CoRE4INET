@@ -17,9 +17,11 @@
 
 namespace CoRE4INET {
 
-Register_Class(CTFrame);
+const char *ctFrameDisplayString="b=15,15,rect,black,kind,5";
+const char *ttFrameDisplayString="b=15,15,rect,black,red,5";
+const char *rcFrameDisplayString="b=15,15,rect,black,orange,5";
 
-unsigned short getCtID(const inet::EthernetMacHeader& hdr) const
+unsigned short getCtID(const inet::EthernetMacHeader& hdr)
 {
     inet::MacAddress mac = hdr.getDest();
     uint16_t CtID = 0;
@@ -36,7 +38,7 @@ void setCtID(inet::EthernetMacHeader& hdr, uint16_t ctID)
     hdr.setDest(mac);
 }
 
-unsigned int getCtMarker(const inet::EthernetMacHeader& hdr) const
+unsigned int getCtMarker(const inet::EthernetMacHeader& hdr)
 {
     inet::MacAddress mac = hdr.getDest();
     uint32_t CtMarker = 0;

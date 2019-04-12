@@ -16,13 +16,13 @@
 #ifndef CORE4INET_CT_FRAME_H_
 #define CORE4INET_CT_FRAME_H_
 
-//Auto-generated Messages
+//INET Auto-generated Messages
 #include "inet/linklayer/ethernet/EtherFrame_m.h"
 
 namespace CoRE4INET {
 
 enum {
-    CTFrameEtherType = 0x891d;
+    CTFrameEtherType = 0x891d
 };
 /**
  * @brief Base class for the CTFrame message
@@ -62,8 +62,9 @@ enum {
      */
     void setCtMarker(inet::EthernetMacHeader& hdr, uint32_t ctMarker);
 
-    const char *ctFrameDisplayString="b=15,15,rect,black,kind,5";
-    const char *ttFrameDisplayString="b=15,15,rect,black,red,5";
+    extern const char *ctFrameDisplayString;
+    extern const char *ttFrameDisplayString;
+    extern const char *rcFrameDisplayString;
 }
 
 #endif /* __CORE4INET_CT_FRAME_CC_ */

@@ -55,7 +55,7 @@ void TicApp::handleMessage(cMessage *msg)
         tic->setCount(par("counter"));
         auto frame = inet::makeShared<inet::EthernetMacHeader>();
         frame->setTypeOrLength(CTFrameEtherType);
-        frame->setCtID(par("ct_id"));
+        setCtID(*frame, par("ct_id"));
         packet->insertAtFront(tic);
         packet->insertAtFront(frame);
 
@@ -66,7 +66,7 @@ void TicApp::handleMessage(cMessage *msg)
         packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
 
         EV_DETAIL << "Sending Tic Message\n";
-        std::list<CTBuffer*> buffer = ctbuffers[frame->getCtID()];
+        std::list<CTBuffer*> buffer = ctbuffers[getCtID(*frame)];
         for (std::list<CTBuffer*>::const_iterator buf = buffer.begin(); buf != buffer.end(); ++buf)
         {
             Incoming* in = dynamic_cast<Incoming *>((*buf)->gate("in")->getPathStartGate()->getOwner());

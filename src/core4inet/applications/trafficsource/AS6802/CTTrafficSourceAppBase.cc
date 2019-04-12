@@ -23,6 +23,7 @@
 #include "core4inet/incoming/base/Incoming.h"
 #include "core4inet/utilities/ConfigFunctions.h"
 
+//INET
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/common/packet/Packet.h"
 #include "inet/common/packet/chunk/ByteCountChunk.h"
@@ -79,7 +80,7 @@ void CTTrafficSourceAppBase::sendMessage()
     {
         for (std::list<CTBuffer*>::const_iterator buf = buffer.begin(); buf != buffer.end(); ++buf)
         {
-            inet::Ptr<CTFrame> frame;
+            inet::Ptr<inet::EthernetMacHeader> frame;
             if (dynamic_cast<TTBuffer*>(*buf))
             {
                 // TTFrame
@@ -95,9 +96,10 @@ void CTTrafficSourceAppBase::sendMessage()
                 continue;
             }
 
+            frame->setTypeOrLength(CTFrameEtherType);
             if (this->ct_id > 0)
             {
-                frame->setCtID(static_cast<uint16_t>(this->ct_id));
+                setCtID(*frame, static_cast<uint16_t>(this->ct_id));
             }
 
             auto packet = new inet::Packet((*buf)->getName());

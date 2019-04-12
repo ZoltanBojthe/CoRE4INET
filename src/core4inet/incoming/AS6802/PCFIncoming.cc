@@ -18,6 +18,9 @@
 //CoRE4INET
 #include "core4inet/utilities/ConfigFunctions.h"
 
+//INET
+#include "inet/linklayer/ethernet/EtherFrame_m.h"
+
 namespace CoRE4INET {
 
 Define_Module(PCFIncoming);

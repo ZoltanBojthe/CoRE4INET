@@ -50,19 +50,25 @@ void CTBuffer::handleMessage(cMessage *msg)
 {
     if (msg && msg->arrivedOn("in"))
     {
+        auto packet = check_and_cast<inet::Packet*>(msg);
+        packet->trimFront();
+        auto ethHeader = packet->removeAtFront<inet::EthernetMacHeader>();
+
         //Try to correct destination mac
-        if (CTFrame *ctframe = dynamic_cast<CTFrame *>(msg))
+        if (ethHeader->getTypeOrLength() == CTFrameEtherType)
         {
-            if (ctframe->getDest().isUnspecified())
+            if (ethHeader->getDest().isUnspecified())
             {
-                ctframe->setCtID(ctId);
-                ctframe->setCtMarker(ctMarker & ctMask);
+                setCtID(*ethHeader, ctId);
+                setCtMarker(*ethHeader, ctMarker & ctMask);
             }
-            else if (ctframe->getCtMarker() == 0)
+            else if (getCtMarker(*ethHeader) == 0)
             {
-                ctframe->setCtMarker(ctMarker & ctMask);
+                setCtMarker(*ethHeader, ctMarker & ctMask);
             }
         }
+        packet->insertAtFront(ethHeader);
+
         Buffer::handleMessage(msg);
     }
 }

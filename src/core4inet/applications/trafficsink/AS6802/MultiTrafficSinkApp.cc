@@ -18,6 +18,9 @@
 //CoRE4INET
 #include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
 
+//INET
+#include "inet/common/packet/Packet.h"
+
 namespace CoRE4INET {
 
 Define_Module(MultiTrafficSinkApp);
@@ -30,10 +33,11 @@ void MultiTrafficSinkApp::handleMessage(cMessage *msg)
 
     if (msg->arrivedOn("RCin") || msg->arrivedOn("TTin"))
     {
-        CTFrame *ctframe = dynamic_cast<CTFrame*>(msg);
-        if (ctframe && (simTime() > getSimulation()->getWarmupPeriod()))
+        inet::Packet* packet = dynamic_cast<inet::Packet*>(msg);
+        if (packet && (simTime() > getSimulation()->getWarmupPeriod()))
         {
-            uint16_t ctID = ctframe->getCtID();
+            const auto& ctframe = packet->peekAtFront<inet::EthernetMacHeader>();
+            uint16_t ctID = getCtID(*ctframe);
             std::unordered_map<uint16_t, simsignal_t>::const_iterator entry = rxPkSignal.find(ctID);
             simsignal_t signal;
             if (entry != rxPkSignal.end())
@@ -53,13 +57,12 @@ void MultiTrafficSinkApp::handleMessage(cMessage *msg)
 
                 rxPkSignal[ctID] = signal;
             }
-            emit(signal, ctframe);
-        }
-        else
-        {
-            EV_ERROR << "only ct frames will collect statistics" << std::endl;
+            emit(signal, packet);
+            delete msg;
+            return;
         }
     }
+    EV_ERROR << "only ct frames will collect statistics" << std::endl;
     delete msg;
 }
 

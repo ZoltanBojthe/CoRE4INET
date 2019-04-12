@@ -70,7 +70,7 @@ void TocApp::handleMessage(cMessage *msg)
             delete msg;
 
             EV_DETAIL << "Answering Tic Message with Toc Message\n";
-            std::list<CTBuffer*> buffer = ctbuffers[frame->getCtID()];
+            std::list<CTBuffer*> buffer = ctbuffers[getCtID(*frame)];
             for (std::list<CTBuffer*>::const_iterator buf = buffer.begin(); buf != buffer.end(); ++buf)
             {
                 Incoming* in = dynamic_cast<Incoming *>((*buf)->gate("in")->getPathStartGate()->getOwner());
