@@ -347,8 +347,7 @@ int32_t TTEAPIApplicationBase::tte_get_var(__attribute__((unused))          cons
 
 int32_t TTEAPIApplicationBase::tte_open_output_buf(tte_buffer_t * const buf, tte_frame_t * const frame)
 {
-    Enter_Method_Silent
-    ();
+    Enter_Method_Silent();
     TTEAPIPriv *priv = static_cast<TTEAPIPriv*>(buf->priv);
 
     //Now we create a frame that can be accessed later
@@ -399,8 +398,7 @@ int32_t TTEAPIApplicationBase::tte_open_output_buf(tte_buffer_t * const buf, tte
 int32_t TTEAPIApplicationBase::tte_open_input_buf(tte_buffer_t * const buf, tte_frame_t * const frame,
         __attribute__((unused))         tte_buf_status_t * const status)
 {
-    Enter_Method_Silent
-    ();
+    Enter_Method_Silent();
     TTEAPIPriv *priv = static_cast<TTEAPIPriv*>(buf->priv);
 
     inet::Packet *msg = priv->buffer->getFrame();
@@ -439,8 +437,8 @@ int32_t TTEAPIApplicationBase::tte_open_input_buf(tte_buffer_t * const buf, tte_
 
 int32_t TTEAPIApplicationBase::tte_close_output_buf(tte_buffer_t * const buf)
 {
-    Enter_Method_Silent
-    ();
+    Enter_Method_Silent();
+
     TTEAPIPriv *priv = static_cast<TTEAPIPriv *>(buf->priv);
     //Copy frame data and free memory
     APIPayload *payload = dynamic_cast<APIPayload*>(priv->frame->getEncapsulatedPacket());
