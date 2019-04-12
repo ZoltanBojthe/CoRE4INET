@@ -460,13 +460,12 @@ int32_t TTEAPIApplicationBase::tte_close_output_buf(tte_buffer_t * const buf)
                         sendDirect(priv->packet, module->gate("in"));
                     }
 
-    if (priv && priv->data)
-    {
-        free(priv->data);
-        priv->data = nullptr;
-    }
     if (priv)
     {
+        if (priv->data)
+        {
+            free(priv->data);
+        }
         delete priv;
         buf->priv = nullptr;
     }
@@ -479,7 +478,7 @@ int32_t TTEAPIApplicationBase::tte_close_input_buf(tte_buffer_t * const buf)
     ();
     TTEAPIPriv *priv = static_cast<TTEAPIPriv *>(buf->priv);
     //Free memory
-    if (priv->data)
+    if (priv && priv->data)
     {
         //free(priv->data);
         priv->data = nullptr;
