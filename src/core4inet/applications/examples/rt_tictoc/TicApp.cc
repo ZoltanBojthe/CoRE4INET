@@ -88,7 +88,7 @@ void TicApp::handleMessage(cMessage *msg)
     {
         auto packet = check_and_cast<inet::Packet*>(msg);
         emit(rxPkSignal, packet);
-        auto rcframe = packet->popAtFront<RCFrame>();
+        auto rcframe = packet->popAtFront<inet::EthernetMacHeader>();
         auto toc = packet->popAtFront<Toc>();
         bubble(toc->getResponse());
         par("counter").setIntValue(static_cast<long>(toc->getCount()));
