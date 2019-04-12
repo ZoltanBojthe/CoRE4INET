@@ -23,6 +23,7 @@
 
 //INET
 #include "inet/common/ModuleAccess.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
 #include "inet/linklayer/ethernet/EtherMacFullDuplex.h"
 
 //Auto-generated
@@ -350,6 +351,8 @@ int32_t TTEAPIApplicationBase::tte_open_output_buf(tte_buffer_t * const buf, tte
     Enter_Method_Silent();
     TTEAPIPriv *priv = static_cast<TTEAPIPriv*>(buf->priv);
 
+    int ethType = 0;
+
     //Now we create a frame that can be accessed later
     if (buf->traffic_type == TTE_BG_TRAFFIC)
     {
@@ -363,8 +366,9 @@ int32_t TTEAPIApplicationBase::tte_open_output_buf(tte_buffer_t * const buf, tte
         //TODO Minor: Divide TT and RC frames in separate types?
         priv->packet = new inet::Packet(frameName.c_str(), inet::IEEE802CTRL_DATA);
         //priv->frame = new CTFrame(frameName.c_str(), inet::IEEE802CTRL_DATA);
+        ethType = CTFrameEtherType;
     }
-    priv->frame->setByteLength(ETHER_MAC_FRAME_BYTES);
+    const auto& ethHeader = inet::makeShared<inet::EthernetMacHeader>();
 
     inet::MacAddress dest;
     dest.setAddressByte(5, frame->eth_hdr.dst_mac[0]);
@@ -373,7 +377,7 @@ int32_t TTEAPIApplicationBase::tte_open_output_buf(tte_buffer_t * const buf, tte
     dest.setAddressByte(2, frame->eth_hdr.dst_mac[3]);
     dest.setAddressByte(1, frame->eth_hdr.dst_mac[4]);
     dest.setAddressByte(0, frame->eth_hdr.dst_mac[5]);
-    priv->frame->setDest(dest);
+    ethHeader->setDest(dest);
     inet::MacAddress src;
     src.setAddressByte(5, frame->eth_hdr.src_mac[0]);
     src.setAddressByte(4, frame->eth_hdr.src_mac[1]);
@@ -381,17 +385,17 @@ int32_t TTEAPIApplicationBase::tte_open_output_buf(tte_buffer_t * const buf, tte
     src.setAddressByte(2, frame->eth_hdr.src_mac[3]);
     src.setAddressByte(1, frame->eth_hdr.src_mac[4]);
     src.setAddressByte(0, frame->eth_hdr.src_mac[5]);
-    priv->frame->setSrc(src);
+    ethHeader->setSrc(src);
+    ethHeader->setTypeOrLength(ethType);
 
-    const auto& payload = inet::makeShared<inet::BytesChunk>(B(frame->length));
-    payload->setByteLength(frame->length);
-    payload->setDataArraySize(frame->length);
-    priv->frame->encapsulate(payload);
+    priv->packet->insertAtFront(ethHeader);
+    inet::EtherEncap::addPaddingAndFcs(priv->packet, inet::FCS_DECLARED_CORRECT);   //TODO get from parameter
 
     frame->data = static_cast<uint8_t*>(malloc(frame->length));
     if (!frame->data)
         return ETT_NOMEM;
     priv->data = frame->data;
+    priv->dataLength = frame->length;
     return ETT_SUCCESS;
 }
 
@@ -408,7 +412,7 @@ int32_t TTEAPIApplicationBase::tte_open_input_buf(tte_buffer_t * const buf, tte_
     auto payload = msg->peekDataAsBytes();
     if (buf->traffic_type == TTE_CT_TRAFFIC)
     {
-        frame->ct_id = getCtID(msgHdr);
+        frame->ct_id = getCtID(*msgHdr);
     }
     frame->length = static_cast<uint16_t>(inet::B(payload->getChunkLength()).get());
     frame->data = static_cast<uint8_t*>(malloc(static_cast<size_t>(frame->length)));
@@ -441,11 +445,11 @@ int32_t TTEAPIApplicationBase::tte_close_output_buf(tte_buffer_t * const buf)
 
     TTEAPIPriv *priv = static_cast<TTEAPIPriv *>(buf->priv);
     //Copy frame data and free memory
-    APIPayload *payload = dynamic_cast<APIPayload*>(priv->frame->getEncapsulatedPacket());
-    for (unsigned int i = 0; i < payload->getDataArraySize(); i++)
-    {
-        payload->setData(i, static_cast<unsigned char *>(priv->data)[i]);
-    }
+    const auto& payload = inet::makeShared<inet::BytesChunk>((uint8_t *)priv->data, (size_t)priv->dataLength);
+    priv->packet->insertAtBack(payload);
+    inet::EtherEncap::addPaddingAndFcs(priv->packet, inet::FCS_DECLARED_CORRECT);   //TODO get from parameter
+    priv->packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
+
     //Send to CTC
     if (priv && priv->buffer)
         if (priv->buffer->gate("in"))

@@ -51,6 +51,11 @@ class TTEAPIPriv
          * @brief Pointer to the raw data
          */
         void *data;
+
+        /**
+         * @brief length of the raw data
+         */
+        uint16_t dataLength;
 };
 
 /**
