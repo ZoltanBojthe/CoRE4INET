@@ -21,7 +21,9 @@
 
 namespace CoRE4INET {
 
-// CTFrame etherType = 0x891d
+enum {
+    CTFrameEtherType = 0x891d;
+};
 /**
  * @brief Base class for the CTFrame message
  *
