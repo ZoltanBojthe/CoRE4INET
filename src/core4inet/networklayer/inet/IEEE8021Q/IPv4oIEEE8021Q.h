@@ -21,6 +21,7 @@
 #include "core4inet/networklayer/inet/base/IPv4oREBase.h"
 #include "core4inet/buffer/base/BGBuffer.h"
 
+#include "inet/common/packet/Packet.h"
 //==============================================================================
 
 namespace CoRE4INET {
@@ -49,7 +50,7 @@ public:
     /**
      * Encapsulates packet in RC Frame and sends to destination Buffers.
      */
-    void sendIEEE8021QFrame(cPacket* packet, const inet::InterfaceEntry* ie, const IPoREFilter* filter);
+    void sendIEEE8021QFrame(inet::Packet* packet, const inet::InterfaceEntry* ie, const IPoREFilter* filter);
 
 
 };

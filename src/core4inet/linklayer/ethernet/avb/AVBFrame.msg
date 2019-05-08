@@ -24,6 +24,7 @@ cplusplus {{
 }}
 
 import inet.common.packet.chunk.Chunk;
+import inet.linklayer.ethernet.EtherFrame;
 
 namespace CoRE4INET;
 
@@ -38,7 +39,7 @@ enum AVBPriority {
 //
 // @author Philipp Meyer 
 //
-class AVBFrame extends inet::FieldsChunk
+class AVBFrame extends inet::EthernetMacHeader
 {    
     // ID of the AVB Stream
     //

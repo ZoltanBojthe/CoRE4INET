@@ -23,14 +23,14 @@
 
 #include "core4inet/base/CoRE4INET_Defs.h"
 #include "core4inet/base/IPoRE/IPoREDefs_m.h"
-#include "core4inet/linklayer/ethernet/AS6802/RCFrame_m.h"
-#include "core4inet/networklayer/inet/AS6802/RCDestinationInfo.h"
 #include "core4inet/buffer/AS6802/RCBuffer.h"
-#include "core4inet/networklayer/inet/base/IPoREFilter.h"
 #include "core4inet/incoming/base/Incoming.h"
+#include "core4inet/networklayer/inet/AS6802/RCDestinationInfo.h"
+#include "core4inet/networklayer/inet/base/IPoREFilter.h"
+#include "inet/linklayer/common/Ieee802Ctrl.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
-#include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
 
 //==============================================================================
@@ -206,9 +206,7 @@ void IPv4oRC<Base>::configureFilters(cXMLElement *config)
 template<class Base>
 void IPv4oRC<Base>::handleMessage(cMessage* msg)
 {
-    if (dynamic_cast<RCFrame*>(msg)) {
-        RCFrame* rcFrame = dynamic_cast<RCFrame*>(msg);
-
+    if (RCFrame* rcFrame = dynamic_cast<RCFrame*>(msg)) {
         //Reset Bag
         RCBuffer *rcBuffer = dynamic_cast<RCBuffer*>(msg->getSenderModule());
         if (rcBuffer)
@@ -263,11 +261,8 @@ void IPv4oRC<Base>::sendRCFrame(cPacket* packet, __attribute__((unused)) const i
 
     RCFrame *outFrame = new RCFrame();
     outFrame->encapsulate(packet);
-    if (outFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
-        outFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
-    }
+    inet::EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);
     outFrame->setCtID(destInfo->getCtId());
-    outFrame->setName(packet->getName());
 
     std::list<RCBuffer*> destBuffers = destInfo->getDestModules();
     std::list<RCBuffer*>::iterator destBuf = destBuffers.begin();

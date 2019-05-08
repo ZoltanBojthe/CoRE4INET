@@ -22,16 +22,17 @@
 
 #include "core4inet/base/CoRE4INET_Defs.h"
 #include "core4inet/base/IPoRE/IPoREDefs_m.h"
-#include "core4inet/linklayer/ethernet/AS6802/TTFrame_m.h"
-#include "core4inet/networklayer/inet/AS6802/TTDestinationInfo.h"
-#include "core4inet/buffer/AS6802/TTBuffer.h"
-#include "core4inet/networklayer/inet/base/IPoREFilter.h"
-#include "core4inet/incoming/base/Incoming.h"
 #include "core4inet/base/NotifierConsts.h"
+#include "core4inet/buffer/AS6802/TTBuffer.h"
+#include "core4inet/incoming/base/Incoming.h"
+#include "core4inet/networklayer/inet/AS6802/TTDestinationInfo.h"
+#include "core4inet/networklayer/inet/base/IPoREFilter.h"
 #include "core4inet/synchronisation/base/SyncNotification_m.h"
+
+#include "inet/linklayer/common/Ieee802Ctrl.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
-#include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/transportlayer/udp/UdpHeader_m.h"
 
 //==============================================================================
@@ -370,12 +371,9 @@ void IPv4oTT<Base>::sendTTFrame(cPacket* packet, const IPoREFilter* filter)
 
     TTFrame *outFrame = new TTFrame();
     outFrame->encapsulate(packet);
-    if (outFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        outFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
-    }
     outFrame->setCtID(destInfo->getCtId());
     outFrame->setName(packet->getName());
+    inet::EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);     //TODO get fcsMode from NED parameter
 
     TTBuffer *destBuf = destInfo->getDestModule();
 

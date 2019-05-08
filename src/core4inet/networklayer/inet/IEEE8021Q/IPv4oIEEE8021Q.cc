@@ -26,8 +26,12 @@
 #include "core4inet/networklayer/inet/base/IPoREFilter.h"
 #include "core4inet/networklayer/inet/IEEE8021Q/IEEE8021QDestinationInfo.h"
 
+#include "inet/common/ProtocolTag_m.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
+#include "inet/linklayer/common/MacAddressTag_m.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
 #include "inet/linklayer/ethernet/Ethernet.h"
+#include "inet/linklayer/ethernet/EtherFrame_m.h"
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 
@@ -224,21 +228,13 @@ void IPv4oIEEE8021Q<Base>::configureFilters(cXMLElement *config)
 template<class Base>
 void IPv4oIEEE8021Q<Base>::handleMessage(cMessage* msg)
 {
-    if (dynamic_cast<EthernetIIFrameWithQTag*>(msg))
+    if (auto packet = dynamic_cast<inet::Packet*>(msg))
     {
-        EthernetIIFrameWithQTag* qFrame = dynamic_cast<EthernetIIFrameWithQTag*>(msg);
-
-        // decapsulate and send up
-        cPacket* ipPacket = qFrame->decapsulate();
-        inet::Ieee802Ctrl *etherctrl = new inet::Ieee802Ctrl();
-        etherctrl->setSrc(qFrame->getSrc());
-        etherctrl->setDest(qFrame->getDest());
-        etherctrl->setEtherType(qFrame->getEtherType());
-        ipPacket->setControlInfo(etherctrl);
-        ipPacket->setArrival(this->getId(), Base::gate("In")->getId());
-
-        delete qFrame;
-        Base::handleMessage(ipPacket);
+        auto *protocolTag = packet->findTag<inet::PacketProtocolTag>();
+        if (protocolTag && *protocolTag->getProtocol() == inet::Protocol::ethernetMac) {
+            auto ethHeader = inet::EtherEncap::decapsulateMacHeader(packet);
+        }
+        Base::handleMessage(packet);
     }
     else
     {
@@ -272,7 +268,7 @@ void IPv4oIEEE8021Q<Base>::sendPacketToBuffers(cPacket *packet, const inet::Inte
 //==============================================================================
 
 template<class Base>
-void IPv4oIEEE8021Q<Base>::sendIEEE8021QFrame(cPacket* packet, __attribute__((unused))  const inet::InterfaceEntry* ie,
+void IPv4oIEEE8021Q<Base>::sendIEEE8021QFrame(inet::Packet* packet, __attribute__((unused))  const inet::InterfaceEntry* ie,
         const IPoREFilter* filter)
 {
     IEEE8021QDestinationInfo *destInfo = dynamic_cast<IEEE8021QDestinationInfo*>(filter->getDestInfo());
@@ -282,29 +278,25 @@ void IPv4oIEEE8021Q<Base>::sendIEEE8021QFrame(cPacket* packet, __attribute__((un
         return;
     }
 
-    EthernetIIFrameWithQTag *outFrame = new EthernetIIFrameWithQTag();
-    outFrame->encapsulate(packet);
-    if (outFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+    auto outFrame = inet::makeShared<inet::EthernetMacHeader>();
+    if (destInfo->getVID() > 0 || destInfo->getPCP() > 0)
     {
-        outFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES);
-    }
-    if (destInfo->getVID() > 0)
-    {
-        outFrame->setVID(destInfo->getVID());
-    }
-    if (destInfo->getPCP() > 0)
-    {
-        outFrame->setPcp(destInfo->getPCP());
+        auto ctag = new inet::Ieee8021qHeader();
+        ctag->setVid(destInfo->getVID());
+        ctag->setPcp(destInfo->getPCP());
+        outFrame->setCTag(ctag);
     }
     outFrame->setDest(*destInfo->getDestMac());
-    outFrame->setName(packet->getName());
+    packet->insertAtFront(outFrame);
+    inet::EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);     //TODO get fcsMode from NED parameter
 
     std::list<BGBuffer*> destBuffers = destInfo->getDestModules();
     std::list<BGBuffer*>::iterator destBuf = destBuffers.begin();
     for (; destBuf != destBuffers.end(); ++destBuf)
     {
-        Base::sendDirect(outFrame, (*destBuf)->gate("in"));
+        Base::sendDirect(packet->dup(), (*destBuf)->gate("in"));
     }
+    delete packet;
 
 }
 

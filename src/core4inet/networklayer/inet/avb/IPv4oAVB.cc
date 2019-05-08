@@ -34,8 +34,9 @@
 #include "core4inet/base/IPoRE/IPoREDefs_m.h"
 #include "core4inet/linklayer/ethernet/avb/AVBFrame_m.h"
 
-#include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
+#include "inet/networklayer/common/L3AddressResolver.h"
 
 #include <algorithm>
 
@@ -134,20 +135,13 @@ void IPv4oAVB<base>::handleMessage(cMessage* msg)
         }
         delete updateMsg;
     }
-    else if (dynamic_cast<AVBFrame*>(msg))
+    else if (auto frame = dynamic_cast<inet::Packet*>(msg))
     {
-        AVBFrame* avbFrame = dynamic_cast<AVBFrame*>(msg);
-        cPacket* ipPacket = avbFrame->decapsulate();
-
-        inet::Ieee802Ctrl *etherctrl = new inet::Ieee802Ctrl();
-        etherctrl->setSrc(avbFrame->getSrc());
-        etherctrl->setDest(avbFrame->getDest());
-        etherctrl->setEtherType(avbFrame->getEtherType());
-        ipPacket->setControlInfo(etherctrl);
-        ipPacket->setArrival(this->getId(), base::gate("AVBin")->getId());
-
-        delete avbFrame;
-        base::handleMessage(ipPacket);
+        auto *protocolTag = frame->findTag<inet::PacketProtocolTag>();
+        if (protocolTag && *protocolTag->getProtocol() == inet::Protocol::ethernetMac) {
+            auto avbFrame = inet::EtherEncap::decapsulateMacHeader(frame);
+        }
+        base::handleMessage(frame);
     }
     else
     {
@@ -459,8 +453,8 @@ void IPv4oAVB<base>::sendAVBFrame(inet::Packet* packet, __attribute__((unused)) 
     outFrame->setStreamID(static_cast<unsigned long>(avbDestInfo->getStreamId()));
     outFrame->setDest(*(avbDestInfo->getDestMac()));
     outFrame->setTypeOrLength(inet::ETHERTYPE_IPv4);
-    packet->pushFront(outFrame);
-    EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);   //TODO get from parameter
+    packet->insertAtFront(outFrame);
+    inet::EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);   //TODO get fcsMode from NED parameter
 
     base::sendDirect(outFrame, avbDestInfo->getDestModule()->gate("in"));
 }
