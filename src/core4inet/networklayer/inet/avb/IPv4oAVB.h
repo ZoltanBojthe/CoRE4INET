@@ -25,6 +25,7 @@
 #include "core4inet/base/IPoRE/IPoREDefs_m.h"
 
 #include "inet/common/ModuleAccess.h"
+#include "inet/common/packet/Packet.h"
 #include "inet/networklayer/ipv4/Ipv4.h"
 
 namespace CoRE4INET {
@@ -76,7 +77,7 @@ class IPv4oAVB : public base {
          * Encapsulates packet in AVB Frame and sends to destination AVB Buffer.
          * StreamID, Name, DestMAC, DestBuffer is taken from filter.
          */
-        void sendAVBFrame(cPacket* packet, const inet::InterfaceEntry* ie, const IPoREFilter* filter);
+        void sendAVBFrame(inet::Packet* packet, const inet::InterfaceEntry* ie, const IPoREFilter* filter);
 
     protected:
         std::list<int> m_subscribeList;

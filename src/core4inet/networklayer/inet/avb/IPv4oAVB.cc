@@ -444,27 +444,25 @@ void IPv4oAVB<base>::sendPacketToBuffers(cPacket *packet, const inet::InterfaceE
 //==============================================================================
 
 template<class base>
-void IPv4oAVB<base>::sendAVBFrame(cPacket* packet, __attribute__((unused))     const inet::InterfaceEntry* ie,
+void IPv4oAVB<base>::sendAVBFrame(inet::Packet* packet, __attribute__((unused))     const inet::InterfaceEntry* ie,
         const IPoREFilter* filter)
 {
     AVBDestinationInfo *avbDestInfo = dynamic_cast<AVBDestinationInfo *>(filter->getDestInfo());
     std::stringstream frameNname;
     frameNname << "Stream " << avbDestInfo->getStreamId();
-    AVBFrame *outFrame = new AVBFrame(frameNname.str().c_str());
+    auto outFrame = inet::makeShared<AVBFrame>();
+    auto ctag = new inet::Ieee8021qHeader();
+    ctag->setVid(avbDestInfo->getVlanId());
+    ctag->setPcp(AVB_VIDEO_PRIORITY);
+    ctag->setDe(false); //TODO true or false?
+    outFrame->setCTag(ctag);
     outFrame->setStreamID(static_cast<unsigned long>(avbDestInfo->getStreamId()));
-    outFrame->setVID(avbDestInfo->getVlanId());
-    outFrame->setPcp(AVB_VIDEO_PRIORITY);
     outFrame->setDest(*(avbDestInfo->getDestMac()));
-    outFrame->setEtherType(inet::ETHERTYPE_IPv4);
+    outFrame->setTypeOrLength(inet::ETHERTYPE_IPv4);
+    packet->pushFront(outFrame);
+    EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);   //TODO get from parameter
 
-    outFrame->encapsulate(packet);
-
-    if (outFrame->getByteLength() < inet::MIN_ETHERNET_FRAME_BYTES)
-    {
-        outFrame->setByteLength(inet::MIN_ETHERNET_FRAME_BYTES);
-    }
     base::sendDirect(outFrame, avbDestInfo->getDestModule()->gate("in"));
-
 }
 
 //==============================================================================
