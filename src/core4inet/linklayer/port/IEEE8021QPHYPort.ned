@@ -32,7 +32,8 @@ module IEEE8021QPHYPort
 {
     parameters:
         @display("bgb=188,180;i=device/port");
-        
+        @class(::inet::InterfaceEntry);
+
         // if true, all packets are received, otherwise only the ones with matching destination MAC address
         bool promiscuous = default(false);
         //Static propagation delay for the port
