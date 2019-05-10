@@ -205,26 +205,23 @@ void IPv4oRC<Base>::configureFilters(cXMLElement *config)
 
 //==============================================================================
 
+typedef inet::EthernetMacHeader RCFrame;    //FIXME KLUDGE
+
 template<class Base>
 void IPv4oRC<Base>::handleMessage(cMessage* msg)
 {
-    if (RCFrame* rcFrame = dynamic_cast<RCFrame*>(msg)) {
+    if (dynamic_cast<RCFrame*>(msg)) {   //FIXME replace condition
         //Reset Bag
         RCBuffer *rcBuffer = dynamic_cast<RCBuffer*>(msg->getSenderModule());
         if (rcBuffer)
             rcBuffer->resetBag();
 
         // decapsulate and send up
-        cPacket* ipPacket = rcFrame->decapsulate();
-        inet::Ieee802Ctrl *etherctrl = new inet::Ieee802Ctrl();
-        etherctrl->setSrc(rcFrame->getSrc());
-        etherctrl->setDest(rcFrame->getDest());
-        etherctrl->setEtherType(rcFrame->getEtherType());
-        ipPacket->setControlInfo(etherctrl);
-        ipPacket->setArrival(this->getId(), Base::gate("RCIn")->getId());
+        auto packet = check_and_cast<inet::Packet*>(msg);
+        auto rcFrame = inet::EtherEncap::decapsulateMacHeader(packet);
+        packet->setArrival(this->getId(), Base::gate("RCIn")->getId());
 
-        delete rcFrame;
-        Base::handleMessage(ipPacket);
+        Base::handleMessage(packet);
     }
     else {
         Base::handleMessage(msg);
@@ -260,10 +257,10 @@ void IPv4oRC<Base>::sendRCFrame(inet::Packet* packet, const IPoREFilter* filter)
         return;
     }
 
-    RCFrame *outFrame = new RCFrame();
-    outFrame->encapsulate(packet);
+    auto outFrame = inet::makeShared<RCFrame>();
+    setCtID(*outFrame.get(), destInfo->getCtId());
+    packet->insertAtFront(outFrame);
     inet::EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);
-    outFrame->setCtID(destInfo->getCtId());
 
     std::list<RCBuffer*> destBuffers = destInfo->getDestModules();
     std::list<RCBuffer*>::iterator destBuf = destBuffers.begin();

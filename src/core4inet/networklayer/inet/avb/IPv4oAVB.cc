@@ -456,7 +456,7 @@ void IPv4oAVB<base>::sendAVBFrame(inet::Packet* packet, const IPoREFilter* filte
     packet->insertAtFront(outFrame);
     inet::EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);   //TODO get fcsMode from NED parameter
 
-    base::sendDirect(outFrame, avbDestInfo->getDestModule()->gate("in"));
+    base::sendDirect(packet, avbDestInfo->getDestModule()->gate("in"));
 }
 
 //==============================================================================

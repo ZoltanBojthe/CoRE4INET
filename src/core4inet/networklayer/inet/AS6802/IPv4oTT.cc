@@ -281,10 +281,12 @@ void IPv4oTT<Base>::configureFilters(cXMLElement *config)
 
 //==============================================================================
 
+//FIXME KLUDGE
+typedef inet::EthernetMacHeader TTFrame;
+
 template<class Base>
 void IPv4oTT<Base>::handleMessage(cMessage* msg)
 {
-
     if (msg->isSelfMessage() && (strcmp(msg->getName(), "IPv4oTT register action time events") == 0))
     {
         std::list<IPoREFilter*> ttFilters = Base::getFilters(DestinationType_TT);
@@ -301,7 +303,7 @@ void IPv4oTT<Base>::handleMessage(cMessage* msg)
             {
                 QueuedPacket *toSend = ttPackets[msgName].front();
                 ttPackets[msgName].pop_front();
-                sendTTFrame(toSend->getPacket(), toSend->getFilter());
+                sendTTFrame(check_and_cast<inet::Packet*>(toSend->getPacket()), toSend->getFilter());
                 delete toSend;
             }
 
@@ -313,19 +315,14 @@ void IPv4oTT<Base>::handleMessage(cMessage* msg)
     }
     else if (dynamic_cast<TTFrame*>(msg))
     {
-        TTFrame* ttFrame = dynamic_cast<TTFrame*>(msg);
+        auto packet = check_and_cast<inet::Packet *>(msg);
 
         // decapsulate and send up
-        cPacket* ipPacket = ttFrame->decapsulate();
-        inet::Ieee802Ctrl *etherctrl = new inet::Ieee802Ctrl();
-        etherctrl->setSrc(ttFrame->getSrc());
-        etherctrl->setDest(ttFrame->getDest());
-        etherctrl->setEtherType(ttFrame->getEtherType());
-        ipPacket->setControlInfo(etherctrl);
-        ipPacket->setArrival(this->getId(), Base::gate("TTIn")->getId());
+        auto ttFrame = inet::EtherEncap::decapsulateMacHeader(packet);
 
-        delete ttFrame;
-        Base::handleMessage(ipPacket);
+        packet->setArrival(this->getId(), Base::gate("TTIn")->getId());       //FIXME why?
+
+        Base::handleMessage(packet);
     }
     else if (msg->arrivedOn("TTIn"))
     {
@@ -370,10 +367,9 @@ void IPv4oTT<Base>::sendTTFrame(inet::Packet* packet, const IPoREFilter* filter)
     if (!destInfo)
         Base::error("Wrong Destination Info Type. Filter invalid!");
 
-    TTFrame *outFrame = new TTFrame();
-    outFrame->encapsulate(packet);
-    outFrame->setCtID(destInfo->getCtId());
-    outFrame->setName(packet->getName());
+    auto outFrame = inet::makeShared<TTFrame>();
+    setCtID(*outFrame.get(), destInfo->getCtId());
+    packet->insertAtFront(outFrame);
     inet::EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);     //TODO get fcsMode from NED parameter
 
     TTBuffer *destBuf = destInfo->getDestModule();
@@ -383,7 +379,7 @@ void IPv4oTT<Base>::sendTTFrame(inet::Packet* packet, const IPoREFilter* filter)
         Incoming* in = dynamic_cast<Incoming *>(destBuf->gate("in")->getPathStartGate()->getOwner());
         if (in)
         {
-            Base::sendDirect(outFrame, in->gate("in"));
+            Base::sendDirect(packet, in->gate("in"));
         }
         else
         {
@@ -394,7 +390,7 @@ void IPv4oTT<Base>::sendTTFrame(inet::Packet* packet, const IPoREFilter* filter)
     }
     else //It is ok to directly send a frame to a buffer if no incoming is attached!
     {
-        Base::sendDirect(outFrame, destBuf->gate("in"));
+        Base::sendDirect(packet, destBuf->gate("in"));
     }
 
 }
