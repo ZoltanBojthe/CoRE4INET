@@ -27,6 +27,7 @@
 #include "core4inet/incoming/base/Incoming.h"
 #include "core4inet/networklayer/inet/AS6802/RCDestinationInfo.h"
 #include "core4inet/networklayer/inet/base/IPoREFilter.h"
+#include "inet/common/XMLUtils.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/linklayer/ethernet/EtherEncap.h"
 #include "inet/networklayer/common/L3Address.h"
@@ -92,7 +93,7 @@ void IPv4oRC<Base>::configureFilters(cXMLElement *config)
         cXMLElement *filterElement = filterElements[i];
         try
         {
-            const char *destType = Base::getRequiredAttribute(filterElement, "destType");
+            const char *destType = inet::xmlutils::getMandatoryAttribute(*filterElement, "destType");
 
 
 //            if (!this->destTypeEnum) {
@@ -105,8 +106,8 @@ void IPv4oRC<Base>::configureFilters(cXMLElement *config)
 
             if (dt == DestinationType_RC) {
                 // Destination Info
-                const char *destModules = Base::getRequiredAttribute(filterElement, "destModules");
-                const char *ctId = Base::getRequiredAttribute(filterElement, "ctId");
+                const char *destModules = inet::xmlutils::getMandatoryAttribute(*filterElement, "destModules");
+                const char *ctId = inet::xmlutils::getMandatoryAttribute(*filterElement, "ctId");
 
                 // Traffic Pattern
                 const char *srcAddrAttr = filterElement->getAttribute("srcAddress");

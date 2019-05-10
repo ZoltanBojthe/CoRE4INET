@@ -29,6 +29,7 @@
 #include "core4inet/networklayer/inet/base/IPoREFilter.h"
 #include "core4inet/synchronisation/base/SyncNotification_m.h"
 
+#include "inet/common/XMLUtils.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/linklayer/ethernet/EtherEncap.h"
 #include "inet/networklayer/common/L3Address.h"
@@ -125,7 +126,7 @@ void IPv4oTT<Base>::configureFilters(cXMLElement *config)
         cXMLElement *filterElement = filterElements[i];
         try
         {
-            const char *destType = Base::getRequiredAttribute(filterElement, "destType");
+            const char *destType = inet::xmlutils::getMandatoryAttribute(*filterElement, "destType");
 
 //            if (!this->destTypeEnum) {
 //                this->destTypeEnum = cEnum::get("CoRE4INET::DestinationType");
@@ -138,10 +139,10 @@ void IPv4oTT<Base>::configureFilters(cXMLElement *config)
             if (dt == DestinationType_TT)
             {
                 // Destination Info
-                const char *destModule = Base::getRequiredAttribute(filterElement, "destModule");
-                const char *ctId = Base::getRequiredAttribute(filterElement, "ctId");
+                const char *destModule = inet::xmlutils::getMandatoryAttribute(*filterElement, "destModule");
+                const char *ctId = inet::xmlutils::getMandatoryAttribute(*filterElement, "ctId");
                 const char *period = filterElement->getAttribute("period");
-                const char *actionTime = Base::getRequiredAttribute(filterElement, "actionTime");
+                const char *actionTime = inet::xmlutils::getMandatoryAttribute(*filterElement, "actionTime");
                 const char *oscillator = filterElement->getAttribute("oscillator");
 
                 // Traffic Pattern

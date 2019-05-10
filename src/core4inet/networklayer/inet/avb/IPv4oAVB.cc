@@ -34,6 +34,7 @@
 #include "core4inet/base/IPoRE/IPoREDefs_m.h"
 #include "core4inet/linklayer/ethernet/avb/AVBFrame_m.h"
 
+#include "inet/common/XMLUtils.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/linklayer/ethernet/EtherEncap.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
@@ -222,7 +223,7 @@ void IPv4oAVB<base>::configureFilters(cXMLElement *config)
         cXMLElement *filterElement = filterElements[i];
         try
         {
-            const char *destType = base::getRequiredAttribute(filterElement, "destType");
+            const char *destType = inet::xmlutils::getMandatoryAttribute(*filterElement, "destType");
 
 //            if (!this->destTypeEnum) {
 //                this->destTypeEnum = cEnum::get("CoRE4INET::DestinationType");
@@ -235,8 +236,8 @@ void IPv4oAVB<base>::configureFilters(cXMLElement *config)
             if (dt == DestinationType_AVB)
             {
 
-                const char *destModule = base::getRequiredAttribute(filterElement, "destModule");
-                const char *destMAC = base::getRequiredAttribute(filterElement, "destMAC");
+                const char *destModule = inet::xmlutils::getMandatoryAttribute(*filterElement, "destModule");
+                const char *destMAC = inet::xmlutils::getMandatoryAttribute(*filterElement, "destMAC");
                 const char *streamId = filterElement->getAttribute("streamId");
                 const char *srClass = filterElement->getAttribute("trafficClass");
                 const char *frameSize = filterElement->getAttribute("frameSize");
@@ -363,7 +364,7 @@ void IPv4oAVB<base>::configureSubscriptions(cXMLElement *config)
         cXMLElement *filterElement = filterElements[i];
         try
         {
-            const char *streamId = base::getRequiredAttribute(filterElement, "streamId");
+            const char *streamId = inet::xmlutils::getMandatoryAttribute(*filterElement, "streamId");
 
             if (streamId)
             {

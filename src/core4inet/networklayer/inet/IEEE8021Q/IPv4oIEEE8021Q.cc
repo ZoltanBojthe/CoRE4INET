@@ -27,6 +27,7 @@
 #include "core4inet/networklayer/inet/IEEE8021Q/IEEE8021QDestinationInfo.h"
 
 #include "inet/common/ProtocolTag_m.h"
+#include "inet/common/XMLUtils.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/linklayer/common/MacAddressTag_m.h"
 #include "inet/linklayer/ethernet/EtherEncap.h"
@@ -99,7 +100,7 @@ void IPv4oIEEE8021Q<Base>::configureFilters(cXMLElement *config)
         cXMLElement *filterElement = filterElements[i];
         try
         {
-            const char *destType = Base::getRequiredAttribute(filterElement, "destType");
+            const char *destType = inet::xmlutils::getMandatoryAttribute(*filterElement, "destType");
 
 //            if (!this->destTypeEnum) {
 //                this->destTypeEnum = cEnum::get("CoRE4INET::DestinationType");
@@ -112,11 +113,11 @@ void IPv4oIEEE8021Q<Base>::configureFilters(cXMLElement *config)
             if (dt == DestinationType_8021Q)
             {
                 // Destination Info
-                const char *destModules = Base::getRequiredAttribute(filterElement, "destModules");
-                const char *vid = Base::getRequiredAttribute(filterElement, "VID");
-                const char *pcp = Base::getRequiredAttribute(filterElement, "PCP");
+                const char *destModules = inet::xmlutils::getMandatoryAttribute(*filterElement, "destModules");
+                const char *vid = inet::xmlutils::getMandatoryAttribute(*filterElement, "VID");
+                const char *pcp = inet::xmlutils::getMandatoryAttribute(*filterElement, "PCP");
 
-                const char *destMAC = Base::getRequiredAttribute(filterElement, "destMAC");
+                const char *destMAC = inet::xmlutils::getMandatoryAttribute(*filterElement, "destMAC");
 
                 // Traffic Pattern
                 const char *srcAddrAttr = filterElement->getAttribute("srcAddress");
