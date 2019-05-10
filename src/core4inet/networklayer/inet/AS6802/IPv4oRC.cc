@@ -270,7 +270,7 @@ void IPv4oRC<Base>::sendRCFrame(inet::Packet* packet, const IPoREFilter* filter)
             Incoming* in = dynamic_cast<Incoming *>((*destBuf)->gate("in")->getPathStartGate()->getOwner());
             if (in)
             {
-                Base::sendDirect(outFrame, in->gate("in"));
+                Base::sendDirect(packet->dup(), in->gate("in"));
             }
             else
             {
@@ -278,6 +278,7 @@ void IPv4oRC<Base>::sendRCFrame(inet::Packet* packet, const IPoREFilter* filter)
                         (*destBuf)->getFullPath().c_str(),
                         (*destBuf)->gate("in")->getPathStartGate()->getOwner()->getFullPath().c_str());
             }
+            delete packet;
         }
         else //It is ok to directly send a frame to a buffer if no incoming is attached!
         {
