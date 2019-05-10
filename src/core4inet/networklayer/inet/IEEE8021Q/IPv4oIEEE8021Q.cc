@@ -29,6 +29,7 @@
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/common/XMLUtils.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
+#include "inet/linklayer/common/InterfaceTag_m.h"
 #include "inet/linklayer/common/MacAddressTag_m.h"
 #include "inet/linklayer/ethernet/EtherEncap.h"
 #include "inet/linklayer/ethernet/Ethernet.h"
@@ -70,7 +71,7 @@ void IPv4oIEEE8021Q<Base>::initialize(int stage)
 //==============================================================================
 
 template<class Base>
-void IPv4oIEEE8021Q<Base>::sendPacketToNIC(cPacket *packet, const inet::InterfaceEntry *ie)
+void IPv4oIEEE8021Q<Base>::sendPacketToNIC(inet::Packet *packet)
 {
     // Check for matching filters
     std::list<IPoREFilter*> matchingFilters;
@@ -80,11 +81,11 @@ void IPv4oIEEE8021Q<Base>::sendPacketToNIC(cPacket *packet, const inet::Interfac
     // send to corresponding modules
     if (filterMatch)
     {
-        IPv4oIEEE8021Q<Base>::sendPacketToBuffers(packet, ie, matchingFilters);
+        IPv4oIEEE8021Q<Base>::sendPacketToBuffers(packet, matchingFilters);
     }
     else
     {
-        Base::sendPacketToNIC(packet, ie);
+        Base::sendPacketToNIC(packet);
     }
 }
 
@@ -246,8 +247,7 @@ void IPv4oIEEE8021Q<Base>::handleMessage(cMessage* msg)
 //==============================================================================
 
 template<class Base>
-void IPv4oIEEE8021Q<Base>::sendPacketToBuffers(cPacket *packet, const inet::InterfaceEntry *ie,
-        std::list<IPoREFilter*> &filters)
+void IPv4oIEEE8021Q<Base>::sendPacketToBuffers(inet::Packet *packet, std::list<IPoREFilter*> &filters)
 {
     if (packet->getByteLength() > inet::MAX_ETHERNET_DATA_BYTES.get())
         Base::error("packet from higher layer (%d bytes) exceeds maximum Ethernet payload length (%d)",
@@ -258,7 +258,7 @@ void IPv4oIEEE8021Q<Base>::sendPacketToBuffers(cPacket *packet, const inet::Inte
     {
         if ((*filter)->getDestInfo()->getDestType() == DestinationType_8021Q)
         {
-            sendIEEE8021QFrame(packet->dup(), ie, (*filter));
+            sendIEEE8021QFrame(packet->dup(), (*filter));
         }
     }
 
@@ -269,8 +269,7 @@ void IPv4oIEEE8021Q<Base>::sendPacketToBuffers(cPacket *packet, const inet::Inte
 //==============================================================================
 
 template<class Base>
-void IPv4oIEEE8021Q<Base>::sendIEEE8021QFrame(inet::Packet* packet, __attribute__((unused))  const inet::InterfaceEntry* ie,
-        const IPoREFilter* filter)
+void IPv4oIEEE8021Q<Base>::sendIEEE8021QFrame(inet::Packet* packet, const IPoREFilter* filter)
 {
     IEEE8021QDestinationInfo *destInfo = dynamic_cast<IEEE8021QDestinationInfo*>(filter->getDestInfo());
     if (!destInfo)

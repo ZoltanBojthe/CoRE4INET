@@ -58,7 +58,7 @@ class IPv4oAVB : public base {
 
     protected:
         virtual void initialize(int stage);
-        virtual void sendPacketToNIC(cPacket *packet, const inet::InterfaceEntry *ie);
+        virtual void sendPacketToNIC(inet::Packet *packet);
         virtual void configureFilters(cXMLElement *config);
         virtual void configureSubscriptions(cXMLElement *config);
         virtual void registerSrpCallbacks(SRPTable *srpTable);
@@ -71,13 +71,13 @@ class IPv4oAVB : public base {
          * Encapsulates packet in Ethernet II frame and sends to each destination buffers.
          * Destination MAC address and destination buffer is taken from filter.
          */
-        virtual void sendPacketToBuffers(cPacket *packet, const inet::InterfaceEntry *ie, std::list<IPoREFilter*> &filters);
+        virtual void sendPacketToBuffers(inet::Packet *packet, std::list<IPoREFilter*> &filters);
 
         /**
          * Encapsulates packet in AVB Frame and sends to destination AVB Buffer.
          * StreamID, Name, DestMAC, DestBuffer is taken from filter.
          */
-        void sendAVBFrame(inet::Packet* packet, const inet::InterfaceEntry* ie, const IPoREFilter* filter);
+        void sendAVBFrame(inet::Packet* packet, const IPoREFilter* filter);
 
     protected:
         std::list<int> m_subscribeList;

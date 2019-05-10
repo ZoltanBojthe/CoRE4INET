@@ -25,8 +25,10 @@
 #include "core4inet/base/IPoRE/IPoREDefs_m.h"
 #include "core4inet/buffer/AS6802/RCBuffer.h"
 #include "core4inet/incoming/base/Incoming.h"
+#include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
 #include "core4inet/networklayer/inet/AS6802/RCDestinationInfo.h"
 #include "core4inet/networklayer/inet/base/IPoREFilter.h"
+
 #include "inet/common/XMLUtils.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/linklayer/ethernet/EtherEncap.h"
@@ -66,7 +68,7 @@ void IPv4oRC<Base>::initialize(int stage)
 //==============================================================================
 
 template<class Base>
-void IPv4oRC<Base>::sendPacketToNIC(cPacket *packet, const inet::InterfaceEntry *ie)
+void IPv4oRC<Base>::sendPacketToNIC(inet::Packet *packet)
 {
     // Check for matching filters
     std::list<IPoREFilter*> matchingFilters;
@@ -75,9 +77,9 @@ void IPv4oRC<Base>::sendPacketToNIC(cPacket *packet, const inet::InterfaceEntry 
     // INFO: if you want to send packages to different buffers (e.g. TT and AVB) you have to check for the "alsoBE" filter element and call base::sendPacketToNIC()
     // send to corresponding modules
     if(filterMatch) {
-        IPv4oRC<Base>::sendPacketToBuffers(packet, ie, matchingFilters);
+        IPv4oRC<Base>::sendPacketToBuffers(packet, matchingFilters);
     } else {
-        Base::sendPacketToNIC(packet, ie);
+        Base::sendPacketToNIC(packet);
     }
 }
 
@@ -199,7 +201,6 @@ void IPv4oRC<Base>::configureFilters(cXMLElement *config)
             throw cRuntimeError("Error in XML <filter> element at %s: %s", filterElement->getSourceLocation(), e.what());
         }
     }
-
 }
 
 //==============================================================================
@@ -233,7 +234,7 @@ void IPv4oRC<Base>::handleMessage(cMessage* msg)
 //==============================================================================
 
 template<class Base>
-void IPv4oRC<Base>::sendPacketToBuffers(cPacket *packet, const inet::InterfaceEntry *ie, std::list<IPoREFilter*> &filters)
+void IPv4oRC<Base>::sendPacketToBuffers(inet::Packet *packet, std::list<IPoREFilter*> &filters)
 {
     if (packet->getByteLength() > inet::MAX_ETHERNET_DATA_BYTES.get())
         Base::error("packet from higher layer (%d bytes) exceeds maximum Ethernet payload length (%d)", packet->getByteLength(), inet::MAX_ETHERNET_DATA_BYTES.get());
@@ -241,18 +242,17 @@ void IPv4oRC<Base>::sendPacketToBuffers(cPacket *packet, const inet::InterfaceEn
     typename std::list<IPoREFilter*>::iterator filter = filters.begin();
     for ( ; filter != filters.end(); ++filter) {
         if ((*filter)->getDestInfo()->getDestType() == DestinationType_RC) {
-            sendRCFrame(packet->dup(), ie, (*filter));
+            sendRCFrame(packet->dup(), (*filter));
         }
     }
 
     delete packet;
-
 }
 
 //==============================================================================
 
 template<class Base>
-void IPv4oRC<Base>::sendRCFrame(cPacket* packet, __attribute__((unused)) const inet::InterfaceEntry* ie, const IPoREFilter* filter)
+void IPv4oRC<Base>::sendRCFrame(inet::Packet* packet, const IPoREFilter* filter)
 {
     RCDestinationInfo *destInfo = dynamic_cast<RCDestinationInfo*>(filter->getDestInfo());
     if (!destInfo){
@@ -284,10 +284,9 @@ void IPv4oRC<Base>::sendRCFrame(cPacket* packet, __attribute__((unused)) const i
         }
         else //It is ok to directly send a frame to a buffer if no incoming is attached!
         {
-            Base::sendDirect(outFrame, (*destBuf)->gate("in"));
+            Base::sendDirect(packet, (*destBuf)->gate("in"));
         }
     }
-
 }
 
 //==============================================================================
@@ -297,3 +296,4 @@ void IPv4oRC<Base>::sendRCFrame(cPacket* packet, __attribute__((unused)) const i
 //==============================================================================
 
 #endif // CORE4INET_IPV4ORC_CC_
+

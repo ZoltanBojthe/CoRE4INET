@@ -25,6 +25,7 @@
 #include "core4inet/base/NotifierConsts.h"
 #include "core4inet/buffer/AS6802/TTBuffer.h"
 #include "core4inet/incoming/base/Incoming.h"
+#include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
 #include "core4inet/networklayer/inet/AS6802/TTDestinationInfo.h"
 #include "core4inet/networklayer/inet/base/IPoREFilter.h"
 #include "core4inet/synchronisation/base/SyncNotification_m.h"
@@ -96,7 +97,7 @@ void IPv4oTT<Base>::initialize(int stage)
 //==============================================================================
 
 template<class Base>
-void IPv4oTT<Base>::sendPacketToNIC(cPacket *packet, const inet::InterfaceEntry *ie)
+void IPv4oTT<Base>::sendPacketToNIC(inet::Packet *packet)
 {
     // Check for matching filters
     std::list<IPoREFilter*> matchingFilters;
@@ -106,11 +107,11 @@ void IPv4oTT<Base>::sendPacketToNIC(cPacket *packet, const inet::InterfaceEntry 
     // send to corresponding modules
     if (filterMatch)
     {
-        IPv4oTT<Base>::sendPacketToBuffers(packet, ie, matchingFilters);
+        IPv4oTT<Base>::sendPacketToBuffers(packet, matchingFilters);
     }
     else
     {
-        Base::sendPacketToNIC(packet, ie);
+        Base::sendPacketToNIC(packet);
     }
 }
 
@@ -340,8 +341,7 @@ void IPv4oTT<Base>::handleMessage(cMessage* msg)
 //==============================================================================
 
 template<class Base>
-void IPv4oTT<Base>::sendPacketToBuffers(cPacket *packet, __attribute__((unused))  const inet::InterfaceEntry *ie,
-        std::list<IPoREFilter*> &filters)
+void IPv4oTT<Base>::sendPacketToBuffers(inet::Packet *packet, std::list<IPoREFilter*> &filters)
 {
     if (packet->getByteLength() > inet::MAX_ETHERNET_DATA_BYTES.get())
         Base::error("packet from higher layer (%d bytes) exceeds maximum Ethernet payload length (%d)",
@@ -364,7 +364,7 @@ void IPv4oTT<Base>::sendPacketToBuffers(cPacket *packet, __attribute__((unused))
 //==============================================================================
 
 template<class Base>
-void IPv4oTT<Base>::sendTTFrame(cPacket* packet, const IPoREFilter* filter)
+void IPv4oTT<Base>::sendTTFrame(inet::Packet* packet, const IPoREFilter* filter)
 {
     TTDestinationInfo *destInfo = dynamic_cast<TTDestinationInfo*>(filter->getDestInfo());
     if (!destInfo)

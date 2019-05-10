@@ -45,19 +45,19 @@ public:
     virtual ~IPv4oTT() override;
 
     virtual void initialize(int stage) override;
-    virtual void sendPacketToNIC(cPacket *packet, const inet::InterfaceEntry *ie) override;
+    virtual void sendPacketToNIC(inet::Packet *packet) override;
     virtual void configureFilters(cXMLElement *config) override;
     virtual void handleMessage(cMessage* msg) override;
 
     /**
      * Encapsulates packet in RC frame and sends to each destination buffers.
      */
-    virtual void sendPacketToBuffers(cPacket *packet, const inet::InterfaceEntry *ie, std::list<IPoREFilter*> &filters) override;
+    virtual void sendPacketToBuffers(inet::Packet *packet, std::list<IPoREFilter*> &filters) override;
 
     /**
      * Encapsulates packet in TT Frame and sends to destination Buffers.
      */
-    void sendTTFrame(cPacket* packet, const IPoREFilter* filter);
+    void sendTTFrame(inet::Packet* packet, const IPoREFilter* filter);
 
     /**
      * Registers Timing events at the periods with the given actionTime for each filter.

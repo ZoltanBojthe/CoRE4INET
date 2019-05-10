@@ -38,21 +38,19 @@ public:
     virtual ~IPv4oRC() override;
 
     virtual void initialize(int stage) override;
-    virtual void sendPacketToNIC(cPacket *packet, const inet::InterfaceEntry *ie) override;
+    virtual void sendPacketToNIC(inet::Packet *packet) override;
     virtual void configureFilters(cXMLElement *config) override;
     virtual void handleMessage(cMessage* msg) override;
 
     /**
      * Encapsulates packet in RC frame and sends to each destination buffers.
      */
-    virtual void sendPacketToBuffers(cPacket *packet, const inet::InterfaceEntry *ie, std::list<IPoREFilter*> &filters) override;
+    virtual void sendPacketToBuffers(inet::Packet *packet, std::list<IPoREFilter*> &filters) override;
 
     /**
      * Encapsulates packet in RC Frame and sends to destination Buffers.
      */
-    void sendRCFrame(cPacket* packet, const inet::InterfaceEntry* ie, const IPoREFilter* filter);
-
-
+    void sendRCFrame(inet::Packet* packet, const IPoREFilter* filter);
 };
 
 //==============================================================================

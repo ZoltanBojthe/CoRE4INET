@@ -90,7 +90,7 @@ void IPv4oAVB<base>::registerSrpCallbacks(SRPTable *srpTable)
 //==============================================================================
 
 template<class base>
-void IPv4oAVB<base>::sendPacketToNIC(cPacket *packet, const inet::InterfaceEntry *ie)
+void IPv4oAVB<base>::sendPacketToNIC(inet::Packet *packet)
 {
     // Check for matching filters
     std::list<IPoREFilter*> matchingFilters;
@@ -100,11 +100,11 @@ void IPv4oAVB<base>::sendPacketToNIC(cPacket *packet, const inet::InterfaceEntry
     // send to corresponding modules
     if (filterMatch)
     {
-        IPv4oAVB<base>::sendPacketToBuffers(packet, ie, matchingFilters);
+        IPv4oAVB<base>::sendPacketToBuffers(packet, matchingFilters);
     }
     else
     {
-        base::sendPacketToNIC(packet, ie);
+        base::sendPacketToNIC(packet);
     }
 }
 
@@ -417,7 +417,7 @@ void IPv4oAVB<base>::registerTalker(const IPoREFilter* filter, SRPTable *srpTabl
 //==============================================================================
 
 template<class base>
-void IPv4oAVB<base>::sendPacketToBuffers(cPacket *packet, const inet::InterfaceEntry *ie, std::list<IPoREFilter*> &filters)
+void IPv4oAVB<base>::sendPacketToBuffers(inet::Packet *packet, std::list<IPoREFilter*> &filters)
 {
     if (packet->getByteLength() > inet::MAX_ETHERNET_DATA_BYTES.get())
         base::error("packet from higher layer (%d bytes) exceeds maximum Ethernet payload length (%d)",
@@ -428,7 +428,7 @@ void IPv4oAVB<base>::sendPacketToBuffers(cPacket *packet, const inet::InterfaceE
     {
         if ((*filter)->getDestInfo()->getDestType() == DestinationType_AVB)
         {
-            sendAVBFrame(packet->dup(), ie, (*filter));
+            sendAVBFrame(packet->dup(), (*filter));
             break;
         }
     }
@@ -439,8 +439,7 @@ void IPv4oAVB<base>::sendPacketToBuffers(cPacket *packet, const inet::InterfaceE
 //==============================================================================
 
 template<class base>
-void IPv4oAVB<base>::sendAVBFrame(inet::Packet* packet, __attribute__((unused))     const inet::InterfaceEntry* ie,
-        const IPoREFilter* filter)
+void IPv4oAVB<base>::sendAVBFrame(inet::Packet* packet, const IPoREFilter* filter)
 {
     AVBDestinationInfo *avbDestInfo = dynamic_cast<AVBDestinationInfo *>(filter->getDestInfo());
     std::stringstream frameNname;
