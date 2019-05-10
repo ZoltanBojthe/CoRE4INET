@@ -22,6 +22,7 @@ import inet.common.MessageDispatcher;
 import inet.common.lifecycle.NodeStatus;
 import inet.linklayer.contract.IMacAddressTable;
 import inet.linklayer.contract.IMacRelayUnit;
+import inet.linklayer.ethernet.IEtherEncap;
 import inet.networklayer.common.InterfaceTable;
 
 
@@ -35,7 +36,7 @@ import inet.networklayer.common.InterfaceTable;
 module IEEE8021QEtherSwitch
 {
     parameters:
-        @display("i=block/switch;bgb=514,312");
+        @display("i=block/switch;bgb=514,421");
         @networkNode;
         @labels(node,ethernet-node);
 
@@ -62,9 +63,18 @@ module IEEE8021QEtherSwitch
             @display("p=47,50;is=n");
         }
 
+        encap: <default("EtherEncap")> like IEtherEncap {
+            @display("p=325,170");
+        }
+
+        up: MessageDispatcher {
+            parameters:
+                @display("p=325,115;b=350,5");
+        }
+
         // Implementation of the forwarding part
         beswitch: <default("MacRelayUnit")> like IMacRelayUnit {
-            @display("p=326,123");
+            @display("p=325,251");
         }
 
         //The mac table associated with the beswitch
@@ -80,7 +90,7 @@ module IEEE8021QEtherSwitch
         // Physical ports of the switch
         phy[sizeof(ethg)]: IEEE8021QPHYPort {
             parameters:
-                @display("p=171,260,column,50");
+                @display("p=170,370,column,50");
                 //For the switch it is necessary to have promiscuous mode enabled
                 promiscuous = true;
         }
@@ -101,7 +111,7 @@ module IEEE8021QEtherSwitch
         }
 
         down: MessageDispatcher {
-            @display("p=326,201;b=350,5");
+            @display("p=325,311;b=350,5");
         }
 
     connections:
@@ -112,5 +122,10 @@ module IEEE8021QEtherSwitch
             phy[i].upperLayerIn <-- down.out++;
             phy[i].upperLayerOut --> down.in++;
         }
+        encap.upperLayerIn <-- up.out++;
+        encap.upperLayerOut --> up.in++;
+
+        encap.lowerLayerOut --> beswitch.upperLayerIn;
+        beswitch.upperLayerOut --> encap.lowerLayerIn;
 }
 
