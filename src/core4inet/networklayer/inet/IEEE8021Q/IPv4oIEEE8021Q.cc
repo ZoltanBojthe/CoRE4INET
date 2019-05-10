@@ -222,7 +222,6 @@ void IPv4oIEEE8021Q<Base>::configureFilters(cXMLElement *config)
                     e.what());
         }
     }
-
 }
 
 //==============================================================================
@@ -263,7 +262,6 @@ void IPv4oIEEE8021Q<Base>::sendPacketToBuffers(inet::Packet *packet, std::list<I
     }
 
     delete packet;
-
 }
 
 //==============================================================================
@@ -297,7 +295,6 @@ void IPv4oIEEE8021Q<Base>::sendIEEE8021QFrame(inet::Packet* packet, const IPoREF
         Base::sendDirect(packet->dup(), (*destBuf)->gate("in"));
     }
     delete packet;
-
 }
 
 //==============================================================================
@@ -307,3 +304,4 @@ void IPv4oIEEE8021Q<Base>::sendIEEE8021QFrame(inet::Packet* packet, const IPoREF
 #endif // CORE4INET_IPV4OIEEE8021Q_CC_
 
 //==============================================================================
+
