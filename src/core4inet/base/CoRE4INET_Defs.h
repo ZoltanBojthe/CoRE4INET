@@ -19,6 +19,10 @@
 //INET
 #include "inet/common/INETDefs.h"
 
+#if INET_VERSION < 0x0402
+#  error At least INET version 4.2 required
+#endif // if INET_VERSION < 0x0402
+
 #include "core4inet/base/Dependencies.h"
 
 namespace CoRE4INET {
