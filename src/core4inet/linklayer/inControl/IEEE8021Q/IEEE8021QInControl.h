@@ -128,7 +128,8 @@ void IEEE8021QInControl<IC>::handleMessage(cMessage *msg)
         else
         {
             inet::MacAddress address;
-            address.setAddress(packet->getArrivalGate()->getPathStartGate()->getOwnerModule()->par("address"));
+//            address.setAddress(packet->getArrivalGate()->getPathStartGate()->getOwnerModule()->par("address"));     //FIXME this is a KLUDGE of CoRE4INET developers. Why did need it?
+            address = check_and_cast<inet::InterfaceEntry*>(packet->getArrivalGate()->getPathStartGate()->getOwnerModule()->getParentModule())->getMacAddress();     //FIXME this is a KLUDGE of CoRE4INET developers. Why did need it?
             if (frame->getDest().equals(address))
             {
                 cSimpleModule::send(msg, "out");
