@@ -12,13 +12,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
- 
+
 package core4inet.linklayer.port;
 
 import core4inet.linklayer.inControl.IEEE8021Q.IEEE8021Q_InControl;
 import core4inet.linklayer.shaper.IEEE8021Q_Shaper;
-
 import inet.linklayer.ethernet.EtherMacFullDuplex;
+import inet.networklayer.common.InterfaceEntry;
+
 
 //
 // The IEEE8021QPHYPort is a compund module that contains the input Shaper, output Shaper and MAC (EtherMacFullDuplex)
@@ -28,12 +29,15 @@ import inet.linklayer.ethernet.EtherMacFullDuplex;
 //
 // @author Philipp Meyer
 //
-module IEEE8021QPHYPort
+module IEEE8021QPHYPort extends InterfaceEntry
 {
     parameters:
         @display("bgb=188,180;i=device/port");
         @class(::inet::InterfaceEntry);
 
+        string address = default("auto");   // MAC address as hex string (12 hex digits), or
+                                            // "auto". "auto" values will be replaced by
+                                            // a generated MAC address in init stage 0.
         // if true, all packets are received, otherwise only the ones with matching destination MAC address
         bool promiscuous = default(false);
         //Static propagation delay for the port
@@ -44,9 +48,9 @@ module IEEE8021QPHYPort
         int untaggedVID = default(0);
         //Interface allows frames with this VLAN to enter and leave the port
         string taggedVIDs = default("0");
-        
+
         *.interfaceTableModule = default(absPath(interfaceTableModule));
-        
+
     gates:
         //Input from the upper layer for best-effort Traffic
         input upperLayerIn @loose @labels(EtherFrame);
@@ -62,24 +66,24 @@ module IEEE8021QPHYPort
             untaggedVID = untaggedVID;
             taggedVIDs = taggedVIDs;
         }
-        
+
         //Module for the organisation of inbound traffic
         inControl: IEEE8021Q_InControl {
             parameters:
                 @display("p=142,45");
                 promiscuous = promiscuous;
                 untaggedVID = untaggedVID;
-            	taggedVIDs = taggedVIDs;
+                taggedVIDs = taggedVIDs;
         }
-        
+
         //MAC interface
         mac: EtherMacFullDuplex {
             parameters:
-                promiscuous = true; 
+                promiscuous = true;
                 queueModule = "^.shaper";
                 @display("p=87,139");
         }
-        
+
     connections:
         upperLayerIn --> shaper.in;
         upperLayerOut <-- inControl.out;
@@ -87,3 +91,4 @@ module IEEE8021QPHYPort
         inControl.in <-- mac.upperLayerOut;
         phys <--> mac.phys;
 }
+
