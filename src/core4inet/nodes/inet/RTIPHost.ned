@@ -54,13 +54,10 @@ module RTIPHost
         bool forwarding = default(true);
         bool multicastForwarding = default(false);
         int numNetPerfMeterApps = default(0);  // no of netPerfMeter apps. Specify the app types in INI file with netPerfMeterApp[0..1].typename="NetPerfMeter" syntax
-        int numTcpApps = default(0);  // no of Tcp apps. Specify the app types in INI file with tcpApp[0..1].typename="TcpEchoApp" syntax
-        int numUdpApps = default(0);  // no of Udp apps. Specify the app types in INI file with udpApp[0..1].typename="UdpVideoStreamClient" syntax
-        int numSctpApps = default(0); // no of Sctp apps. Specify the app types in INI file with sctpApp[0..1].typename="SctpServer" syntax
-        int numPingApps = default(0);  // no of PING apps. Specify the app types in INI file with pingApp[0..1].typename="PingApp" syntax
-        bool hasTcp = default(numTcpApps>0 || numNetPerfMeterApps>0);
-        bool hasUdp = default(numUdpApps>0 || numNetPerfMeterApps>0);
-        bool hasSctp = default(numSctpApps>0 || numNetPerfMeterApps>0);
+        int numInetApps = default(0);  // no of INET apps. Specify the app types in INI file with tcpApp[0..1].typename="TcpEchoApp" syntax
+        bool hasTcp = default(numInetApps>0 || numNetPerfMeterApps>0);
+        bool hasUdp = default(numInetApps>0 || numNetPerfMeterApps>0);
+        bool hasSctp = default(numInetApps>0 || numNetPerfMeterApps>0);
         string tcpType = default(firstAvailable("Tcp", "TcpLwip", "TcpNsc", "TCP_None"));  // tcp implementation (e.g. ~Tcp, ~TcpLwip, ~TcpNsc) or ~TcpSpoof
         string udpType = default(firstAvailable("Udp","UDP_None"));
         string sctpType = default(firstAvailable("Sctp","SCTP_None"));
@@ -80,7 +77,7 @@ module RTIPHost
             @display("p=849,232,row,70");
         }
 
-        inetApp[numUdpApps]: <> like IApp {
+        inetApp[numInetApps]: <> like IApp {
             parameters:
                 @display("p=615,65,row,60");
         }
@@ -124,7 +121,7 @@ module RTIPHost
             @display("p=63,232");
         }
 
-		// Buffers
+        // Buffers
         avbCTC: AVBIncoming {
             parameters:
                 @display("p=186,150");
@@ -171,22 +168,22 @@ module RTIPHost
 
         // application Layer <--> transport Layer
         for i=0..numNetPerfMeterApps-1 {
-            netPerfMeterApp[i].tcpOut --> tcp.appIn++;
-            netPerfMeterApp[i].tcpIn <-- tcp.appOut++;
-            netPerfMeterApp[i].sctpOut --> sctp.from_appl++;
-            netPerfMeterApp[i].sctpIn <-- sctp.to_appl++;
-            netPerfMeterApp[i].udpOut --> udp.appIn++;
-            netPerfMeterApp[i].udpIn <-- udp.appOut++;
+            netPerfMeterApp[i].tcpOut --> tcp.appIn;
+            netPerfMeterApp[i].tcpIn <-- tcp.appOut;
+            netPerfMeterApp[i].sctpOut --> sctp.appIn;
+            netPerfMeterApp[i].sctpIn <-- sctp.appOut;
+            netPerfMeterApp[i].udpOut --> udp.appIn;
+            netPerfMeterApp[i].udpIn <-- udp.appOut;
         }
-        
-        for i=0..numTcpApps-1 {
-            tcpApp[i].tcpOut --> tcp.appIn++;
-            tcpApp[i].tcpIn <-- tcp.appOut++;
+
+        for i=0..numInetApps-1 {
+            inetApp[i].socketOut --> tcp.appIn if hasTcp;
+            tcpApp[i].socketIn <-- tcp.appOut if hasTcp;
         }
 
         for i=0..numUdpApps-1 {
-            udpApp[i].udpOut --> udp.appIn++;
-            udpApp[i].udpIn <-- udp.appOut++;
+            udpApp[i].udpOut --> udp.appIn;
+            udpApp[i].udpIn <-- udp.appOut;
         }
 
         udp.ipOut --> networkLayer.transportIn++ if hasUdp;
@@ -204,13 +201,13 @@ module RTIPHost
             networkLayer.pingIn++ <-- pingApp[i].pingOut;
         }
 
-		// transport Layer <--> network Layer
+        // transport Layer <--> network Layer
         tcp.ipOut --> networkLayer.transportIn++ if hasTcp;
         tcp.ipIn <-- networkLayer.transportOut++ if hasTcp;
 
         // network Layer <--> link Layer
-        networkLayer.ifOut++ --> phy[0].upperLayerIn;
-        phy[0].upperLayerOut --> networkLayer.ifIn++;
+        networkLayer.ifOut --> phy[0].upperLayerIn;
+        phy[0].upperLayerOut --> networkLayer.ifIn;
         avbABuffer.out --> phy[0].AVBAin;
         avbBBuffer.out --> phy[0].AVBBin;
         avbCTC.AVBAout[0] --> avbABuffer.in;
@@ -218,7 +215,7 @@ module RTIPHost
         srpProtocol.out --> phy[0].srpIn;
         phy[0].srpOut --> srpProtocol.in;
 
-		// link layer <--> outside
+        // link layer <--> outside
         phy[0].ethg <--> ethg;
 
         bgOut.out --> phy[0].bgIn;
