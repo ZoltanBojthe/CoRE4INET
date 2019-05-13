@@ -101,11 +101,6 @@ void Buffer::handleMessage(cMessage *msg)
         {
             recordPacketReceived(frame);
 
-            if (frame->getDataLength() < inet::MIN_ETHERNET_FRAME_BYTES)
-            {
-                auto oldFcs = frame->removeAtBack<inet::EthernetFcs>(inet::B(4));
-                inet::EtherEncap::addPaddingAndFcs(frame, oldFcs->getFcsMode(), inet::MIN_ETHERNET_FRAME_BYTES);
-            }
             if (static_cast<size_t>(frame->getByteLength()) <= maxMessageSize)
             {
                 putFrame(frame);

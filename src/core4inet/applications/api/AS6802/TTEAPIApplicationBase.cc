@@ -388,7 +388,7 @@ int32_t TTEAPIApplicationBase::tte_open_output_buf(tte_buffer_t * const buf, tte
     ethHeader->setTypeOrLength(ethType);
 
     priv->packet->insertAtFront(ethHeader);
-    inet::EtherEncap::addPaddingAndFcs(priv->packet, inet::FCS_DECLARED_CORRECT);   //TODO get from parameter
+    priv->packet->insertAtBack(inet::makeShared<inet::EthernetFcs>(inet::FcsMode::FCS_DECLARED_CORRECT));    //TODO get crcMode from parameter
 
     frame->data = static_cast<uint8_t*>(malloc(frame->length));
     if (!frame->data)
@@ -446,7 +446,7 @@ int32_t TTEAPIApplicationBase::tte_close_output_buf(tte_buffer_t * const buf)
     //Copy frame data and free memory
     const auto& payload = inet::makeShared<inet::BytesChunk>((uint8_t *)priv->data, (size_t)priv->dataLength);
     priv->packet->insertAtBack(payload);
-    inet::EtherEncap::addPaddingAndFcs(priv->packet, inet::FCS_DECLARED_CORRECT);   //TODO get from parameter
+    priv->packet->insertAtBack(inet::makeShared<inet::EthernetFcs>(inet::FcsMode::FCS_DECLARED_CORRECT));    //TODO get fcsMode from parameter
     priv->packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
 
     //Send to CTC

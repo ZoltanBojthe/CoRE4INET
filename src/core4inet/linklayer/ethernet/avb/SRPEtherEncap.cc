@@ -97,7 +97,7 @@ void SRPEtherEncap::dispatchSRP(inet::Packet *packet)
     frame->setSrc(macAddressReq->getSrcAddress());
     frame->setTypeOrLength(MSRP_ETHERTYPE);
     packet->insertAtFront(frame);
-    addPaddingAndFcs(packet, fcsMode);
+    packet->insertAtBack(inet::makeShared<inet::EthernetFcs>(fcsMode));
     packet->addTagIfAbsent<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);
 
     if (notPortNum != 0)

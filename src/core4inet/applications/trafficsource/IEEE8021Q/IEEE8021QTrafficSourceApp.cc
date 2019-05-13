@@ -76,8 +76,7 @@ void IEEE8021QTrafficSourceApp::sendMessage()
         packet->insertAtFront(payload);
         packet->insertAtFront(frame);
 
-        //Padding
-        inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);    //TODO get crcMode from parameter
+        packet->insertAtBack(inet::makeShared<inet::EthernetFcs>(inet::FcsMode::FCS_DECLARED_CORRECT));    //TODO get fcsMode from parameter
 
         //PacketProtocolTag
         packet->addTag<inet::PacketProtocolTag>()->setProtocol(&inet::Protocol::ethernetMac);

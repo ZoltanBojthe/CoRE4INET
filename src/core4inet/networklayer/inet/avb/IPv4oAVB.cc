@@ -454,7 +454,8 @@ void IPv4oAVB<base>::sendAVBFrame(inet::Packet* packet, const IPoREFilter* filte
     outFrame->setDest(*(avbDestInfo->getDestMac()));
     outFrame->setTypeOrLength(inet::ETHERTYPE_IPv4);
     packet->insertAtFront(outFrame);
-    inet::EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);   //TODO get fcsMode from NED parameter
+
+    packet->insertAtBack(inet::makeShared<inet::EthernetFcs>(inet::FcsMode::FCS_DECLARED_CORRECT));    //TODO get fcsMode from parameter
 
     base::sendDirect(packet, avbDestInfo->getDestModule()->gate("in"));
 }

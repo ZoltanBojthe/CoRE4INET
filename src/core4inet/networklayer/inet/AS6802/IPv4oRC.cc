@@ -260,7 +260,8 @@ void IPv4oRC<Base>::sendRCFrame(inet::Packet* packet, const IPoREFilter* filter)
     auto outFrame = inet::makeShared<RCFrame>();
     setCtID(*outFrame.get(), destInfo->getCtId());
     packet->insertAtFront(outFrame);
-    inet::EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);
+
+    packet->insertAtBack(inet::makeShared<inet::EthernetFcs>(inet::FcsMode::FCS_DECLARED_CORRECT));    //TODO get fcsMode from parameter
 
     std::list<RCBuffer*> destBuffers = destInfo->getDestModules();
     std::list<RCBuffer*>::iterator destBuf = destBuffers.begin();

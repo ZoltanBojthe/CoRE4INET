@@ -286,7 +286,8 @@ void IPv4oIEEE8021Q<Base>::sendIEEE8021QFrame(inet::Packet* packet, const IPoREF
     }
     outFrame->setDest(*destInfo->getDestMac());
     packet->insertAtFront(outFrame);
-    inet::EtherEncap::addPaddingAndFcs(packet, inet::FCS_DECLARED_CORRECT);     //TODO get fcsMode from NED parameter
+
+    packet->insertAtBack(inet::makeShared<inet::EthernetFcs>(inet::FcsMode::FCS_DECLARED_CORRECT));    //TODO get fcsMode from parameter
 
     std::list<BGBuffer*> destBuffers = destInfo->getDestModules();
     std::list<BGBuffer*>::iterator destBuf = destBuffers.begin();
