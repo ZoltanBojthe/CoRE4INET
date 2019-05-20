@@ -15,17 +15,18 @@
 
 package core4inet.linklayer.shaper.base;
 
-import inet.common.queue.IOutputQueue;
-
 //
 // Interface for real-time Ethernet traffic shapers
 //
-// @see ~IOutputQueue, ~BE_Shaper, ~PCF_RC_BE_Shaper, ~TT_PCF_RC_BE_Shaper 
+// @see ~BE_Shaper, ~PCF_RC_BE_Shaper, ~TT_PCF_RC_BE_Shaper 
 //
 // @author Till Steinbach
 //
-moduleinterface IShaper extends IOutputQueue
+moduleinterface IShaper
 {
     parameters:
         @display("i=block/classifier");
+    gates:
+        input in;
+        output out;
 }

@@ -15,8 +15,6 @@
 
 package core4inet.incoming.base;
 
-import inet.common.queue.IOutputQueue;
-
 //
 // Interface for modules implementing the conformance checks of incoming traffic.
 //
@@ -24,7 +22,7 @@ import inet.common.queue.IOutputQueue;
 //
 // @author Till Steinbach
 //
-moduleinterface IIncoming extends IOutputQueue
+moduleinterface IIncoming
 {
     //Incoming is implemented by the Incoming C++ Class
     @class(Incoming);
@@ -42,4 +40,8 @@ moduleinterface IIncoming extends IOutputQueue
     @statistic[rxBytes](title="Received Bytes"; source=rxPk; unit=B; record="sum(packetBytes)?","vector(packetBytes)?"; interpolationmode=none);
     //Statistic of the end-to-end latency
     @statistic[latency](title="End-to-end latency"; source="messageAge(rxPk)"; unit=s; record=stats,histogram,vector; interpolationmode=none);
+
+  gates:
+    input in;
+    output out;
 }

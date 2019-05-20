@@ -15,18 +15,20 @@
 
 package core4inet.linklayer.inControl.base;
 
-import inet.common.queue.IOutputQueue;
-
 import core4inet.utilities.classes.ITimed;
 
 //
 // Interface for a module that controls incoming real-time Ethernet traffic
 //
-// @see ~IOutputQueue, ~ITimed, ~TTEInput
+// @see ~ITimed, ~TTEInput
 //
 // @author Till Steinbach
 //
-moduleinterface IInControl extends IOutputQueue, ITimed
+moduleinterface IInControl extends ITimed
 {
+  parameters:
     @display("i=block/classifier");
+  gates:
+    input in;
+    output out;
 }

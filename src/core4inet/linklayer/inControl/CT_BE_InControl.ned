@@ -22,7 +22,7 @@ import core4inet.linklayer.inControl.base.BE_InControl;
 // critical traffic ID and then forwarded either as best-effort traffic to
 // the upper layer or when critical traffic to the CTC module (via sendDirect).
 //
-// @see ~BE_InControl, ~EtherLlc, ~IMacRelayUnit, ~IOutputQueue
+// @see ~BE_InControl, ~EtherLlc, ~IMacRelayUnit
 //
 // @author Till Steinbach
 //

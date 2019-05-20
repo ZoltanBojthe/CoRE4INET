@@ -20,7 +20,7 @@ package core4inet.linklayer.inControl;
 // critical traffic ID and then forwarded either as best-effort traffic to
 // the upper layer or when avb or critical traffic to the CTC module (via sendDirect).
 //
-// @see ~CT_BE_InControl, ~EtherLlc, ~IMacRelayUnit, ~IOutputQueue
+// @see ~CT_BE_InControl, ~EtherLlc, ~IMacRelayUnit
 //
 // @author Till Steinbach
 //

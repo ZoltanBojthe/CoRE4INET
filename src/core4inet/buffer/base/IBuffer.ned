@@ -14,7 +14,6 @@
 // 
 package core4inet.buffer.base;
 
-import inet.common.queue.IOutputQueue;
 
 //
 // Interface representing a buffer module.
@@ -25,7 +24,7 @@ import inet.common.queue.IOutputQueue;
 // @see Buffer
 //
 // @author Till Steinbach
-moduleinterface IBuffer extends IOutputQueue
+moduleinterface IBuffer
 {
     parameters:
         @display("i=block/buffer");
@@ -56,5 +55,8 @@ moduleinterface IBuffer extends IOutputQueue
  
         //Comma seperated list of gates where the frames of the buffer are delivered
         string destination_gates;
+    gates:
+        input in;
+        output out;
 }
 

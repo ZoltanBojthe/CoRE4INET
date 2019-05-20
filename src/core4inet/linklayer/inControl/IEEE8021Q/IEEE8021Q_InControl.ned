@@ -23,7 +23,7 @@ import core4inet.utilities.classes.Timed;
 // critical traffic ID and then forwarded either as best-effort traffic to
 // the upper layer or when critical traffic to the CTC module (via sendDirect).
 //
-// @see ~Timed, ~IInControl, ~EtherLlc, ~IMacRelayUnit, ~IOutputQueue
+// @see ~Timed, ~IInControl, ~EtherLlc, ~IMacRelayUnit
 //
 // @author Till Steinbach
 //
