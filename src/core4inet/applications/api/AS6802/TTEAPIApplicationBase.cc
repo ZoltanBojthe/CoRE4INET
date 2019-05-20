@@ -27,7 +27,6 @@
 #include "inet/linklayer/ethernet/EtherMacFullDuplex.h"
 
 //Auto-generated
-#include "core4inet/api/AS6802/APIPayload_m.h"
 #include "core4inet/synchronisation/base/SyncNotification_m.h"
 
 namespace CoRE4INET {
