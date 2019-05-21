@@ -372,8 +372,7 @@ void TTShaper<TC>::requestPacket()
 template<class TC>
 cMessage* TTShaper<TC>::pop()
 {
-    Enter_Method
-    ("pop()");
+    Enter_Method("pop()");
     //TTFrames
     if (!ttQueue.isEmpty())
     {
@@ -401,8 +400,7 @@ cMessage* TTShaper<TC>::pop()
 template<class TC>
 cMessage* TTShaper<TC>::front()
 {
-    Enter_Method
-    ("front()");
+    Enter_Method("front()");
     //TTFrames
     if (!ttQueue.isEmpty())
     {
@@ -428,8 +426,7 @@ void TTShaper<TC>::clear()
 template<class TC>
 void TTShaper<TC>::registerTTBuffer(TTBuffer *ttBuffer)
 {
-    Enter_Method
-    ("registerTTBuffer(%s)", ttBuffer->getName());
+    Enter_Method("registerTTBuffer(%s)", ttBuffer->getName());
     uint64_t sendWindowStart = ttBuffer->nextSendWindowStart();
 
     std::map<uint64_t, TTBuffer*>::iterator buf = ttBuffers.find(sendWindowStart);

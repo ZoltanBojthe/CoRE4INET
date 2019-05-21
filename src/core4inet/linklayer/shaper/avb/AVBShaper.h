@@ -306,7 +306,7 @@ cMessage* AVBShaper<SRCLASS, TC>::pop()
     Enter_Method("pop()");
     //AVBFrames
     if (avbBuffer->initialized())
-    avbBuffer->refresh();
+        avbBuffer->refresh();
     if (!avbQueue.isEmpty() && avbBuffer->getCredit() >= 0)
     {
         cMessage *msg = static_cast<cMessage*>(avbQueue.pop());
