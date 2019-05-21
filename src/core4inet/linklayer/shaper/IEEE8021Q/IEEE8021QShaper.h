@@ -156,7 +156,7 @@ class IEEE8021QShaper : public TC, public virtual Timed
          * @return the message with the highest priority from any queue. nullptr if the
          * queues are empty or cannot send due to the traffic policies.
          */
-        virtual cMessage *pop() override;
+        virtual inet::Packet *popPacket(cGate *gate = nullptr) override;
 
         /**
          * @brief Returns a pointer to a frame directly from the queues.
@@ -387,7 +387,7 @@ void IEEE8021QShaper<TC>::requestPacket()
 }
 
 template<class TC>
-cMessage* IEEE8021QShaper<TC>::pop()
+inet::Packet *IEEE8021QShaper<TC>::popPacket(cGate *gate)
 {
     Enter_Method("pop()");
 

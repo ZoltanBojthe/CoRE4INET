@@ -159,7 +159,7 @@ class AVBShaper : public TC, public virtual cListener
          * @return the message with the highest priority from any queue. nullptr if the
          * queues are empty or cannot send due to the traffic policies.
          */
-        virtual cMessage *pop() override;
+        virtual inet::Packet *popPacket(cGate *gate = nullptr) override;
 
         /**
          * @brief Returns a pointer to a frame directly from the queues.
@@ -291,8 +291,9 @@ void AVBShaper<SRCLASS, TC>::requestPacket()
     //Feed the MAC layer with the next frame
     TC::framesRequested++;
 
-    if (cMessage *msg = pop())
+    if (!isEmpty())
     {
+        cMessage *msg = popPacket();
         TC::framesRequested--;
         cSimpleModule::send(msg, cModule::gateBaseId("out"));
         ASSERT(state == IDLE_STATE);
@@ -301,7 +302,7 @@ void AVBShaper<SRCLASS, TC>::requestPacket()
 }
 
 template<SR_CLASS SRCLASS, class TC>
-cMessage* AVBShaper<SRCLASS, TC>::pop()
+inet::Packet *AVBShaper<SRCLASS, TC>::popPacket(cGate *gate = nullptr)
 {
     Enter_Method("pop()");
     //AVBFrames
@@ -309,11 +310,11 @@ cMessage* AVBShaper<SRCLASS, TC>::pop()
         avbBuffer->refresh();
     if (!avbQueue.isEmpty() && avbBuffer->getCredit() >= 0)
     {
-        cMessage *msg = static_cast<cMessage*>(avbQueue.pop());
+        inet::Packet *msg = inet::check_and_cast<inet::Packet*>(avbQueue.pop());
         cComponent::emit(avbQueueLengthSignal, static_cast<unsigned long>(avbQueue.getLength()));
         avbQueueSize -= static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
         cComponent::emit(avbQueueSizeSignal, static_cast<unsigned long>(avbQueueSize));
-        auto *sizeMsg = dynamic_cast<inet::Packet*>(msg->dup());
+        auto *sizeMsg = msg->dup();
         sizeMsg->setByteLength(sizeMsg->getByteLength() + inet::B(inet::PREAMBLE_BYTES + inet::SFD_BYTES + inet::INTERFRAME_GAP_BITS).get());
         SimTime duration = TC::outChannel->calculateDuration(sizeMsg);
         delete sizeMsg;
@@ -322,9 +323,9 @@ cMessage* AVBShaper<SRCLASS, TC>::pop()
     }
     else if (avbBuffer->getCredit() <= 0)
     {
-        return TC::pop();
+        return TC::popPacket();
     }
-    return nullptr;
+    throw cRuntimeError("popPacket(): queue is empty");
 }
 
 template<SR_CLASS SRCLASS, class TC>

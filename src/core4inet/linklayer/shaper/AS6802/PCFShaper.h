@@ -270,7 +270,7 @@ void PCFShaper<TC>::requestPacket()
 }
 
 template<class TC>
-cMessage* PCFShaper<TC>::pop()
+inet::Packet *PCFShaper<TC>::popPacket(cGate *gate)
 {
     Enter_Method("pop()");
     //RCFrames

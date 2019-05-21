@@ -48,25 +48,6 @@ int BaseShaper::numInitStages() const
     return 1;
 }
 
-void BaseShaper::addListener(inet::IPassiveQueueListener *listener)
-{
-    std::list<inet::IPassiveQueueListener*>::const_iterator it = find(listeners.begin(), listeners.end(), listener);
-    if (it == listeners.end())
-        listeners.push_back(listener);
-}
-void BaseShaper::removeListener(inet::IPassiveQueueListener *listener)
-{
-    std::list<inet::IPassiveQueueListener*>::iterator it = find(listeners.begin(), listeners.end(), listener);
-    if (it != listeners.end())
-        listeners.erase(it);
-}
-
-void BaseShaper::notifyListeners()
-{
-    for (std::list<inet::IPassiveQueueListener*>::const_iterator it = listeners.begin(); it != listeners.end(); ++it)
-        (*it)->packetEnqueued(this);
-}
-
 void BaseShaper::handleMessage(cMessage *msg)
 {
     EV_WARN << "Shaper has no method to handle frametype. Dropping frame" << endl;

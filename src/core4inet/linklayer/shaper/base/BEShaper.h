@@ -113,7 +113,7 @@ class BEShaper : public TC
          * received.
          *
          */
-        virtual void requestPacket() override;
+        virtual void requestPacket();
 
         /**
          * @brief Returns true when there are no pending messages.
@@ -125,7 +125,7 @@ class BEShaper : public TC
         /**
          * @brief Clears all queued packets and stored requests.
          */
-        virtual void clear() override;
+        virtual void clear();
 
         /**
          * @brief Returns a frame directly from the queues, bypassing the primary,
@@ -134,7 +134,7 @@ class BEShaper : public TC
          * @return the message with the highest priority from any queue. nullptr if the
          * queues are empty or cannot send due to the traffic policies.
          */
-        virtual cMessage *pop() override;
+        virtual inet::Packet *popPacket(cGate *gate = nullptr) override;
 
         /**
          * @brief Returns a pointer to a frame directly from the queues.
@@ -229,28 +229,28 @@ void BEShaper<TC>::requestPacket()
     //Feed the MAC layer with the next frame
     TC::framesRequested++;
 
-    if (cMessage *msg = pop())
-    {
+    if (!isEmpty()) {
+        inet::Packet *msg = popPacket();
         TC::framesRequested--;
         cSimpleModule::send(msg, cModule::gateBaseId("out"));
     }
 }
 
 template<class TC>
-cMessage* BEShaper<TC>::pop()
+inet::Packet *BEShaper<TC>::popPacket(cGate *gate)
 {
-    Enter_Method("pop()");
+    Enter_Method("popPacket()");
     //BEFrames
     if (!beQueue.isEmpty())
     {
-        cMessage* message = static_cast<cMessage*>(beQueue.pop());
+        inet::Packet *message = inet::check_and_cast<inet::Packet*>(beQueue.pop());
         cComponent::emit(beQueueLengthSignal, static_cast<unsigned long>(beQueue.getLength()));
 
-        beQueueSize-=static_cast<size_t>(check_and_cast<inet::Packet*>(message)->getByteLength());
+        beQueueSize -= static_cast<size_t>(message->getByteLength());
         cComponent::emit(beQueueSizeSignal, static_cast<unsigned long>(beQueueSize));
         return message;
     }
-    return TC::pop();
+    return TC::popPacket(gate);
 }
 
 template<class TC>

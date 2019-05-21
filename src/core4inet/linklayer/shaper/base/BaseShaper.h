@@ -20,7 +20,7 @@
 #include "core4inet/base/CoRE4INET_Defs.h"
 
 //INET
-#include "inet/common/queue/IPassiveQueue.h"
+#include "inet/common/queueing/contract/IPacketQueue.h"
 
 namespace CoRE4INET {
 
@@ -32,7 +32,7 @@ namespace CoRE4INET {
  *
  * @author Till Steinbach
  */
-class BaseShaper : public virtual cSimpleModule, public virtual inet::IPassiveQueue, public virtual cListener
+class BaseShaper : public virtual cSimpleModule, public virtual inet::queueing::IPacketQueue, public virtual cListener
 {
     public:
         /**
@@ -43,16 +43,6 @@ class BaseShaper : public virtual cSimpleModule, public virtual inet::IPassiveQu
             this->framesRequested = 0;
             this->outChannel = nullptr;
         }
-
-        /**
-         * Implementation of IPassiveQueue::addListener().
-         */
-        virtual void addListener(inet::IPassiveQueueListener *listener) override;
-
-        /**
-         * Implementation of IPassiveQueue::removeListener().
-         */
-        virtual void removeListener(inet::IPassiveQueueListener *listener) override;
 
         virtual void receiveSignal(__attribute__((unused))  cComponent *source, __attribute__((unused))  simsignal_t signalID,
                 __attribute__((unused)) bool b, __attribute__((unused)) cObject *details) override
@@ -82,13 +72,6 @@ class BaseShaper : public virtual cSimpleModule, public virtual inet::IPassiveQu
                 __attribute__((unused))  cObject *obj, __attribute__((unused)) cObject *details) override
         {
         }
-    private:
-        /**
-         * @brief List of TTBuffers.
-         *
-         * The vector is ordered by action time
-         */
-        std::list<inet::IPassiveQueueListener *> listeners;
 
     protected:
         /**
@@ -142,25 +125,6 @@ class BaseShaper : public virtual cSimpleModule, public virtual inet::IPassiveQu
         virtual void enqueueMessage(cMessage *msg);
 
         /**
-         * @brief this method is invoked when the underlying mac is idle.
-         *
-         * When this method is invoked the module sends a new message when there is
-         * one. Else it saves the state and sends the message immediately when it is
-         * received.
-         */
-        virtual void requestPacket() override
-        {
-        }
-
-        /**
-         * @brief Returns number of requested messages.
-         */
-        virtual int getNumPendingRequests() override
-        {
-            return static_cast<int>(framesRequested);
-        }
-
-        /**
          * @brief Returns true when there are no pending messages.
          *
          * @return true if all queues are empty.
@@ -171,20 +135,13 @@ class BaseShaper : public virtual cSimpleModule, public virtual inet::IPassiveQu
         }
 
         /**
-         * @brief Clears all queued packets and stored requests.
-         */
-        virtual void clear() override
-        {
-        }
-
-        /**
          * @brief Returns a frame directly from the queues, bypassing the primary,
          * send-on-request mechanism. Returns nullptr if the queue is empty.
          *
          * @return the message with the highest priority from any queue. nullptr if the
          * queues are empty or cannot send due to the traffic policies.
          */
-        virtual cMessage *pop() override
+        virtual inet::Packet *popPacket(cGate *gate = nullptr) override
         {
             return nullptr;
         }

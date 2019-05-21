@@ -169,7 +169,7 @@ class RCShaper : public TC, public virtual Timed
          * @return the message with the highest priority from any queue. nullptr if the
          * queues are empty or cannot send due to the traffic policies.
          */
-        virtual cMessage *pop() override;
+        virtual inet::Packet *popPacket(cGate *gate = nullptr) override;
 
         /**
          * @brief Returns a pointer to a frame directly from the queues.
@@ -333,7 +333,7 @@ void RCShaper<TC>::requestPacket()
     //Feed the MAC layer with the next frame
     TC::framesRequested++;
 
-    if (cMessage *msg = pop())
+    if (cMessage *msg = popPacket())
     {
         TC::framesRequested--;
         cSimpleModule::send(msg, cModule::gateBaseId("out"));
@@ -341,7 +341,7 @@ void RCShaper<TC>::requestPacket()
 }
 
 template<class TC>
-cMessage* RCShaper<TC>::pop()
+inet::Packet *RCShaper<TC>::popPacket(cGate *gate)
 {
     Enter_Method("pop()");
     //RCFrames
@@ -381,7 +381,7 @@ cMessage* RCShaper<TC>::pop()
             return message;
         }
     }
-    return TC::pop();
+    return TC::popPacket();
 }
 
 template<class TC>
