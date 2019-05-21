@@ -237,14 +237,7 @@ void RCShaper<TC>::initialize(int stage)
 template<class TC>
 int RCShaper<TC>::numInitStages() const
 {
-    if (TC::numInitStages() > 1)
-    {
-        return TC::numInitStages();
-    }
-    else
-    {
-        return 1;
-    }
+    return std::max(TC::numInitStages(), 1);
 }
 
 template<class TC>

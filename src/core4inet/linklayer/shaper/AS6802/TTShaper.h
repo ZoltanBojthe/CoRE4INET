@@ -240,14 +240,7 @@ void TTShaper<TC>::initialize(int stage)
 template<class TC>
 int TTShaper<TC>::numInitStages() const
 {
-    if (TC::numInitStages() > 3)
-    {
-        return TC::numInitStages();
-    }
-    else
-    {
-        return 3;
-    }
+    return std::max(TC::numInitStages(), 3);
 }
 
 template<class TC>
