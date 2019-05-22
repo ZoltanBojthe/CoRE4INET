@@ -131,16 +131,6 @@ class AVBShaper : public TC, public virtual cListener
         virtual void enqueueMessage(cMessage *msg) override;
 
         /**
-         * @brief this method is invoked when the underlying mac is idle.
-         *
-         * When this method is invoked the module sends a new message when there is
-         * one. Else it saves the state and sends the message immediately when it is
-         * received.
-         *
-         */
-        virtual void requestPacket() override;
-
-        /**
          * @brief Returns true when there are no pending messages.
          *
          * @return true if all queues are empty.
@@ -281,23 +271,6 @@ void AVBShaper<SRCLASS, TC>::enqueueMessage(cMessage *msg)
     else
     {
         TC::enqueueMessage(msg);
-    }
-}
-
-template<SR_CLASS SRCLASS, class TC>
-void AVBShaper<SRCLASS, TC>::requestPacket()
-{
-    Enter_Method("requestPacket()");
-    //Feed the MAC layer with the next frame
-    TC::framesRequested++;
-
-    if (!isEmpty())
-    {
-        cMessage *msg = popPacket();
-        TC::framesRequested--;
-        cSimpleModule::send(msg, cModule::gateBaseId("out"));
-        ASSERT(state == IDLE_STATE);
-        state = BLOCKED_STATE;
     }
 }
 

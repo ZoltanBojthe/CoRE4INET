@@ -141,16 +141,6 @@ class RCShaper : public TC, public virtual Timed
         virtual void enqueueMessage(cMessage *msg) override;
 
         /**
-         * @brief this method is invoked when the underlying mac is idle.
-         *
-         * When this method is invoked the module sends a new message when there is
-         * one. Else it saves the state and sends the message immediately when it is
-         * received.
-         *
-         */
-        virtual void requestPacket() override;
-
-        /**
          * @brief Returns true when there are no pending messages.
          *
          * @return true if all queues are empty.
@@ -323,20 +313,6 @@ void RCShaper<TC>::enqueueMessage(cMessage *msg)
     else
     {
         TC::enqueueMessage(msg);
-    }
-}
-
-template<class TC>
-void RCShaper<TC>::requestPacket()
-{
-    Enter_Method("requestPacket()");
-    //Feed the MAC layer with the next frame
-    TC::framesRequested++;
-
-    if (cMessage *msg = popPacket())
-    {
-        TC::framesRequested--;
-        cSimpleModule::send(msg, cModule::gateBaseId("out"));
     }
 }
 
