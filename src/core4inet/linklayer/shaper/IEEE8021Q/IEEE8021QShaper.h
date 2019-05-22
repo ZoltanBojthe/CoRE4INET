@@ -137,7 +137,7 @@ class IEEE8021QShaper : public TC, public virtual Timed
         /**
          * @brief Clears all queued packets and stored requests.
          */
-        virtual void clear() override;
+        virtual void clear();
 
         /**
          * @brief Returns a frame directly from the queues, bypassing the primary,

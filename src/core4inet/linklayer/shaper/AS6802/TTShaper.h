@@ -145,7 +145,7 @@ class TTShaper : public TC, public virtual Timed
          * @return the message with the highest priority from any queue. nullptr if the
          * queues are empty or cannot send due to the traffic policies.
          */
-        virtual cMessage *pop() override;
+        virtual inet::Packet *popPacket(cGate *gate = nullptr) override;
 
         /**
          * @brief Returns a pointer to a frame directly from the queues.
@@ -338,13 +338,13 @@ void TTShaper<TC>::enqueueMessage(cMessage *msg)
 }
 
 template<class TC>
-cMessage* TTShaper<TC>::pop()
+inet::Packet *TTShaper<TC>::popPacket(cGate *gate)
 {
     Enter_Method("pop()");
     //TTFrames
     if (!ttQueue.isEmpty())
     {
-        cMessage *msg = static_cast<cMessage*>(ttQueue.pop());
+        inet::Packet *msg = check_and_cast<inet::Packet*>(ttQueue.pop());
         cComponent::emit(ttQueueLengthSignal, static_cast<unsigned long>(ttQueue.getLength()));
 
         if (ttBuffers.size() > 0)
@@ -359,7 +359,7 @@ cMessage* TTShaper<TC>::pop()
         inet::Packet *frontMsg = static_cast<inet::Packet*>(front());
         if (isTransmissionAllowed(frontMsg))
         {
-            return TC::pop();
+            return TC::popPacket(gate);
         }
     }
     return nullptr;
