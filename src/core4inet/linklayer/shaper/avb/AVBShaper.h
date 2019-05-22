@@ -302,7 +302,7 @@ void AVBShaper<SRCLASS, TC>::requestPacket()
 }
 
 template<SR_CLASS SRCLASS, class TC>
-inet::Packet *AVBShaper<SRCLASS, TC>::popPacket(cGate *gate = nullptr)
+inet::Packet *AVBShaper<SRCLASS, TC>::popPacket(cGate *gate)
 {
     Enter_Method("pop()");
     //AVBFrames
@@ -323,7 +323,7 @@ inet::Packet *AVBShaper<SRCLASS, TC>::popPacket(cGate *gate = nullptr)
     }
     else if (avbBuffer->getCredit() <= 0)
     {
-        return TC::popPacket();
+        return TC::popPacket(gate);
     }
     throw cRuntimeError("popPacket(): queue is empty");
 }

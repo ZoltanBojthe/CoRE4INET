@@ -408,7 +408,7 @@ inet::Packet *IEEE8021QShaper<TC>::popPacket(cGate *gate)
             return message;
         }
     }
-    return TC::pop();
+    return TC::popPacket(gate);
 }
 
 template<class TC>
@@ -442,7 +442,9 @@ bool IEEE8021QShaper<TC>::isEmpty()
 template<class TC>
 void IEEE8021QShaper<TC>::clear()
 {
-    TC::clear();
+    while (!TC::isEmpty())
+        delete TC::popPacket();
+
     for (unsigned int i = 0; i < 8; i++)
     {
         qQueue[i].clear();

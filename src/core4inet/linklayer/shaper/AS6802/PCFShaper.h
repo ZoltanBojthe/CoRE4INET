@@ -143,7 +143,7 @@ class PCFShaper : public TC, public virtual Timed
          * @return the message with the highest priority from any queue. nullptr if the
          * queues are empty or cannot send due to the traffic policies.
          */
-        virtual cMessage *pop() override;
+        virtual inet::Packet *popPacket(cGate *gate = nullptr) override;
 
         /**
          * @brief Returns a pointer to a frame directly from the queues.
@@ -276,7 +276,7 @@ inet::Packet *PCFShaper<TC>::popPacket(cGate *gate)
     //RCFrames
     if (!pcfQueue.isEmpty())
     {
-        cMessage *msg = static_cast<cMessage*>(pcfQueue.pop());
+        inet::Packet *msg = check_and_cast<inet::Packet*>(pcfQueue.pop());
         cComponent::emit(pcfQueueLengthSignal, static_cast<unsigned long>(pcfQueue.getLength()));
 
         pcfQueueSize-=static_cast<size_t>(check_and_cast<inet::Packet*>(msg)->getByteLength());
