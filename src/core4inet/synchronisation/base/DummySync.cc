@@ -25,14 +25,7 @@ Define_Module(DummySync);
 
 int DummySync::numInitStages() const
 {
-    if (SyncBase::numInitStages() > 3)
-    {
-        return SyncBase::numInitStages();
-    }
-    else
-    {
-        return 3;
-    }
+    return std::max(SyncBase::numInitStages(), 3);
 }
 
 void DummySync::initialize(int stage)
