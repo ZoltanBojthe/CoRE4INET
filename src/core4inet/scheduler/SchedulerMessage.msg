@@ -33,7 +33,7 @@ message SchedulerMessage {
 // @author Till Steinbach
 //
 message SchedulerEvent extends SchedulerMessage {
-    @customize(true);
+    omnetpp::cGate *destinationGate;
 }
 
 //

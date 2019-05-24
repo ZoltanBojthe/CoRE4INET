@@ -15,11 +15,6 @@
 
 import core4inet.scheduler.SchedulerMessage;
 
-cplusplus {{
-    //CoRE4INET
-    #include "core4inet/scheduler/SchedulerEvent.h"
-}}
-
 namespace CoRE4INET;
 
 //

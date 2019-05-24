@@ -111,7 +111,7 @@ void Timer::sendOutEvents()
         for (std::list<std::pair<SchedulerActionTimeEvent*, Period*> >::const_iterator it2 = (*it).second.begin();
                 it2 != (*it).second.end(); ++it2)
         {
-            sendDirect((*it2).first, (*it2).first->getDestinationGate());
+            sendDirect((*it2).first, (*it2).first->getDestinationGateForUpdate());
         }
         registredActionTimeEvents.erase(it++);
     }
@@ -126,7 +126,7 @@ void Timer::sendOutEvents()
         for (std::list<SchedulerTimerEvent*>::const_iterator it2 = (*it).second.begin(); it2 != (*it).second.end();
                 ++it2)
         {
-            sendDirect((*it2), (*it2)->getDestinationGate());
+            sendDirect((*it2), (*it2)->getDestinationGateForUpdate());
         }
         registredTimerEvents.erase(it++);
     }
@@ -221,7 +221,7 @@ uint64_t Timer::registerEvent(SchedulerTimerEvent *event)
     //We do not have to schedule anything if the point is now!
     if (event->getTimer() == 0)
     {
-        sendDirect(event, event->getDestinationGate());
+        sendDirect(event, event->getDestinationGateForUpdate());
         return getTotalTicks();
     }
     else
@@ -284,7 +284,7 @@ uint64_t Timer::registerEvent(SchedulerActionTimeEvent *actionTimeEvent, Period 
     //We do not have to schedule anything if the point is now!
     if (actionpoint == getTotalTicks())
     {
-        sendDirect(actionTimeEvent, actionTimeEvent->getDestinationGate());
+        sendDirect(actionTimeEvent, actionTimeEvent->getDestinationGateForUpdate());
     }
     else
     {
@@ -372,7 +372,7 @@ void Timer::clockCorrection(int32_t correction_ticks)
                 for (std::list<std::pair<SchedulerActionTimeEvent*, Period*> >::const_iterator it4 =
                         (*it2).second.begin(); it4 != (*it2).second.end(); ++it4)
                 {
-                    sendDirect((*it4).first, (*it4).first->getDestinationGate());
+                    sendDirect((*it4).first, (*it4).first->getDestinationGateForUpdate());
                 }
             }
             else

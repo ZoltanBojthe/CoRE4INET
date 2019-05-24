@@ -18,7 +18,7 @@
 
 //CoRE4INET
 #include "core4inet/base/CoRE4INET_Defs.h"
-#include "core4inet/scheduler/SchedulerEvent.h"
+#include "core4inet/scheduler/SchedulerMessage_m.h"
 //Auto-generated Messages
 #include "core4inet/scheduler/SchedulerMessageEvents_m.h"
 
