@@ -280,7 +280,7 @@ void TTShaper<TC>::handleMessage(cMessage *msg)
             if (TC::getNumPendingRequests())
             {
                 EV_TRACE << "TT Buffer was empty, allow lower priority frame" << endl;
-                cMessage* lowPrioFrame = pop();
+                cMessage* lowPrioFrame = popPacket();
                 if (lowPrioFrame)
                 {
                     TC::framesRequested--;
