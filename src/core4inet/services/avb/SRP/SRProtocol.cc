@@ -44,10 +44,6 @@ SRProtocol::SRProtocol(){
 void SRProtocol::initialize()
 {
     srpTable = inet::getModuleFromPar<SRPTable>(par("srpTable"), this, true);
-    if (!srpTable)
-    {
-        throw cRuntimeError("srpTable module required for stream reservation");
-    }
     srpTable->subscribe(NF_AVB_TALKER_REGISTERED, this);
     srpTable->subscribe(NF_AVB_LISTENER_REGISTERED, this);
     srpTable->subscribe(NF_AVB_LISTENER_UPDATED, this);
