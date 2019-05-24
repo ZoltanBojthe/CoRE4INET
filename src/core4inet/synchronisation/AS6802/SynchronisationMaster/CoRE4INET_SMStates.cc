@@ -29,7 +29,7 @@
 #include "algorithm"
 #include "core4inet/utilities/HelperFunctions.h"
 #include "CoRE4INET_TTEScheduler.h"
-#include "SchedulerMessageEvents_m.h"
+#include "core4inet/scheduler/SchedulerMessage_m.h"
 #include "core4inet/linklayer/ethernet/AS6802/PCFrame_m.h"
 
 namespace CoRE4INET {

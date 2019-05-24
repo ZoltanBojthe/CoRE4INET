@@ -27,8 +27,7 @@
 
 #include <stdio.h>
 #include "core4inet/linklayer/ethernet/AS6802/PCFrame_m.h"
-#include "core4inet/scheduler/SchedulerEvent.h"
-#include "core4inet/scheduler/SchedulerMessageEvents_m.h"
+#include "core4inet/scheduler/SchedulerMessage_m.h"
 #include "core4inet/synchronisation/AS6802/SynchronisationEvents_m.h"
 #include "core4inet/TTEScheduler.h"
 #include <map>

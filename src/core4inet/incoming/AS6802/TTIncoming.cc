@@ -21,7 +21,7 @@
 //INET
 #include "inet/common/ModuleAccess.h"
 //Auto-generated Messages
-#include "core4inet/scheduler/SchedulerMessageEvents_m.h"
+#include "core4inet/scheduler/SchedulerMessage_m.h"
 
 namespace CoRE4INET {
 

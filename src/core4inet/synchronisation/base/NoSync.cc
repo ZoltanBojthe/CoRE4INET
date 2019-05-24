@@ -19,7 +19,7 @@
 #include "core4inet/base/NotifierConsts.h"
 
 //Auto-generated Messages
-#include "core4inet/scheduler/SchedulerMessageEvents_m.h"
+#include "core4inet/scheduler/SchedulerMessage_m.h"
 #include "core4inet/synchronisation/base/SyncNotification_m.h"
 
 using namespace CoRE4INET;

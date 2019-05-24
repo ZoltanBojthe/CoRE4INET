@@ -1,12 +1,8 @@
-cplusplus {{
-        #include "core4inet/scheduler/SchedulerMessageEvents_m.h"
-        #include "core4inet/linklayer/ethernet/AS6802/PCFrame_m.h"
-}}
+
+import core4inet.scheduler.SchedulerMessage;
+import core4inet.linklayer.ethernet.AS6802.PCFrame;
 
 namespace CoRE4INET;
-
-class SchedulerActionTimeEvent;
-class SchedulerTimerEvent;
 
 enum PCFType;
 

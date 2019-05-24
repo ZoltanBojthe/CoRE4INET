@@ -27,9 +27,7 @@
 
 #include "core4inet/linklayer/ethernet/AS6802/PCFrame_m.h"
 #include "CoRE4INET_TTEScheduler.h"
-#include "SchedulerMessage_m.h"
-#include "SchedulerMessageEvents_m.h"
-#include "core4inet/scheduler/SchedulerEvent.h"
+#include "core4inet/scheduler/SchedulerMessage_m.h"
 
 class HICM;
 

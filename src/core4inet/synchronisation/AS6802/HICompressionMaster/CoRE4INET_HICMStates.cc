@@ -29,7 +29,7 @@
 #include "core4inet/base/CoRE4INET_Defs.h"
 #include <algorithm>
 #include "core4inet/utilities/HelperFunctions.h"
-#include "SchedulerMessageEvents_m.h"
+#include "SchedulerMessage_m.h"
 #include "cmessage.h"
 #include "core4inet/linklayer/ethernet/AS6802/PCFrame_m.h"
 #include "cobject.h"

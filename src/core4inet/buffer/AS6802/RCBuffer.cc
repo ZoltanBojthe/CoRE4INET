@@ -17,7 +17,7 @@
 #include "core4inet/linklayer/ethernet/AS6802/CTFrame.h"
 
 //Auto-generated Messages
-#include "core4inet/scheduler/SchedulerMessageEvents_m.h"
+#include "core4inet/scheduler/SchedulerMessage_m.h"
 
 //CoRE4INET
 #include "core4inet/base/AS6802/AS6802Defs.h"
