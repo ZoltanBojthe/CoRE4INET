@@ -78,35 +78,50 @@ void CTTrafficSourceAppBase::sendMessage()
     }
     else
     {
+        enum FrameType { TT_FRAME=1, RC_FRAME=2, BE_FRAME=3 };
         for (std::list<CTBuffer*>::const_iterator buf = buffer.begin(); buf != buffer.end(); ++buf)
         {
-            inet::Ptr<inet::EthernetMacHeader> frame;
-            if (dynamic_cast<TTBuffer*>(*buf))
-            {
+            FrameType frameType = BE_FRAME;
+            if (dynamic_cast<TTBuffer*>(*buf)) {
                 // TTFrame
-                frame = inet::makeShared<inet::EthernetMacHeader>();
+                frameType = TT_FRAME;
             }
-            else if (dynamic_cast<RCBuffer*>(*buf))
-            {
+            else if (dynamic_cast<RCBuffer*>(*buf)) {
                 // RCFrame
-                frame = inet::makeShared<inet::EthernetMacHeader>();
+                frameType = RC_FRAME;
             }
-            else
-            {
+            else  {
                 continue;
-            }
-
-            frame->setTypeOrLength(CTFrameEtherType);
-            if (this->ct_id > 0)
-            {
-                setCtID(*frame, static_cast<uint16_t>(this->ct_id));
             }
 
             auto packet = new inet::Packet((*buf)->getName());
             packet->setTimestamp();
+
+            if (frameType == TT_FRAME)
+            {
+                // TTFrame
+                auto frame = inet::makeShared<inet::EthernetMacHeader>();
+                frame->setTypeOrLength(CTFrameEtherType);
+                if (this->ct_id > 0)
+                    setCtID(*frame, static_cast<uint16_t>(this->ct_id));
+                packet->insertAtFront(frame);
+                //FIXME how to create a valid TT frame?
+            }
+            else if (frameType == RC_FRAME)
+            {
+                // RCFrame
+                auto frame = inet::makeShared<inet::EthernetMacHeader>();
+                frame->setTypeOrLength(CTFrameEtherType);
+                if (this->ct_id > 0)
+                    setCtID(*frame, static_cast<uint16_t>(this->ct_id));
+                packet->insertAtFront(frame);
+                //FIXME how to create a valid RC frame?
+            }
+            else
+                throw cRuntimeError("model error: unknown frame type");
+
             auto payload = inet::makeShared<inet::ByteCountChunk>(inet::B(getPayloadBytes()));
-            packet->insertAtFront(payload);
-            packet->insertAtFront(frame);
+            packet->insertAtBack(payload);
 
             //Padding
             inet::EtherEncap::addPaddingAndFcs(packet, inet::FcsMode::FCS_DECLARED_CORRECT);    //TODO get crcMode from parameter
