@@ -1,0 +1,2 @@
+#!/bin/bash
+./fingerprints *.csv.ncf  -a 'fingerprintcalculator-class=inet::NetworkCommunicationFingerprintCalculator'

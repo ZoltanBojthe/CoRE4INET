@@ -1,0 +1,18 @@
+#note that the fingerprints provided may not match your architecture. Thus the test may fail although everything is ok
+# workingdir,                                                     args,                                                  simtimelimit,    fingerprint
+/examples/AS6802/small_network/,                                  -f omnetpp.ini -c General -r 0,                        1s,              cba8-41db/tpNlx
+/examples/AS6802/small_network/,                                  -f omnetpp.ini -c With_Crosstraffic -r 0,              0.1s,            cffc-3c6b/tpNlx
+/examples/AS6802/small_network/,                                  -f omnetpp.ini -c With_Crossbursts -r 0,               0.1s,            fd01-3e25/tpNlx
+/examples/AS6802/rt_tictoc/,                                      -f omnetpp.ini -c General -r 0,                        1s,              c357-86ce/tpNlx
+#/examples/AS6802/synchronization/HighIntegrity_small/,           -f omnetpp.ini -c General -r 0,                        1s,              da3e-3e7b/tpNlx
+#/examples/AS6802/synchronization/StandardIntegrity_large/,       -f omnetpp.ini -c General -r 0,                        1s,              b23c-ebb5/tpNlx
+#/examples/AS6802/synchronization/StandardIntegrity_medium/,      -f omnetpp.ini -c General -r 0,                        1s,              e040-f0be/tpNlx
+/examples/avb_AS6802/small_network/,                           	  -f omnetpp.ini -c General -r 0,                        1s,              a890-e5c6/tpNlx
+/examples/avb_AS6802/small_network/,                              -f omnetpp.ini -c With_Crosstraffic -r 0,              0.1s,            7040-e0dc/tpNlx
+/examples/avb_AS6802/large_network/,                              -f omnetpp.ini -c Timespan_between_TT_short -r 0,      0.1s,            f4a5-6158/tpNlx
+/examples/avb_AS6802/large_network/,                              -f omnetpp.ini -c Timespan_between_TT_valid -r 0,      0.1s,            270e-b11e/tpNlx
+/examples/avb_AS6802/large_network/,                              -f omnetpp.ini -c Half_framesize_BE_and_TT -r 0,       0.1s,            83db-ad5a/tpNlx
+/examples/avb_AS6802/large_network/,                              -f omnetpp.ini -c MTU_parameter_study,                 0.1s,            cd5c-9f82/tpNlx
+/examples/inet/small_network/,                                    -f omnetpp.ini -c General -r 0,                        1s,              59e9-44c0/tpNlx
+/examples/IEEE8021Q/small_network/,                               -f omnetpp.ini -c General -r 0,                        1s,              57b8-a4e9/tpNlx
+/examples/IEEE8021Q/small_network/,                               -f omnetpp.ini -c With_Crosstraffic -r 0,              0.1s,            b62b-b742/tpNlx
