@@ -69,7 +69,7 @@ module TTEAVBEtherSwitch
             @display("p=791,415");
         }
 
-		//The mac table associated with the be switch
+        //The mac table associated with the be switch
         macTable: <default("MacAddressTable")> like IMacAddressTable {
             @display("p=146,417");
         }
@@ -96,12 +96,12 @@ module TTEAVBEtherSwitch
         // Physical ports of the switch
         phy[sizeof(ethg)]: TTEAVBPHYPort {
             parameters:
-                @display("p=711,754,c,130");
+                @display("p=711,754,r,130");
                 //For the switch it is necessary to have promiscuous mode enabled
                 promiscuous = true;
         }
 
-		// AVB critical traffic control
+        // AVB critical traffic control
         avbCTC: AVBIncoming {
             parameters:
                 @display("p=677,548");
@@ -111,18 +111,18 @@ module TTEAVBEtherSwitch
                 AVBBout[sizeof(ethg)];
         }
 
-		// AVB class A buffer
+        // AVB class A buffer
         avbABuffer[sizeof(ethg)]: AVBQueueBuffer {
             parameters:
                 srClass = "A";
-                @display("p=711,642,c,130");
+                @display("p=711,642,r,130");
         }
 
-		// AVB class B buffer
+        // AVB class B buffer
         avbBBuffer[sizeof(ethg)]: AVBQueueBuffer {
             parameters:
                 srClass = "B";
-                @display("p=632,640,c,130");
+                @display("p=632,640,r,130");
         }
 
         // Sync module for synchronisation of the scheduler
