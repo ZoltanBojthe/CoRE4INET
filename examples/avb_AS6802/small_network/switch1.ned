@@ -25,7 +25,6 @@ import core4inet.buffer.AS6802.TTDoubleBuffer;
 //
 module Switch1 extends TTEAVBEtherSwitch
 {
-    @display("bgb=990,547");
     submodules:
         vl_100_ctc: TTIncoming {
             parameters:
