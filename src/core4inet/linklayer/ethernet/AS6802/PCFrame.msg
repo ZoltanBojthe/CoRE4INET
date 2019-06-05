@@ -41,10 +41,10 @@ enum PCFType
 // @author Till Steinbach
 //
 class PCFrame extends inet::FieldsChunk
-{   
+{
     // Set PCF Bytelength
     chunkLength = inet::B(46);
-    	
+
     // pcf_integration_cycle: Represents the integration cycle in which the protocol control frame was sent
     //
     // 32 Bit field
@@ -55,6 +55,7 @@ class PCFrame extends inet::FieldsChunk
 	uint32_t membership_new;	
 	// pcf_sync_priority: Static configured value in each Synchronization Master, Synchronization Client, and Compression Master
 	//
+    uint32_t reserved1 = 0;
 	// 8 Bit field
 	uint8_t sync_priority;
 	// pcf_sync_domain: Static configured value in each Synchronization Master, Synchronization Client, and Compression Master
@@ -65,13 +66,20 @@ class PCFrame extends inet::FieldsChunk
 	//
 	// 4 Bit field
 	uint8_t type @enum(PCFType);	
+
+    // 12 Bit field
+    uint16_t reserved2 = 0;
+
+    // 32 Bit field
+    uint32_t reserved3 = 0;
+
 	// pcf_transparent_clock: stores the accumulated delay of a Protocol Control Frame up to the consumer.
 	//
 	// Time is represented as multiples of picoseconds
 	//
 	// 64 Bit field
 	uint64_t transparent_clock;
-	
+
 	// string displayString="b=15,15,rect,white,orange,5";
 }
 
